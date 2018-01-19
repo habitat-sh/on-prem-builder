@@ -2,8 +2,8 @@
 
 set -eou pipefail
 
-if [ -f bldr.env ]; then
-  source bldr.env
+if [ -f ../bldr.env ]; then
+  source ../bldr.env
 elif [ -f /vagrant/bldr.env ]; then
   source /vagrant/bldr.env
 else
