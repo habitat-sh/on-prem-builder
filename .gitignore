@@ -1,0 +1,4 @@
+bldr.env
+.vagrant
+.secrets/**
+!.secrets/.gitkeep
