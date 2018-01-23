@@ -396,7 +396,7 @@ generate_bldr_keys() {
 upload_github_keys() {
   if [ -f "./.secrets/builder-github-app.pem" ]; then
     for svc in sessionsrv worker api originsrv; do
-      hab file upload "builder-${svc}.default" $(date +%s) "/src/.secrets/builder-github-app.pem"
+      hab file upload "builder-${svc}.default" $(date +%s) "./.secrets/builder-github-app.pem"
     done
   elif [ -f "/vagrant/.secrets/builder-github-app.pem" ]; then
     for svc in sessionsrv worker api originsrv; do

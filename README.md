@@ -13,7 +13,7 @@
 1. Set the value of `Webhook URL` to `http://${APP_HOSTNAME}/`
 1. Set everything to read only (this is only used for your org so it's safe)
 1. Save and download the pem key
-1. Copy the pem key to `${SRC_ROOT}/.secrets/builder-dev-app.pem`
+1. Copy the pem key to `${SRC_ROOT}/.secrets/builder-github-app.pem`
 1. Record the the client-id, client-secret and app_id. These will be used for the `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` and `GITHUP_APP_ID` build variables (seen below).
 
 ## Setup
@@ -23,3 +23,7 @@
 1. `cp bldr.env.sample bldr.env`
 1. Edit `bldr.env` with a text editor and replace the values for the `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, and `GITHUB_APP_ID` environment variables
 1. `sudo ./install.sh`
+
+## Web UI
+
+Nagigate to http://${APP_HOSTNAME}/#/sign-in to access the Builder UI

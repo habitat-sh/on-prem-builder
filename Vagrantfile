@@ -2,7 +2,7 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "bento/ubuntu-17.10"
+  config.vm.box = "bento/centos-7.4"
   config.vm.provision "shell", path: "scripts/install-hab.sh", privileged: true
   config.vm.provision "shell", path: "scripts/hab-sup.service.sh", privileged: true
   config.vm.provision "shell", path: "scripts/provision.sh", privileged: true
