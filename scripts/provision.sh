@@ -34,27 +34,21 @@ configure() {
 
   mkdir -p /hab/svc/builder-api
   cat <<EOT > /hab/svc/builder-api/user.toml
+log_level="debug"
+
 [github]
 url = "$GITHUB_API_URL"
 web_url = "$GITHUB_WEB_URL"
 client_id = "$GITHUB_CLIENT_ID"
 client_secret = "$GITHUB_CLIENT_SECRET"
 app_id = $GITHUB_APP_ID
-
-[web]
-app_url          = "http://$APP_HOSTNAME"
-community_url    = "https://www.habitat.sh/community"
-docs_url         = "https://www.habitat.sh/docs"
-environment      = "production"
-friends_only     = false
-source_code_url  = "https://github.com/habitat-sh/habitat"
-tutorials_url    = "https://www.habitat.sh/tutorials"
-www_url          = "http://$APP_HOSTNAME/#/sign-in"
 EOT
 
   mkdir -p /hab/svc/builder-api-proxy
   cat <<EOT > /hab/svc/builder-api-proxy/user.toml
-app_url = "http://localhost:9636"
+log_level="debug"
+
+app_url = "http://${APP_HOSTNAME}:9636"
 
 [github]
 url = "$GITHUB_API_URL"
@@ -66,6 +60,8 @@ EOT
 
   mkdir -p /hab/svc/builder-originsrv
   cat <<EOT > /hab/svc/builder-originsrv/user.toml
+log_level="debug"
+
 [app]
 shards = [
   0,
@@ -205,6 +201,8 @@ EOT
 
   mkdir -p /hab/svc/builder-sessionsrv
   cat <<EOT > /hab/svc/builder-sessionsrv/user.toml
+log_level="debug"
+
 [app]
 shards = [
   0,

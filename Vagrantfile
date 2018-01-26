@@ -7,9 +7,11 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", path: "scripts/hab-sup.service.sh", privileged: true
   config.vm.provision "shell", path: "scripts/provision.sh", privileged: true
 
-  config.vm.network "forwarded_port", guest: 9636, host: 9636
-  config.vm.network "forwarded_port", guest: 80, host: 80
-  config.vm.network "forwarded_port", guest: 9631, host: 9631
+  config.vm.network "private_network", ip: "10.10.1.4"
+
+#  config.vm.network "forwarded_port", guest: 9636, host: 9636
+#  config.vm.network "forwarded_port", guest: 80, host: 80
+#  config.vm.network "forwarded_port", guest: 9631, host: 9631
 
   config.vm.provider "virtualbox" do |v|
     v.memory = 4096
