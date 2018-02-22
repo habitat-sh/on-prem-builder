@@ -380,16 +380,17 @@ generate_bldr_keys() {
 }
 
 upload_github_keys() {
-  if [ -f "./.secrets/builder-github-app.pem" ]; then
+  echo "${PWD}"
+  if [ -f "../.secrets/builder-github-app.pem" ]; then
     for svc in sessionsrv worker api originsrv; do
-      hab file upload "builder-${svc}.default" $(date +%s) "./.secrets/builder-github-app.pem"
+      hab file upload "builder-${svc}.default" $(date +%s) "../.secrets/builder-github-app.pem"
     done
   elif [ -f "/vagrant/.secrets/builder-github-app.pem" ]; then
     for svc in sessionsrv worker api originsrv; do
       hab file upload "builder-${svc}.default" $(date +%s) "/vagrant/.secrets/builder-github-app.pem"
     done
   else
-    echo "Please add your secred app key to the .secrets directory"
+    echo "Please add your secret app key to the .secrets directory"
   fi
 }
 
