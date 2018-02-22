@@ -348,39 +348,39 @@ EOT
 }
 
 start-admin() {
-  hab svc load core/builder-admin --bind router:builder-router.default --force
+  hab svc load habitat/builder-admin --bind router:builder-router.default --force
 }
 
 start-admin-proxy() {
-  hab svc load core/builder-admin-proxy --bind http:builder-admin.default --force
+  hab svc load habitat/builder-admin-proxy --bind http:builder-admin.default --force
 }
 
 start-api() {
-  hab svc load core/builder-api --bind router:builder-router.default --force
+  hab svc load habitat/builder-api --bind router:builder-router.default --force
 }
 
 start-api-proxy() {
-  hab svc load core/builder-api-proxy --bind http:builder-api.default --force
+  hab svc load habitat/builder-api-proxy --bind http:builder-api.default --force
 }
 
 start-datastore() {
-  hab svc load core/builder-datastore --force
+  hab svc load habitat/builder-datastore --force
 }
 
 start-jobsrv() {
-  hab svc load core/builder-jobsrv --bind router:builder-router.default --bind datastore:builder-datastore.default --force
+  hab svc load habitat/builder-jobsrv --bind router:builder-router.default --bind datastore:builder-datastore.default --force
 }
 
 start-originsrv() {
-  hab svc load core/builder-originsrv --bind router:builder-router.default --bind datastore:builder-datastore.default --force
+  hab svc load habitat/builder-originsrv --bind router:builder-router.default --bind datastore:builder-datastore.default --force
 }
 
 start-router() {
-  hab svc load core/builder-router --force
+  hab svc load habitat/builder-router --force
 }
 
 start-sessionsrv() {
-  hab svc load core/builder-sessionsrv --bind router:builder-router.default --bind datastore:builder-datastore.default --force
+  hab svc load habitat/builder-sessionsrv --bind router:builder-router.default --bind datastore:builder-datastore.default --force
 }
 
 generate_bldr_keys() {
