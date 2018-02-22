@@ -348,27 +348,27 @@ EOT
 }
 
 start-api() {
-  hab svc load habitat/builder-api --bind router:builder-router.default --force
+  hab svc load habitat/builder-api --bind router:builder-router.default --channel "${BLDR_CHANNEL}" --force
 }
 
 start-api-proxy() {
-  hab svc load habitat/builder-api-proxy --bind http:builder-api.default --force
+  hab svc load habitat/builder-api-proxy --bind http:builder-api.default --channel "${BLDR_CHANNEL}" --force
 }
 
 start-datastore() {
-  hab svc load habitat/builder-datastore --force
+  hab svc load habitat/builder-datastore --channel "${BLDR_CHANNEL}" --force
 }
 
 start-originsrv() {
-  hab svc load habitat/builder-originsrv --bind router:builder-router.default --bind datastore:builder-datastore.default --force
+  hab svc load habitat/builder-originsrv --bind router:builder-router.default --bind datastore:builder-datastore.default --channel "${BLDR_CHANNEL}" --force
 }
 
 start-router() {
-  hab svc load habitat/builder-router --force
+  hab svc load habitat/builder-router --channel "${BLDR_CHANNEL}" --force
 }
 
 start-sessionsrv() {
-  hab svc load habitat/builder-sessionsrv --bind router:builder-router.default --bind datastore:builder-datastore.default --force
+  hab svc load habitat/builder-sessionsrv --bind router:builder-router.default --bind datastore:builder-datastore.default --channel "${BLDR_CHANNEL}" --force
 }
 
 generate_bldr_keys() {
