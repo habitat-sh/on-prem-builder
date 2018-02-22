@@ -347,14 +347,6 @@ app_id = $GITHUB_APP_ID
 EOT
 }
 
-start-admin() {
-  hab svc load habitat/builder-admin --bind router:builder-router.default --force
-}
-
-start-admin-proxy() {
-  hab svc load habitat/builder-admin-proxy --bind http:builder-admin.default --force
-}
-
 start-api() {
   hab svc load habitat/builder-api --bind router:builder-router.default --force
 }
@@ -365,10 +357,6 @@ start-api-proxy() {
 
 start-datastore() {
   hab svc load habitat/builder-datastore --force
-}
-
-start-jobsrv() {
-  hab svc load habitat/builder-jobsrv --bind router:builder-router.default --bind datastore:builder-datastore.default --force
 }
 
 start-originsrv() {
@@ -385,7 +373,7 @@ start-sessionsrv() {
 
 generate_bldr_keys() {
   KEY_NAME=$(hab user key generate bldr | grep -Po "bldr-\d+")
-  for svc in api jobsrv worker; do
+  for svc in api worker; do
     hab file upload "builder-${svc}.default" $(date +%s) "/hab/cache/keys/${KEY_NAME}.pub"
     hab file upload "builder-${svc}.default" $(date +%s) "/hab/cache/keys/${KEY_NAME}.box.key"
   done
@@ -410,8 +398,6 @@ start-builder() {
   start-datastore
   configure
   start-router
-  start-admin
-  start-admin-proxy
   start-api
   start-api-proxy
   start-originsrv
