@@ -347,61 +347,50 @@ app_id = $GITHUB_APP_ID
 EOT
 }
 
-start-admin() {
-  hab svc load core/builder-admin --bind router:builder-router.default --force
-}
-
-start-admin-proxy() {
-  hab svc load core/builder-admin-proxy --bind http:builder-admin.default --force
-}
-
 start-api() {
-  hab svc load core/builder-api --bind router:builder-router.default --force
+  hab svc load habitat/builder-api --bind router:builder-router.default --channel "${BLDR_CHANNEL}" --force
 }
 
 start-api-proxy() {
-  hab svc load core/builder-api-proxy --bind http:builder-api.default --force
+  hab svc load habitat/builder-api-proxy --bind http:builder-api.default --channel "${BLDR_CHANNEL}" --force
 }
 
 start-datastore() {
-  hab svc load core/builder-datastore --force
-}
-
-start-jobsrv() {
-  hab svc load core/builder-jobsrv --bind router:builder-router.default --bind datastore:builder-datastore.default --force
+  hab svc load habitat/builder-datastore --channel "${BLDR_CHANNEL}" --force
 }
 
 start-originsrv() {
-  hab svc load core/builder-originsrv --bind router:builder-router.default --bind datastore:builder-datastore.default --force
+  hab svc load habitat/builder-originsrv --bind router:builder-router.default --bind datastore:builder-datastore.default --channel "${BLDR_CHANNEL}" --force
 }
 
 start-router() {
-  hab svc load core/builder-router --force
+  hab svc load habitat/builder-router --channel "${BLDR_CHANNEL}" --force
 }
 
 start-sessionsrv() {
-  hab svc load core/builder-sessionsrv --bind router:builder-router.default --bind datastore:builder-datastore.default --force
+  hab svc load habitat/builder-sessionsrv --bind router:builder-router.default --bind datastore:builder-datastore.default --channel "${BLDR_CHANNEL}" --force
 }
 
 generate_bldr_keys() {
   KEY_NAME=$(hab user key generate bldr | grep -Po "bldr-\d+")
-  for svc in api jobsrv worker; do
+  for svc in api worker; do
     hab file upload "builder-${svc}.default" $(date +%s) "/hab/cache/keys/${KEY_NAME}.pub"
     hab file upload "builder-${svc}.default" $(date +%s) "/hab/cache/keys/${KEY_NAME}.box.key"
   done
 }
 
 upload_github_keys() {
-  if [ -f "./.secrets/builder-github-app.pem" ]; then
+  echo "${PWD}"
+  if [ -f "../.secrets/builder-github-app.pem" ]; then
     for svc in sessionsrv worker api originsrv; do
-      hab file upload "builder-${svc}.default" $(date +%s) "./.secrets/builder-github-app.pem"
+      hab file upload "builder-${svc}.default" $(date +%s) "../.secrets/builder-github-app.pem"
     done
   elif [ -f "/vagrant/.secrets/builder-github-app.pem" ]; then
     for svc in sessionsrv worker api originsrv; do
       hab file upload "builder-${svc}.default" $(date +%s) "/vagrant/.secrets/builder-github-app.pem"
     done
   else
-    echo "Please add your secred app key to the .secrets directory"
+    echo "Please add your secret app key to the .secrets directory"
   fi
 }
 
@@ -410,8 +399,6 @@ start-builder() {
   start-datastore
   configure
   start-router
-  start-admin
-  start-admin-proxy
   start-api
   start-api-proxy
   start-originsrv
