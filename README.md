@@ -21,7 +21,7 @@
 1. Clone this repo to the desired machine to stand up builder
 1. `cd ${SRC_ROOT}`
 1. `cp bldr.env.sample bldr.env`
-1. Edit `bldr.env` with a text editor and replace the values for the `APP_HOSTNAME`, `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, and `GITHUB_APP_ID` environment variables
+1. Edit `bldr.env` with a text editor and replace the values for the `APP_HOSTNAME`, `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, and `GITHUB_APP_ID` environment variables. Also update the `OAUTH_CLIENT_ID`, `OAUTH_AUTHORIZE_URL` and `OAUTH_REDIRECT_URL` appropriately.
 1. `sudo ./install.sh`
 
 ## Web UI
