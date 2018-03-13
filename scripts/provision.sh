@@ -54,8 +54,13 @@ app_url = "http://${APP_HOSTNAME}:9636"
 url = "$GITHUB_API_URL"
 web_url = "$GITHUB_WEB_URL"
 client_id = "$GITHUB_CLIENT_ID"
-client_secret = "$GITHUB_CLIENT_SECRET"
 app_id = $GITHUB_APP_ID
+
+[oauth]
+provider = "$OAUTH_PROVIDER"
+client_id = "$OAUTH_CLIENT_ID"
+authorize_url = "$OAUTH_AUTHORIZE_URL"
+redirect_url = "$OAUTH_REDIRECT_URL"
 EOT
 
   mkdir -p /hab/svc/builder-originsrv
