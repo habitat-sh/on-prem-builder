@@ -1,6 +1,26 @@
-# On Prem Habitat Builder
+# On Premise Habitat Depot
 
 :construction: THIS IS NOT FOR PRODUCTION USE :construction:
+
+## Introduction
+
+This repository contains scripts to install Habitat back-end services. These services (referred to as the On-Premise Habitat Depot) allow for the hosting of Habitat packages (and associated artifacts such as keys) by enterprises in-house (behind the firewall). Habitat clients can be pointed to the on-premise depot and allow for development, execution and management without depending on the public Habitat services.
+
+This work is currently a MVP - it is not intended for general production use.
+
+## Requirements
+
+The following are minimum requirements for installation/deployment of the Habitat Depot:
+
+* Services should be deployed on a Habitat supported [Linux OS](https://www.habitat.sh/docs/install-habitat/)
+* OS should support `systemd` process manager
+* Deployment to bare-metal, VM or container image
+* 8 GB or more RAM recommended (for single node)
+* Significant free disk space (depends on package storage - plan conservatively)
+* Services should be deployed single-node - scale out is not yet supported
+* Outbound network (HTTPS) connectivity to WAN is required for the _initial_ install
+* Inbound network connectivity from LAN (HTTP) for internal access to the Depot
+* OAuth2 authentication provider (Github and Bitbucket verified)
 
 ## Pre-Requisites
 
