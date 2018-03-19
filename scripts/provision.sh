@@ -34,29 +34,29 @@ configure() {
 
   mkdir -p /hab/svc/builder-api
   cat <<EOT > /hab/svc/builder-api/user.toml
-log_level="debug"
+log_level="info"
 
-[github]
+["$OAUTH_PROVIDER"]
 enabled = true
-url = "$GITHUB_API_URL"
-web_url = "$GITHUB_WEB_URL"
-client_id = "$GITHUB_CLIENT_ID"
-client_secret = "$GITHUB_CLIENT_SECRET"
-app_id = $GITHUB_APP_ID
+url = "$OAUTH_API_URL"
+api_url = "$OAUTH_API_URL"
+web_url = "$OAUTH_TOKEN_BASE_URL"
+client_id = "$OAUTH_CLIENT_ID"
+client_secret = "$OAUTH_CLIENT_SECRET"
 EOT
 
   mkdir -p /hab/svc/builder-api-proxy
   cat <<EOT > /hab/svc/builder-api-proxy/user.toml
-log_level="debug"
+log_level="info"
 
 app_url = "http://${APP_HOSTNAME}:9636"
 enable_builder = false
 
-[github]
-url = "$GITHUB_API_URL"
-web_url = "$GITHUB_WEB_URL"
-client_id = "$GITHUB_CLIENT_ID"
-app_id = $GITHUB_APP_ID
+["$OAUTH_PROVIDER"]
+url = "$OAUTH_API_URL"
+api_url = "$OAUTH_API_URL"
+web_url = "$OAUTH_TOKEN_BASE_URL"
+client_id = "$OAUTH_CLIENT_ID"
 
 [oauth]
 provider = "$OAUTH_PROVIDER"
@@ -67,7 +67,7 @@ EOT
 
   mkdir -p /hab/svc/builder-originsrv
   cat <<EOT > /hab/svc/builder-originsrv/user.toml
-log_level="debug"
+log_level="info"
 
 [app]
 shards = [
@@ -208,7 +208,7 @@ EOT
 
   mkdir -p /hab/svc/builder-sessionsrv
   cat <<EOT > /hab/svc/builder-sessionsrv/user.toml
-log_level="debug"
+log_level="info"
 
 [app]
 shards = [
@@ -345,12 +345,6 @@ shards = [
 [datastore]
 password = "$PGPASSWORD"
 database = "builder_sessionsrv"
-
-[github]
-url = "$GITHUB_API_URL"
-client_id = "$GITHUB_CLIENT_ID"
-client_secret = "$GITHUB_CLIENT_SECRET"
-app_id = $GITHUB_APP_ID
 EOT
 }
 
@@ -379,25 +373,15 @@ start-sessionsrv() {
 }
 
 generate_bldr_keys() {
-  KEY_NAME=$(hab user key generate bldr | grep -Po "bldr-\d+")
-  for svc in api worker; do
-    hab file upload "builder-${svc}.default" $(date +%s) "/hab/cache/keys/${KEY_NAME}.pub"
-    hab file upload "builder-${svc}.default" $(date +%s) "/hab/cache/keys/${KEY_NAME}.box.key"
-  done
-}
-
-upload_github_keys() {
-  echo "${PWD}"
-  if [ -f "../.secrets/builder-github-app.pem" ]; then
-    for svc in sessionsrv worker api originsrv; do
-      hab file upload "builder-${svc}.default" $(date +%s) "../.secrets/builder-github-app.pem"
-    done
-  elif [ -f "/vagrant/.secrets/builder-github-app.pem" ]; then
-    for svc in sessionsrv worker api originsrv; do
-      hab file upload "builder-${svc}.default" $(date +%s) "/vagrant/.secrets/builder-github-app.pem"
-    done
+  if [ -n "$(find /hab/cache/keys -name "bldr-*.pub")" ]; then
+    echo "Re-using existing builder key"
   else
-    echo "Please add your secret app key to the .secrets directory"
+    echo "Generating builder key"
+    KEY_NAME=$(hab user key generate bldr | grep -Po "bldr-\d+")
+    for svc in api worker; do
+      hab file upload "builder-${svc}.default" "$(date +%s)" "/hab/cache/keys/${KEY_NAME}.pub"
+      hab file upload "builder-${svc}.default" "$(date +%s)" "/hab/cache/keys/${KEY_NAME}.box.key"
+    done
   fi
 }
 
@@ -411,7 +395,6 @@ start-builder() {
   start-originsrv
   start-sessionsrv
   sleep 2
-  upload_github_keys
   generate_bldr_keys
 }
 
