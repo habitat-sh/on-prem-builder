@@ -50,6 +50,7 @@ EOT
 log_level="debug"
 
 app_url = "http://${APP_HOSTNAME}:9636"
+enable_builder = false
 
 [github]
 url = "$GITHUB_API_URL"
