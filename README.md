@@ -20,28 +20,33 @@ The following are minimum requirements for installation/deployment of the Habita
 * Services should be deployed single-node - scale out is not yet supported
 * Outbound network (HTTPS) connectivity to WAN is required for the _initial_ install
 * Inbound network connectivity from LAN (HTTP) for internal access to the Depot
-* OAuth2 authentication provider (Github and Bitbucket verified)
+* OAuth2 authentication provider (Github or Bitbucket currently supported)
 
 ## Pre-Requisites
 
-### GitHub OAuth Application
+### OAuth Application
 
-1. Create a GitHub Organization
-1. [Setup a GitHub application](https://github.com/settings/apps/new) for your GitHub organization.
+We currently support Github and Atlassian Bitbucket OAuth providers for authentication. Follow the steps below to configure your OAuth application.
+
+1. Set up an OAuth Application in your OAuth Provider - for example, [GitHub](https://github.com/settings/applications/new)
 1. Set the value of `Homepage URL` to `http://${APP_HOSTNAME_OR_IP}`
 1. Set the value of `User authorization callback URL` to `http://${APP_HOSTNAME_OR_IP}/` (The trailing `/` is *important*)
-1. Set the value of `Webhook URL` to `http://${APP_HOSTNAME_OR_IP}/`
-1. Set everything to read only (this is only used for your org so it's safe)
-1. Save and download the pem key
-1. Copy the pem key to `${SRC_ROOT}/.secrets/builder-github-app.pem`
-1. Record the the client-id, client-secret and app_id. These will be used for the `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` and `GITHUP_APP_ID` build variables (seen below).
+1. Record the the Client Id and Client Secret. These will be used for the `OAUTH_CLIENT_ID` and `OAUTH_CLIENT_SECRET` environment variables in the section below.
+
+For the configuration below, you will also need to know following end-points:
+* Authorization Endpoint (example: `https://github.com/login/oauth/authorize`)
+* Token Endpoint (example: `https://github.com` - only the base URL is needed)
+* API Endpoint (example: `https://api.github.com`)
+
+For more information, please refer to the
+[Github Developer Documentation](https://developer.github.com/apps/building-oauth-apps/authorization-options-for-oauth-apps/) or the [BitBucket Developer Documentation](https://confluence.atlassian.com/bitbucket/oauth-on-bitbucket-cloud-238027431.html).
 
 ## Setup
 
-1. Clone this repo to the desired machine to stand up builder
+1. Clone this repo to the desired machine where you will stand up the Habitat Depot
 1. `cd ${SRC_ROOT}`
 1. `cp bldr.env.sample bldr.env`
-1. Edit `bldr.env` with a text editor and replace the values for the `APP_HOSTNAME`, `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, and `GITHUB_APP_ID` environment variables. Also update the `OAUTH_CLIENT_ID`, `OAUTH_AUTHORIZE_URL` and `OAUTH_REDIRECT_URL` appropriately.
+1. Edit `bldr.env` with a text editor and replace the values appropriately
 1. `sudo ./install.sh`
 
 ## Web UI
@@ -50,6 +55,7 @@ Nagigate to http://${APP_HOSTNAME_OR_IP}/#/sign-in to access the Builder UI
 
 ## Debug Logging
 
+If you want to turn on and examine the services debug logging, you can do so by doing the following:
 1. `cd ${SRC_ROOT}`
 1. `for svc in originsrv api sessionsrv; do echo 'log_level="debug"' | hab config apply "builder-${svc}.default" $(date +%s) ; done`
 1. `journalctl -fu hab-sup`
