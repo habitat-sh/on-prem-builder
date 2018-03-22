@@ -38,9 +38,8 @@ log_level="info"
 
 ["$OAUTH_PROVIDER"]
 enabled = true
-url = "$OAUTH_API_URL"
 api_url = "$OAUTH_API_URL"
-web_url = "$OAUTH_TOKEN_BASE_URL"
+token_url = "$OAUTH_TOKEN_URL"
 client_id = "$OAUTH_CLIENT_ID"
 client_secret = "$OAUTH_CLIENT_SECRET"
 EOT
@@ -48,15 +47,7 @@ EOT
   mkdir -p /hab/svc/builder-api-proxy
   cat <<EOT > /hab/svc/builder-api-proxy/user.toml
 log_level="info"
-
-app_url = "http://${APP_HOSTNAME}:9636"
 enable_builder = false
-
-["$OAUTH_PROVIDER"]
-url = "$OAUTH_API_URL"
-api_url = "$OAUTH_API_URL"
-web_url = "$OAUTH_TOKEN_BASE_URL"
-client_id = "$OAUTH_CLIENT_ID"
 
 [oauth]
 provider = "$OAUTH_PROVIDER"
