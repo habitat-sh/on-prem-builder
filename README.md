@@ -26,7 +26,7 @@ The following are minimum requirements for installation/deployment of the Habita
 
 ### OAuth Application
 
-We currently support Github and Atlassian Bitbucket OAuth providers for authentication. Follow the steps below to configure your OAuth application.
+We currently support GitHub and Atlassian Bitbucket OAuth providers for authentication. Follow the steps below to configure your OAuth application.
 
 1. Set up an OAuth Application in your OAuth Provider - for example, [GitHub](https://github.com/settings/applications/new)
 1. Set the value of `Homepage URL` to `http://${APP_HOSTNAME_OR_IP}`
@@ -39,7 +39,7 @@ For the configuration below, you will also need to know following end-points:
 * API Endpoint (example: `https://api.github.com`)
 
 For more information, please refer to the
-[Github Developer Documentation](https://developer.github.com/apps/building-oauth-apps/authorization-options-for-oauth-apps/) or the [BitBucket Developer Documentation](https://confluence.atlassian.com/bitbucket/oauth-on-bitbucket-cloud-238027431.html).
+[GitHub Developer Documentation](https://developer.github.com/apps/building-oauth-apps/authorization-options-for-oauth-apps/) or the [BitBucket Developer Documentation](https://confluence.atlassian.com/bitbucket/oauth-on-bitbucket-cloud-238027431.html).
 
 ## Setup
 
