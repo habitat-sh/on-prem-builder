@@ -28,7 +28,7 @@
 set -euo pipefail
 
 usage() {
-  echo "Usage: on-prem-archive.sh {create-archive|populate-depot <DEPOT_URL> [PATH_TO_EXISTING_TARBALL]}"
+  echo "Usage: on-prem-archive.sh {create-archive | populate-depot <DEPOT_URL> [PATH_TO_EXISTING_TARBALL] | download-archive}"
   exit 1
 }
 
@@ -87,6 +87,10 @@ cleanup() {
     echo "Done."
 }
 
+download_latest_archive() {
+  curl -O "$s3_root_url/$marker"
+}
+
 trap cleanup EXIT
 
 download_hart_if_missing() {
@@ -104,6 +108,7 @@ download_hart_if_missing() {
 }
 
 bucket="${HAB_ON_PREM_BOOTSTRAP_BUCKET_NAME:-habitat-on-prem-builder-bootstrap}"
+s3_root_url="${HAB_ON_PREM_BOOTSTRAP_S3_ROOT_URL:-https://s3-us-west-2.amazonaws.com}/$bucket"
 marker="LATEST.tar.gz"
 
 case "${1:-}" in
@@ -206,7 +211,6 @@ case "${1:-}" in
     check_tools curl
     check_vars HAB_AUTH_TOKEN
 
-    s3_root_url="${HAB_ON_PREM_BOOTSTRAP_S3_ROOT_URL:-https://s3-us-west-2.amazonaws.com}/$bucket"
     tmp_dir=$(mktemp -d)
 
     if [ -f "${3:-}" ]; then
@@ -216,7 +220,7 @@ case "${1:-}" in
     else
       echo "Fetching latest package bootstrap file."
       cd "$tmp_dir"
-      curl -O "$s3_root_url/$marker"
+      download_latest_archive
     fi
 
     tar zxvf $marker
@@ -259,6 +263,9 @@ case "${1:-}" in
 
     echo "Package uploads finished."
 
+    ;;
+  download-archive)
+    download_latest_archive
     ;;
   *)
     usage
