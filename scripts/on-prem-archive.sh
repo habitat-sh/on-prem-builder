@@ -17,11 +17,18 @@
 # after itself by deleting the intermediate files that were created during its run.
 # Setting this variable to any value will cause the cleanup to be skipped. By
 # default, the script will clean up after itself.
+#
+# Additionally, if you're using this script to populate an existing depot, and you
+# don't have network connectivity to download a tarball from S3, you can pass the
+# path to your existing tarball as the third argument and that will be used to
+# upload packages instead. Note that this script expects the tarball passed to be
+# in the same format as the one that this script generates - it can't have any
+# random internal structure.
 
 set -euo pipefail
 
 usage() {
-  echo "Usage: on-prem-archive.sh {create-archive|populate-depot <DEPOT_URL>}"
+  echo "Usage: on-prem-archive.sh {create-archive|populate-depot <DEPOT_URL> [PATH_TO_EXISTING_TARBALL]}"
   exit 1
 }
 
@@ -202,9 +209,16 @@ case "${1:-}" in
     s3_root_url="${HAB_ON_PREM_BOOTSTRAP_S3_ROOT_URL:-https://s3-us-west-2.amazonaws.com}/$bucket"
     tmp_dir=$(mktemp -d)
 
-    cd "$tmp_dir"
-    echo "Fetching latest package bootstrap file."
-    curl -O "$s3_root_url/$marker"
+    if [ -f "${3:-}" ]; then
+      echo "Skipping S3 download and using existing file $3 instead."
+      mv "$3" "$tmp_dir/$marker"
+      cd "$tmp_dir"
+    else
+      echo "Fetching latest package bootstrap file."
+      cd "$tmp_dir"
+      curl -O "$s3_root_url/$marker"
+    fi
+
     tar zxvf $marker
 
     echo
