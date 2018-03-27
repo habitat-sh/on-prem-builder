@@ -2,11 +2,11 @@
 
 ## Introduction
 
-This repository contains scripts to install Habitat Builder back-end services. These services (referred to as the On-Premise Habitat Builder depot) allow for the hosting of Habitat packages (and associated artifacts such as keys) by enterprises in-house (behind the firewall). Habitat clients can be pointed to the on-premise depot and allow for development, execution and management without depending on the public Habitat services.
+This repository contains scripts to install Habitat Builder back-end services. These services (referred to as the On-Premise Habitat Builder depot) allow privately hosting Habitat packages (and associated artifacts such as keys) on-premise. Habitat clients (such as the `hab` cli, Supervisors and Studios) can be pointed to the on-premise depot and allow for development, execution and management without depending on the public Habitat services.
 
 ## Audience
 
-This work is *Alpha* level, and intended for use by Chef Customer Development Partners only.
+This work is *MVP/Alpha* level, and intended for use by Chef Customer Development Partners only. We will be continually improving it over the next few months, and users should be prepared to actively update their installations to benefit from these updates.
 
 ## Requirements
 
@@ -16,11 +16,11 @@ The following are minimum requirements for installation/deployment of the Habita
 * OS should support `systemd` process manager
 * Deployment to bare-metal, VM or container image
 * 8 GB or more RAM recommended (for single node)
-* Significant free disk space (depends on package storage - plan conservatively)
+* Significant free disk space (depends on package storage, which depends on the size of the applications you are building and storing here - plan conservatively. Around 2GB is required for the baseline installation with only the packages required to run the Builder services)
 * Services should be deployed single-node - scale out is not yet supported
 * Outbound network (HTTPS) connectivity to WAN is required for the _initial_ install
-* Inbound network connectivity from LAN (HTTP) for internal access to the Depot
-* OAuth2 authentication provider (Github or Bitbucket currently supported)
+* Inbound network connectivity from LAN (HTTP) is required for internal clients to access the depot
+* OAuth2 authentication provider (GitHub, GitHub Enterprise and Bitbucket have been verified - additional providers can be added)
 
 ## Functionality
 
