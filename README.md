@@ -16,7 +16,7 @@ The following are minimum requirements for installation/deployment of the Habita
 * OS should support `systemd` process manager
 * Deployment to bare-metal, VM or container image
 * 8 GB or more RAM recommended (for single node)
-* Significant free disk space (depends on package storage, which depends on the size of the applications you are building and storing here - plan conservatively. Around 2GB is required for the baseline installation with only the packages required to run the Builder services)
+* Significant free disk space (depends on package storage, which depends on the size of the applications you are building and storing here - plan conservatively. Around 2GB is required for the baseline installation with only the packages required to run the Builder services, and another 5GB+ of disk space for the latest versions of core packages)
 * Services should be deployed single-node - scale out is not yet supported
 * Outbound network (HTTPS) connectivity to WAN is required for the _initial_ install
 * Inbound network connectivity from LAN (HTTP) is required for internal clients to access the depot
@@ -100,6 +100,8 @@ At that point you should be able to log in using your configured OAuth provider.
 
 Once you are logged in, you should be able to create an origin by clicking on the 'Create Origin' button.
 
+You will need to at least create a `core` origin for an initial set of base packages (see section below). Go ahead and create a new origin now, and type in `core` as the origin name.
+
 ### Generate a Personal Access Token
 
 In order to bootstrap a set of `core` package, as well as perform authenticated operations using the `hab` client, you will need to generate a Personal Access Token.
@@ -108,14 +110,16 @@ Click on your Gravatar icon on the top right corner of the Builder web page, and
 
 ## Bootstrap `core` packages
 
+*Important*: Please make sure you have created a `core` origin before starting this process.
+
 The freshly installed Builder depot does not contain any packages. In order to bootstrap a set of stable `core` origin packages (refer to the [core-plans repo](https://github.com/habitat-sh/core-plans)), you can do the following:
 
 1. Export your Personal Access Token as `HAB_AUTH_TOKEN` to
    your environment (e.g, `export HAB_AUTH_TOKEN=<your token>`)
-1. `sudo ./scripts/on-prem-archive.sh populate-depot http://${APP_HOSTNAME_OR_IP}`, passing the
+1. `sudo -E ./scripts/on-prem-archive.sh populate-depot http://${APP_HOSTNAME_OR_IP}`, passing the
    root URL of your new depot as the last argument
 
-This is quite a lengthy process, so be patient. It will download a *large* archive of the latest stable core plans, and then install them to your on-premise depot.
+This is quite a lengthy process, so be patient. It will download a *large* (~ 5GB currently) archive of the latest stable core plans, and then install them to your on-premise depot.
 
 Please ensure that you have plenty of free drive space available, for hosting the `core` packages as well as your own packages.
 
@@ -123,7 +127,7 @@ Please ensure that you have plenty of free drive space available, for hosting th
 
 Currently, the Builder services are not set to auto-upgrade. If you need to upgrade the services, there is a simple uninstall script you can use to stop and unload the services, and remove the services. In order to uninstal, you may do the following:
 1. `cd ${SRC_ROOT}`
-1. `./uninstall.sh`
+1. `sudo ./uninstall.sh`
 
 Once the services are uninstalled, you may re-install them by running `./install.sh` again.
 
@@ -149,14 +153,24 @@ You can also turn on debug logging (section below) and check to see that the aut
 
 The OAuth Token and API endpoints must be reachable from the on-premise install point.
 
+### Error when bootstrapping core packages
+
+You may see the following error when bootstrapping the core packages using the script above. If this happens, the bootstrap process will continue re-trying, and the upload will eventually succeed. Be patient and let the process continue until successful completion.
+
+```
+✗✗✗
+✗✗✗ Pooled stream disconnected
+✗✗✗
+```
+
 ### Debug Logging
 
 If you want to turn on and examine the services debug logging, you can do so by doing the following on your install location:
 
-`for svc in originsrv api sessionsrv; do echo 'log_level="debug"' | hab config apply "builder-${svc}.default" $(date +%s) ; done`
+`for svc in originsrv api router sessionsrv; do echo 'log_level="debug"' | hab config apply "builder-${svc}.default" $(date +%s) ; done`
 
 Once the logging is enabled, you can examine it via `journalctl -fu hab-sup`
 
 When you are done with debugging, you can set the logging back to the default setting by running:
 
-`for svc in originsrv api sessionsrv; do echo 'log_level="info"' | hab config apply "builder-${svc}.default" $(date +%s) ; done`
+`for svc in originsrv api router sessionsrv; do echo 'log_level="info"' | hab config apply "builder-${svc}.default" $(date +%s) ; done`
