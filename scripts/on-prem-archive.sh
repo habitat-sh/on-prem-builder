@@ -215,7 +215,7 @@ case "${1:-}" in
 
     if [ -f "${3:-}" ]; then
       echo "Skipping S3 download and using existing file $3 instead."
-      mv "$3" "$tmp_dir/$marker"
+      cp "$3" "$tmp_dir/$marker"
       cd "$tmp_dir"
     else
       echo "Fetching latest package bootstrap file."

@@ -35,6 +35,10 @@ configure() {
   mkdir -p /hab/svc/builder-api
   cat <<EOT > /hab/svc/builder-api/user.toml
 log_level="info"
+jobsrv_enabled = false
+
+[depot]
+jobsrv_enabled = false
 
 ["$OAUTH_PROVIDER"]
 enabled = true
@@ -365,16 +369,18 @@ start-sessionsrv() {
 }
 
 generate_bldr_keys() {
-  if [ -n "$(find /hab/cache/keys -name "bldr-*.pub")" ]; then
-    echo "Re-using existing builder key"
+  keys=( $(find /hab/cache/keys -name "bldr-*.pub") )
+
+  if [ "${#keys[@]}" -gt 0 ]; then
+    KEY_NAME=$(echo $keys[0] | grep -Po "bldr-\d+")
+    echo "Re-using existing builder key: $KEY_NAME"
   else
-    echo "Generating builder key"
     KEY_NAME=$(hab user key generate bldr | grep -Po "bldr-\d+")
-    for svc in api worker; do
-      hab file upload "builder-${svc}.default" "$(date +%s)" "/hab/cache/keys/${KEY_NAME}.pub"
-      hab file upload "builder-${svc}.default" "$(date +%s)" "/hab/cache/keys/${KEY_NAME}.box.key"
-    done
+    echo "Generated new builder key: $KEY_NAME"
   fi
+
+  hab file upload "builder-api.default" "$(date +%s)" "/hab/cache/keys/${KEY_NAME}.pub"
+  hab file upload "builder-api.default" "$(date +%s)" "/hab/cache/keys/${KEY_NAME}.box.key"
 }
 
 start-builder() {
