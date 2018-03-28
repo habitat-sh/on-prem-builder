@@ -205,6 +205,7 @@ EOT
   mkdir -p /hab/svc/builder-sessionsrv
   cat <<EOT > /hab/svc/builder-sessionsrv/user.toml
 log_level="info"
+jobsrv_enabled = false
 
 [app]
 shards = [
