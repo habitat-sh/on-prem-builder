@@ -65,7 +65,7 @@ For the configuration below, you will also need to know following *fully qualifi
 For more information, please refer to the
 [GitHub Developer Documentation](https://developer.github.com/apps/building-oauth-apps/authorization-options-for-oauth-apps/) or the [BitBucket Developer Documentation](https://confluence.atlassian.com/bitbucket/oauth-on-bitbucket-cloud-238027431.html).
 
-Further information on the OAuth endpoints can also be found [here](https://tools.ietf.org/html/rfc6749#page-21)
+Further information on the OAuth endpoints can also be found [here](https://tools.ietf.org/html/rfc6749#page-21).
 
 ## Setup
 
@@ -92,7 +92,7 @@ If things don't work as expected, please see the Troubleshooting section below.
 
 Once the services are running successfully, the Builder UI will become available at the configured hostname or IP address.
 
-Nagigate to http://${APP_HOSTNAME_OR_IP}/#/sign-in to access the Builder UI
+Navigate to `http://${APP_HOSTNAME_OR_IP}/#/sign-in` to access the Builder UI.
 
 At that point you should be able to log in using your configured OAuth provider.
 
@@ -133,7 +133,7 @@ Once the services are uninstalled, you may re-install them by running `./install
 
 ## Support
 
-Please work with your Chef success engineers for support. You may also file issues directly at the [Github repo](https://github.com/habitat-sh/on-prem-builder/issues)
+Please work with your Chef success engineers for support. You may also file issues directly at the [Github repo](https://github.com/habitat-sh/on-prem-builder/issues).
 
 ## Troubleshooting
 
@@ -147,7 +147,7 @@ If you have outgoing access via a proxy, please ensure that HTTPS_PROXY is set c
 
 ### Authentication failure when logging in
 
-If you are not able to log in, please double check the settings that you have configured your OAuth application with, as well as the URLs that you have specified in your bldr.env file.
+If you are not able to log in, please double check the settings that you have configured your OAuth application with, as well as the URLs that you have specified in your `bldr.env` file.
 
 You can also turn on debug logging (section below) and check to see that the authenticate endpoint is getting called at the Builder API backend, and whether there is any additional information in the logs that may be helpful.
 
