@@ -44,6 +44,7 @@ jobsrv_enabled = false
 enabled = true
 api_url = "$OAUTH_API_URL"
 token_url = "$OAUTH_TOKEN_URL"
+redirect_url = "$OAUTH_REDIRECT_URL"
 client_id = "$OAUTH_CLIENT_ID"
 client_secret = "$OAUTH_CLIENT_SECRET"
 EOT

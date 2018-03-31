@@ -20,7 +20,7 @@ The following are minimum requirements for installation/deployment of the Habita
 * Services should be deployed single-node - scale out is not yet supported
 * Outbound network (HTTPS) connectivity to WAN is required for the _initial_ install
 * Inbound network connectivity from LAN (HTTP) is required for internal clients to access the depot
-* OAuth2 authentication provider (GitHub, GitHub Enterprise and Bitbucket have been verified - additional providers can be added)
+* OAuth2 authentication provider (GitHub, GitHub Enterprise, GitLab and Bitbucket have been verified - additional providers may be added on request)
 
 ## Functionality
 
@@ -67,6 +67,14 @@ For more information, please refer to the
 
 Further information on the OAuth endpoints can also be found [here](https://tools.ietf.org/html/rfc6749#page-21).
 
+### Preparing your filesystem (Optional)
+
+Since substantial storage may be required for holding packages, please ensure you have an appropriate amount of free space on your filesystem.
+
+For reference, the package artifacts will be stored at the following location: `/hab/svc/builder-api/data`
+
+If you need to add additional storage, it is recommended that you create a mount at `/hab` and point it to your external storage. This is not required if you already have sufficient free space.
+
 ## Setup
 
 1. Clone this repo (or unzip the archive you have been given) at the desired machine where you will stand up the Habitat depot
@@ -86,7 +94,9 @@ hab-sup(MN): The habitat/builder-originsrv service was successfully loaded
 hab-sup(MN): The habitat/builder-sessionsrv service was successfully loaded
 ```
 
-If things don't work as expected, please see the Troubleshooting section below.
+Do a `hab svc status` to check the status of all the services. They may take a few seconds to all come up.
+
+If things don't work as expected (eg, if all the services are not in the `up` state), please see the Troubleshooting section below.
 
 ## Web UI
 
@@ -95,6 +105,8 @@ Once the services are running successfully, the Builder UI will become available
 Navigate to `http://${APP_HOSTNAME_OR_IP}/#/sign-in` to access the Builder UI.
 
 At that point you should be able to log in using your configured OAuth provider.
+
+*Note*: If you set up `GitLab` as your OAuth provider, even though the Sign In page says "Sign in with GitHub", it should direct to your GitLab authentication endpoint correctly.
 
 ### Create an Origin
 
@@ -152,6 +164,23 @@ If you are not able to log in, please double check the settings that you have co
 You can also turn on debug logging (section below) and check to see that the authenticate endpoint is getting called at the Builder API backend, and whether there is any additional information in the logs that may be helpful.
 
 The OAuth Token and API endpoints must be reachable from the on-premise install point.
+
+### Error "sorry, too many clients already"
+
+If the hab services don't come up as expected, use `journalctl -fu hab-sup` to check the service logs (also see below for turning on Debug Logging).
+
+If you see a Postgresql error "sorry, too many clients already", you may need to increase the number of configured connections to the database.
+
+In order to do that, run the following:
+
+`echo 'max_connections=200' | hab config apply "builder-datastore.default" $(date +%s)`
+
+Wait for a bit for the datastore service to restart. If the service does not restart on it's own, you can do a 'sudo systemctl restart hab-sup' to restart things.
+
+### Error "Text file busy"
+
+Occasionally you may get an error saying "Text file too busy" during install.
+If you get this, please re-try the install step again.
 
 ### Error when bootstrapping core packages
 
