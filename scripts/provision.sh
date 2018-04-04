@@ -65,6 +65,7 @@ EOT
   mkdir -p /hab/svc/builder-originsrv
   cat <<EOT > /hab/svc/builder-originsrv/user.toml
 log_level="info"
+jobsrv_enabled = false
 
 [app]
 shards = [
