@@ -46,9 +46,8 @@ meets all the requirements.
 
 Note that the initial install will require _outgoing_ network connectivity.
 
-Your on-premise Builder instance will need to have the following _inbound_ ports open:
+Your on-premise Builder instance will need to have the following _inbound_ port open:
 * Port 80
-* Port 9636
 
 You may need to work with your enterprise network admin to enable the appropriate firewall rules.
 
@@ -163,9 +162,8 @@ If the initial install fails, please check that you have outgoing connectivity, 
 
 If you have outgoing access via a proxy, please ensure that HTTPS_PROXY is set correctly in your environment.
 
-You also will need to have the following _inbound_ ports open for your instance:
+You also will need to have the following _inbound_ port open for your instance:
 * Port 80
-* Port 9636
 
 Please work with your enterprise network admin to ensure the appropriate firewall rules are configured for network access.
 

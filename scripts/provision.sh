@@ -53,7 +53,7 @@ EOT
   cat <<EOT > /hab/svc/builder-api-proxy/user.toml
 log_level="info"
 enable_builder = false
-app_url = "${APP_URL}:9636"
+app_url = "${APP_URL}"
 
 [oauth]
 provider = "$OAUTH_PROVIDER"
