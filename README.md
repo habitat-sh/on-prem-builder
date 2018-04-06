@@ -46,6 +46,12 @@ meets all the requirements.
 
 Note that the initial install will require _outgoing_ network connectivity.
 
+Your on-premise Builder instance will need to have the following _inbound_ ports open:
+* Port 80
+* Port 9636
+
+You may need to work with your enterprise network admin to enable the appropriate firewall rules.
+
 ### OAuth Application
 
 We currently support GitHub and Atlassian Bitbucket OAuth providers for authentication. You will need to set up an OAuth application for the instance of the depot you are setting up.
@@ -157,6 +163,12 @@ If the initial install fails, please check that you have outgoing connectivity, 
 
 If you have outgoing access via a proxy, please ensure that HTTPS_PROXY is set correctly in your environment.
 
+You also will need to have the following _inbound_ ports open for your instance:
+* Port 80
+* Port 9636
+
+Please work with your enterprise network admin to ensure the appropriate firewall rules are configured for network access.
+
 ### Authentication failure when logging in
 
 If you are not able to log in, please double check the settings that you have configured your OAuth application with, as well as the URLs that you have specified in your `bldr.env` file.
@@ -164,6 +176,10 @@ If you are not able to log in, please double check the settings that you have co
 You can also turn on debug logging (section below) and check to see that the authenticate endpoint is getting called at the Builder API backend, and whether there is any additional information in the logs that may be helpful.
 
 The OAuth Token and API endpoints must be reachable from the on-premise install point.
+
+*Important*: If you change any settings in your `bldr.env` file, you will need to do the following steps after making the changes:
+1. Re-run the install script (`./install.sh`)
+2. Restart the services (`sudo systemctl restart hab-sup`)
 
 ### Error "sorry, too many clients already"
 
