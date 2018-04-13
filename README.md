@@ -205,6 +205,23 @@ You may see the following error when bootstrapping the core packages using the s
 ✗✗✗ Pooled stream disconnected
 ✗✗✗
 ```
+### Error uploading large packages
+
+By default, there is a 1GB limit for packages that can be uploaded to Builder. If you need to change the limit, you can do so by injecting an updated config to the Builder services.
+
+For example, to change the limit to 2GB, you can do the following:
+
+Create a file called `config.toml` with the following content:
+```
+[nginx]
+max_body_size = "2048m"
+```
+
+Then, issue the following command:
+```
+hab config apply builder-api-proxy.default $(date +%s) config.toml
+```
+After the config is successfully applied, re-try the upload.
 
 ### Debug Logging
 
