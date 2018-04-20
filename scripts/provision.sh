@@ -40,9 +40,9 @@ jobsrv_enabled = false
 [depot]
 jobsrv_enabled = false
 
-["$OAUTH_PROVIDER"]
-enabled = true
-api_url = "$OAUTH_API_URL"
+[oauth]
+provider = "$OAUTH_PROVIDER"
+userinfo_url = "$OAUTH_USERINFO_URL"
 token_url = "$OAUTH_TOKEN_URL"
 redirect_url = "$OAUTH_REDIRECT_URL"
 client_id = "$OAUTH_CLIENT_ID"

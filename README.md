@@ -53,7 +53,7 @@ You may need to work with your enterprise network admin to enable the appropriat
 
 ### OAuth Application
 
-We currently support GitHub and Atlassian Bitbucket OAuth providers for authentication. You will need to set up an OAuth application for the instance of the depot you are setting up.
+We currently support GitHub, GitLab and Atlassian Bitbucket OAuth providers for authentication. You will need to set up an OAuth application for the instance of the depot you are setting up.
 
 Refer to the steps that are specific to your OAuth provider to create and configure your OAuth application. The below steps illustrate setting up the OAuth application using Github as the identity provider:
 
@@ -110,8 +110,6 @@ Once the services are running successfully, the Builder UI will become available
 Navigate to `http://${APP_HOSTNAME_OR_IP}/#/sign-in` to access the Builder UI.
 
 At that point you should be able to log in using your configured OAuth provider.
-
-*Note*: If you set up `GitLab` as your OAuth provider, even though the Sign In page says "Sign in with GitHub", it should direct to your GitLab authentication endpoint correctly.
 
 ### Create an Origin
 
