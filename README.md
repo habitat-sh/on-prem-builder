@@ -19,7 +19,7 @@ The following are minimum requirements for installation/deployment of the Habita
 * Significant free disk space (depends on package storage, which depends on the size of the applications you are building and storing here - plan conservatively. Around 2GB is required for the baseline installation with only the packages required to run the Builder services, and another 5GB+ of disk space for the latest versions of core packages)
 * Services should be deployed single-node - scale out is not yet supported
 * Outbound network (HTTPS) connectivity to WAN is required for the _initial_ install
-* Inbound network connectivity from LAN (HTTP) is required for internal clients to access the depot
+* Inbound network connectivity from LAN (HTTP/HTTPS) is required for internal clients to access the depot
 * OAuth2 authentication provider (Azure AD, GitHub, GitHub Enterprise, GitLab and Bitbucket have been verified - additional providers may be added on request)
 
 ## Functionality
@@ -47,7 +47,7 @@ meets all the requirements.
 Note that the initial install will require _outgoing_ network connectivity.
 
 Your on-premise Builder instance will need to have the following _inbound_ port open:
-* Port 80
+* Port 80 (or 443 if you plan to enable SSL)
 
 You may need to work with your enterprise network admin to enable the appropriate firewall rules.
 
@@ -58,8 +58,8 @@ We currently support Azure AD (OpenId Connect), GitHub, GitLab and Atlassian Bit
 Refer to the steps that are specific to your OAuth provider to create and configure your OAuth application. The below steps illustrate setting up the OAuth application using Github as the identity provider:
 
 1. Create a new OAuth Application in your OAuth Provider - for example, [GitHub](https://github.com/settings/applications/new)
-1. Set the value of `Homepage URL` to `http://${APP_HOSTNAME_OR_IP}`
-1. Set the value of `User authorization callback URL` to `http://${APP_HOSTNAME_OR_IP}/` (The trailing `/` is *important*)
+1. Set the value of `Homepage URL` to `http://${APP_HOSTNAME_OR_IP}`, or `https://${APP_HOSTNAME_OR_IP}` if you plan to enable SSL.
+1. Set the value of `User authorization callback URL` to `http://${APP_HOSTNAME_OR_IP}/` (The trailing `/` is *important*). Specify `https` instead of `http` if you plan to enable SSL.
 1. Record the the Client Id and Client Secret. These will be used for the `OAUTH_CLIENT_ID` and `OAUTH_CLIENT_SECRET` environment variables in the section below.
 
 For the configuration below, you will also need to know following *fully qualified* end-points:
@@ -79,6 +79,24 @@ Since substantial storage may be required for holding packages, please ensure yo
 For reference, the package artifacts will be stored at the following location: `/hab/svc/builder-api/data`
 
 If you need to add additional storage, it is recommended that you create a mount at `/hab` and point it to your external storage. This is not required if you already have sufficient free space.
+
+### Procuring SSL certificate (Recommended)
+
+By default, the on-premise Builder will expose the web UI and API via http. Though it allows for easier setup and is fine for evaluation purposes, for a secure and more permanent installation it is recommended that you enable SSL on the Builder endpoints.
+
+In order to prepare for this, you should procure a SSL certificate. If needed, you may use a self-signed certificate - however if you do so, you will need to install the certificate in the trusted chain on client machines (ones that will use the Builder UI or APIs). You may use the `SSL_CERT_FILE` environment variable to also point to the certificate on client machines when invoking the `hab` client, for example:
+
+```
+SSL_CERT_FILE=ssl-certificate.crt hab pkg search -u https://localhost <search term>
+```
+
+Below is a sample command to generate a self-signed certificate with OpenSSL:
+
+```
+sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/ssl-certificate.key -out /etc/ssl/certs/ssl-certificate.crt
+```
+
+*Important*: Make sure that the certificate files are named exactly `ssl-certificate.key` and `ssl-certificate.crt`. If you have procured the certificate from a different source, rename them to the prescribed filenames, and ensure that they are located in the same folder as the `install.sh` script. They will get uploaded to the Habitat supervisor during the install.
 
 ## Setup
 
@@ -132,7 +150,7 @@ The freshly installed Builder depot does not contain any packages. In order to b
 1. Export your Personal Access Token as `HAB_AUTH_TOKEN` to
    your environment (e.g, `export HAB_AUTH_TOKEN=<your token>`)
 1. `sudo -E ./scripts/on-prem-archive.sh populate-depot http://${APP_HOSTNAME_OR_IP}`, passing the
-   root URL of your new depot as the last argument
+   root URL of your new depot as the last argument  (Replace `http` with `https` in the URL if SSL is enabled)
 
 This is quite a lengthy process, so be patient. It will download a *large* (~ 5GB currently) archive of the latest stable core plans, and then install them to your on-premise depot.
 

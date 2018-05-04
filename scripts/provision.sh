@@ -7,7 +7,7 @@ if [ -f ../bldr.env ]; then
 elif [ -f /vagrant/bldr.env ]; then
   source /vagrant/bldr.env
 else
-  echo "bldr.env file required"
+  echo "ERROR: bldr.env file is missing!"
   exit 1
 fi
 
@@ -60,6 +60,9 @@ provider = "$OAUTH_PROVIDER"
 client_id = "$OAUTH_CLIENT_ID"
 authorize_url = "$OAUTH_AUTHORIZE_URL"
 redirect_url = "$OAUTH_REDIRECT_URL"
+
+[server]
+listen_tls = $APP_SSL_ENABLED
 EOT
 
   mkdir -p /hab/svc/builder-originsrv
@@ -386,6 +389,19 @@ generate_bldr_keys() {
   hab file upload "builder-api.default" "$(date +%s)" "/hab/cache/keys/${KEY_NAME}.box.key"
 }
 
+upload_ssl_certificate() {
+  if [ ${APP_SSL_ENABLED} = true ]; then
+    echo "SSL enabled - uploading certificate files"
+    if ! [ -f "../ssl-certificate.crt" ] || ! [ -f "../ssl-certificate.key" ]; then
+      echo "$(pwd)"
+      echo "ERROR: Certificate file(s) not found!"
+      exit 1
+    fi
+    hab file upload "builder-api-proxy.default" "$(date +%s)" "../ssl-certificate.crt"
+    hab file upload "builder-api-proxy.default" "$(date +%s)" "../ssl-certificate.key"
+  fi
+}
+
 start-builder() {
   init-datastore
   start-datastore
@@ -397,6 +413,7 @@ start-builder() {
   start-sessionsrv
   sleep 2
   generate_bldr_keys
+  upload_ssl_certificate
 }
 
 if command -v useradd > /dev/null; then
