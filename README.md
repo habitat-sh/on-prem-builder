@@ -20,7 +20,7 @@ The following are minimum requirements for installation/deployment of the Habita
 * Services should be deployed single-node - scale out is not yet supported
 * Outbound network (HTTPS) connectivity to WAN is required for the _initial_ install
 * Inbound network connectivity from LAN (HTTP/HTTPS) is required for internal clients to access the depot
-* OAuth2 authentication provider (Azure AD, GitHub, GitHub Enterprise, GitLab and Bitbucket have been verified - additional providers may be added on request)
+* OAuth2 authentication provider (Azure AD, GitHub, GitHub Enterprise, GitLab, Okta and Bitbucket have been verified - additional providers may be added on request)
 
 ## Functionality
 
@@ -53,7 +53,7 @@ You may need to work with your enterprise network admin to enable the appropriat
 
 ### OAuth Application
 
-We currently support Azure AD (OpenId Connect), GitHub, GitLab and Atlassian Bitbucket OAuth providers for authentication. You will need to set up an OAuth application for the instance of the depot you are setting up.
+We currently support Azure AD (OpenId Connect), GitHub, GitLab (OpenId Connect), Okta (OpenId Connect) and Atlassian Bitbucket OAuth providers for authentication. You will need to set up an OAuth application for the instance of the depot you are setting up.
 
 Refer to the steps that are specific to your OAuth provider to create and configure your OAuth application. The below steps illustrate setting up the OAuth application using Github as the identity provider:
 
@@ -67,8 +67,12 @@ For the configuration below, you will also need to know following *fully qualifi
 * Token Endpoint (example: `https://github.com/login/oauth/access_token`)
 * API Endpoint (example: `https://api.github.com`)
 
-For more information, please refer to the
-[GitHub Developer Documentation](https://developer.github.com/apps/building-oauth-apps/authorization-options-for-oauth-apps/) or the [BitBucket Developer Documentation](https://confluence.atlassian.com/bitbucket/oauth-on-bitbucket-cloud-238027431.html).
+For more information, please refer to the developer documentation of these services:
+* [Azure Active Directory](https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-protocols-oauth-code)
+* [GitHub](https://developer.github.com/apps/building-oauth-apps/authorization-options-for-oauth-apps/)
+* [GitLab](https://docs.gitlab.com/ee/integration/oauth_provider.html)
+* [Okta](https://developer.okta.com/authentication-guide/implementing-authentication/auth-code)
+* [BitBucket](https://confluence.atlassian.com/bitbucket/oauth-on-bitbucket-cloud-238027431.html)
 
 Further information on the OAuth endpoints can also be found [here](https://tools.ietf.org/html/rfc6749#page-21).
 
