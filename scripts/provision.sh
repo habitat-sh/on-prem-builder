@@ -61,6 +61,14 @@ client_id = "$OAUTH_CLIENT_ID"
 authorize_url = "$OAUTH_AUTHORIZE_URL"
 redirect_url = "$OAUTH_REDIRECT_URL"
 
+[nginx]
+max_body_size = "2048m"
+proxy_send_timeout = 180
+proxy_read_timeout = 180
+
+[http]
+keepalive_timeout = "180s"
+
 [server]
 listen_tls = $APP_SSL_ENABLED
 EOT
@@ -210,7 +218,6 @@ EOT
   mkdir -p /hab/svc/builder-sessionsrv
   cat <<EOT > /hab/svc/builder-sessionsrv/user.toml
 log_level="info"
-jobsrv_enabled = false
 
 [app]
 shards = [
