@@ -225,16 +225,26 @@ You may see the following error when bootstrapping the core packages using the s
 ✗✗✗ Pooled stream disconnected
 ✗✗✗
 ```
+
+If some packages do not upload, you may try re-uploading them manually via the `hab pkg upload` command.
+
+This may also be an indication that your installation may not have sufficient CPU, RAM or other resources, and you may want to either allocate additional resources (eg, if on a VM) or move to a more scaled-up instance.
+
 ### Error uploading large packages
 
-By default, there is a 1GB limit for packages that can be uploaded to Builder. If you need to change the limit, you can do so by injecting an updated config to the Builder services.
+By default, the installed services configuration will set a 2GB limit for packages that can be uploaded to the on-premise Builder. If you need to change the limit, you can do so by injecting an updated config to the Builder services.
 
-For example, to change the limit to 2GB, you can do the following:
+For example, to change the limit to 3GB, you could do the following:
 
 Create a file called `config.toml` with the following content:
 ```
 [nginx]
-max_body_size = "2048m"
+max_body_size = "3072m"
+proxy_send_timeout = 360
+proxy_read_timeout = 360
+
+[http]
+keepalive_timeout = "360s"
 ```
 
 Then, issue the following command:
@@ -242,6 +252,13 @@ Then, issue the following command:
 hab config apply builder-api-proxy.default $(date +%s) config.toml
 ```
 After the config is successfully applied, re-try the upload.
+
+If you have any issues, you may also need to adjust the timeout configuration on the Habitat client.
+You can do that via an environment variable: `HAB_CLIENT_SOCKET_TIMEOUT`. The value of this environment variable is a timeout in seconds. So for example, you could do something like this when uploading a file:
+
+```
+HAB_CLIENT_SOCKET_TIMEOUT=360 hab pkg upload -u http://localhost -z <your auth token> <file>
+```
 
 ### Debug Logging
 
