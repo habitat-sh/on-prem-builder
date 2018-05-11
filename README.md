@@ -160,6 +160,35 @@ This is quite a lengthy process, so be patient. It will download a *large* (~ 5G
 
 Please ensure that you have plenty of free drive space available, for hosting the `core` packages as well as your own packages.
 
+## Setting up a package upstream
+
+It is possible to configure the on-premise builder to point to the hosted Builder site as an 'upstream'.
+This allows new packages from the upstream to get created in the on-premise instance automatically.
+
+If your on-premise instance will have continued outgoing Internet connectivity, you may wish to configure an upstream.
+
+In order to do so, please create a file called `upstream.toml` with the following content:
+```
+[depot]
+upstream_depot = "https://bldr.habitat.sh"
+```
+
+Then, issue the following command:
+```
+hab config apply builder-api.default $(date +%s) upstream.toml
+```
+After the config is successfully applied, the services should be configured to use the upstream.
+
+Now, you can test out that the upstream works by trying to install a package that you know exists in the upstream (in the _stable_ channel), but not in the local on-premise builder.
+
+```
+hab pkg install -u http://localhost -z <auth-token> <package>
+```
+
+Initially, you will get a `Package Not Found` error.  Wait for a bit (the package will get synchronized in the background) and try again - this time the install should succeed!
+
+*NOTE*: It is important to understand how the upstream cache is working. Packages that are requested (either via a `hab pkg install`, or even searching or browsing packages in the Web UI) in the local on-premise depot that have newer (or existing) versions in the upstream in the *stable* channel are marked for retrieval in the background. It is only after the background retrieval of the package succeeds that the package then becomes available in the local instance. If there is any failure to retrieve or submit the package, the next retrieval attempt will be triggered only by another request for that package. This functionality is new, and will be refined over time.
+
 ## Upgrading
 
 Currently, the Builder services are not set to auto-upgrade. If you need to upgrade the services, there is a simple uninstall script you can use to stop and unload the services, and remove the services. In order to uninstal, you may do the following:
@@ -271,3 +300,14 @@ Once the logging is enabled, you can examine it via `journalctl -fu hab-sup`
 When you are done with debugging, you can set the logging back to the default setting by running:
 
 `for svc in originsrv api router sessionsrv; do echo 'log_level="info"' | hab config apply "builder-${svc}.default" $(date +%s) ; done`
+
+*WARNING*: If you turn on debug logging as above, it will remove any other configuration that you might have applied via `hab config apply`.  If you have made other configuration changes via `hab config apply`, you should turn on debug logging by adding the `log_level="debug"` entry to your other configuration file and applying that file, instead of using the script above.
+
+### Upstream packages are not getting retrieved/installed
+
+If you are not seeing upstream packages getting installed, please check the following:
+
+1. The package you are trying to retrieve is public (private packages will not be retrieved currently)
+2. The package you are trying to retrieve is in the `stable` channel
+3. Make sure you have allowed sufficient time for package download (large packages may take a while)
+4. You may also want to re-apply the configuration to set up the upstream - check that the `/hab/svc/builder-api/config/config.toml` file has a setting for `upstream_depot` under the `[depot]` section.
