@@ -189,6 +189,16 @@ Initially, you will get a `Package Not Found` error.  Wait for a bit (the packag
 
 *NOTE*: It is important to understand how the upstream cache is working. Packages that are requested (either via a `hab pkg install`, or even searching or browsing packages in the Web UI) in the local on-premise depot that have newer (or existing) versions in the upstream in the *stable* channel are marked for retrieval in the background. It is only after the background retrieval of the package succeeds that the package then becomes available in the local instance. If there is any failure to retrieve or submit the package, the next retrieval attempt will be triggered only by another request for that package. This functionality is new, and will be refined over time.
 
+## Configuring a user workstation
+
+Configuring a user's workstation to point to the on-prem builder should be fairly straightforward.
+
+The following environment variables should be configured as needed:
+
+1. `HAB_BLDR_URL` - this is the main (and most important) configuration. It should point to the instance of on-prem builder that you have set up.
+2. `HAB_AUTH_TOKEN` - this is the user's auth token that will be needed for private packages (if any), or for operations requiring privileges, for example, package uploads.  The user will need to create their auth token and set/use it appropriately.
+3. `SSL_CERT_FILE` - if the on-prem builder is configured with SSL and uses a self-signed or other certificate that is not in the trusted chain, then this environment variable can be used on the user's workstation to point the `hab` client to the correct certificate to use when connecting to on-prem builder.
+
 ## Upgrading
 
 Currently, the Builder services are not set to auto-upgrade. If you need to upgrade the services, there is a simple uninstall script you can use to stop and unload the services, and remove the services. In order to uninstal, you may do the following:
