@@ -6,7 +6,7 @@ This repository contains scripts to install Habitat Builder back-end services. T
 
 ## Audience
 
-This work is *MVP/Alpha* level, and intended for use by Chef Customer Development Partners only. We will be continually improving it over the next few months, and users should be prepared to actively update their installations to benefit from these updates.
+This repository is intended for use by any one who wishes to host Habitat packages in their own infrastructure. Users should be prepared to actively update their installations to benefit from continued improvements and updates.
 
 ## Requirements
 
@@ -15,7 +15,9 @@ The following are minimum requirements for installation/deployment of the Habita
 * Services should be deployed on a Habitat supported [Linux OS](https://www.habitat.sh/docs/install-habitat/)
 * OS should support `systemd` process manager
 * Deployment to bare-metal, VM or container image
-* 8 GB or more RAM recommended (for single node)
+* CPU / RAM should be appropriate for the deployment purpose:
+  - For trial deployments: 2 CPU/4 GB RAM (corresponding to AWS c4.xlarge or better) or better
+  - For production deployments: 16 CPU/32 GB RAM (corresponding to AWS c4.4xlarge) or better
 * Significant free disk space (depends on package storage, which depends on the size of the applications you are building and storing here - plan conservatively. Around 2GB is required for the baseline installation with only the packages required to run the Builder services, and another 5GB+ of disk space for the latest versions of core packages)
 * Services should be deployed single-node - scale out is not yet supported
 * Outbound network (HTTPS) connectivity to WAN is required for the _initial_ install
@@ -33,8 +35,9 @@ Once installed, the following functionality will be available to users:
 * Promotion and demotion of Habitat packages to channels
 * Normal interactions of the `hab` client with the Builder API
 * Package builds using the `hab` client and Habitat Studio
+* Ability to import core packages from the upstream Habitat Builder
 
-The following Habitat Builder functionality will *NOT* be available:
+The following Habitat Builder functionality is *NOT* currently available:
 * Automated package builds using Builder
 * Automated package exports using Builder
 
@@ -201,15 +204,17 @@ The following environment variables should be configured as needed:
 
 ## Upgrading
 
-Currently, the Builder services are not set to auto-upgrade. If you need to upgrade the services, there is a simple uninstall script you can use to stop and unload the services, and remove the services. In order to uninstal, you may do the following:
+Currently, the Builder services are not set to auto-upgrade. When you wish to upgrade the services, there is a simple uninstall script you can use to stop and unload the services, and remove the services. In order to uninstall, you may do the following:
 1. `cd ${SRC_ROOT}`
 1. `sudo ./uninstall.sh`
 
 Once the services are uninstalled, you may re-install them by running `./install.sh` again.
 
+*IMPORTANT*: Running the uninstall script will *NOT* remove any user data, so you can freely uninstall and re-install the services.
+
 ## Support
 
-Please work with your Chef success engineers for support. You may also file issues directly at the [Github repo](https://github.com/habitat-sh/on-prem-builder/issues).
+You can also post any questions or issues on the [Habitat Forum](https://forums.habitat.sh/), on our [Slack channel](https://habitat-sh.slack.com), or file issues directly at the [Github repo](https://github.com/habitat-sh/on-prem-builder/issues).
 
 ## Troubleshooting
 
