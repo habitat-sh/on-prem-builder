@@ -1,4 +1,4 @@
-# On Premise Habitat Builder
+# On Premise Habitat Builder Depot
 
 ## Introduction
 
