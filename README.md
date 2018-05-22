@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This repository contains scripts to install Habitat Builder back-end services. These services (referred to as the On-Premise Habitat Builder depot) allow privately hosting Habitat packages (and associated artifacts such as keys) on-premise. Habitat clients (such as the `hab` cli, Supervisors and Studios) can be pointed to the on-premise depot and allow for development, execution and management without depending on the public Habitat services.
+This repository contains scripts to install Habitat Builder Depot services. These services (referred to as the On-Premise Habitat Builder Depot) allow privately hosting Habitat packages (and associated artifacts such as keys) on-premise. Habitat clients (such as the `hab` cli, Supervisors and Studios) can be pointed to the on-premise depot and allow for development, execution and management without depending on the public Habitat services.
 
 ## Audience
 
@@ -10,7 +10,7 @@ This repository is intended for use by any one who wishes to host Habitat packag
 
 ## Requirements
 
-The following are minimum requirements for installation/deployment of the Habitat Depot:
+The following are minimum requirements for installation/deployment of the Habitat Builder Depot:
 
 * Services should be deployed on a Habitat supported [Linux OS](https://www.habitat.sh/docs/install-habitat/)
 * OS should support `systemd` process manager
@@ -28,7 +28,7 @@ The following are minimum requirements for installation/deployment of the Habita
 
 Once installed, the following functionality will be available to users:
 
-* Logging into the on-premise Builder depot web site
+* Logging into the on-premise Habitat Builder Depot web site
 * Creation of origins, keys, access tokens, etc
 * Invitation of users to origins
 * Upload and download of Habitat packages
@@ -89,7 +89,7 @@ If you need to add additional storage, it is recommended that you create a mount
 
 ### Procuring SSL certificate (Recommended)
 
-By default, the on-premise Builder will expose the web UI and API via http. Though it allows for easier setup and is fine for evaluation purposes, for a secure and more permanent installation it is recommended that you enable SSL on the Builder endpoints.
+By default, the on-premise Builder Depot will expose the web UI and API via http. Though it allows for easier setup and is fine for evaluation purposes, for a secure and more permanent installation it is recommended that you enable SSL on the Builder endpoints.
 
 In order to prepare for this, you should procure a SSL certificate. If needed, you may use a self-signed certificate - however if you do so, you will need to install the certificate in the trusted chain on client machines (ones that will use the Builder UI or APIs). You may use the `SSL_CERT_FILE` environment variable to also point to the certificate on client machines when invoking the `hab` client, for example:
 
@@ -107,7 +107,7 @@ sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/privat
 
 ## Setup
 
-1. Clone this repo (or unzip the archive you have been given) at the desired machine where you will stand up the Habitat depot
+1. Clone this repo (or unzip the archive you have been given) at the desired machine where you will stand up the Habitat Builder Depot
 1. `cd ${SRC_ROOT}`
 1. `cp bldr.env.sample bldr.env`
 1. Edit `bldr.env` with a text editor and replace the values appropriately
@@ -152,7 +152,7 @@ Click on your Gravatar icon on the top right corner of the Builder web page, and
 
 *Important*: Please make sure you have created a `core` origin before starting this process.
 
-The freshly installed Builder depot does not contain any packages. In order to bootstrap a set of stable `core` origin packages (refer to the [core-plans repo](https://github.com/habitat-sh/core-plans)), you can do the following:
+The freshly installed Builder Depot does not contain any packages. In order to bootstrap a set of stable `core` origin packages (refer to the [core-plans repo](https://github.com/habitat-sh/core-plans)), you can do the following:
 
 1. Export your Personal Access Token as `HAB_AUTH_TOKEN` to
    your environment (e.g, `export HAB_AUTH_TOKEN=<your token>`)
@@ -303,6 +303,18 @@ You can do that via an environment variable: `HAB_CLIENT_SOCKET_TIMEOUT`. The va
 ```
 HAB_CLIENT_SOCKET_TIMEOUT=360 hab pkg upload -u http://localhost -z <your auth token> <file>
 ```
+
+### Updated upstream packages not showing up in the on-premise depot
+
+If you have turned on the automated package fetch from an upstream, and are not seeing updated packages, please check the following:
+
+1. Check that the upstream configuration is correctly applied - you should see an "upstream_depot" setting in the builder-api configuration - check the `hab/svc/builder-api/config/config.toml` file.  If you don't see an 'upstream_depot' setting, you may need to re-apply it following the setup instructions.
+
+2. Check the upstream log file for any errors or other status - this log file is located at 'hab/svc/builder-api/var/builder-upstream.log'
+
+3. Check that there are updated packages in the `stable` channel in the upstream, that are newer than the latest version you have on-premise.
+
+4. Make sure you have triggered the automated fetch for the package you are interested in by doing a `hab pkg install` of the package, or searching for the package via the web UI.
 
 ### Debug Logging
 
