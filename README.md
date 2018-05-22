@@ -308,13 +308,17 @@ HAB_CLIENT_SOCKET_TIMEOUT=360 hab pkg upload -u http://localhost -z <your auth t
 
 If you have turned on the automated package fetch from an upstream, and are not seeing updated packages, please check the following:
 
-1. Check that the upstream configuration is correctly applied - you should see an "upstream_depot" setting in the builder-api configuration - check the `hab/svc/builder-api/config/config.toml` file.  If you don't see an 'upstream_depot' setting, you may need to re-apply it following the setup instructions.
+1. Check that the package you are trying to retrieve is public (private packages will not be retrieved currently).
 
-2. Check the upstream log file for any errors or other status - this log file is located at 'hab/svc/builder-api/var/builder-upstream.log'
+2. Check that there are updated packages in the `stable` channel in the upstream, that are newer than the latest version you have on-premise.
 
-3. Check that there are updated packages in the `stable` channel in the upstream, that are newer than the latest version you have on-premise.
+3. Make sure you have allowed sufficient time for package download (large packages may take a while).
 
-4. Make sure you have triggered the automated fetch for the package you are interested in by doing a `hab pkg install` of the package, or searching for the package via the web UI.
+4. Check that the upstream configuration is correctly applied - you should see an `upstream_depot` setting in the builder-api configuration - check the `hab/svc/builder-api/config/config.toml` file.  If you don't see an 'upstream_depot' setting, you may need to re-apply it following the setup instructions.
+
+5. Check the upstream log file for any errors or other status - this log file is located at 'hab/svc/builder-api/var/builder-upstream.log'.
+
+6. Make sure you have triggered the automated fetch for the package you are interested in by doing a `hab pkg install` of the package, or searching for the package via the web UI.
 
 ### Debug Logging
 
@@ -330,11 +334,11 @@ When you are done with debugging, you can set the logging back to the default se
 
 *WARNING*: If you turn on debug logging as above, it will remove any other configuration that you might have applied via `hab config apply`.  If you have made other configuration changes via `hab config apply`, you should turn on debug logging by adding the `log_level="debug"` entry to your other configuration file and applying that file, instead of using the script above.
 
-### Upstream packages are not getting retrieved/installed
+## License
 
-If you are not seeing upstream packages getting installed, please check the following:
+Copyright (c) 2018 Chef Software Inc. and/or applicable contributors
 
-1. The package you are trying to retrieve is public (private packages will not be retrieved currently)
-2. The package you are trying to retrieve is in the `stable` channel
-3. Make sure you have allowed sufficient time for package download (large packages may take a while)
-4. You may also want to re-apply the configuration to set up the upstream - check that the `/hab/svc/builder-api/config/config.toml` file has a setting for `upstream_depot` under the `[depot]` section.
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
