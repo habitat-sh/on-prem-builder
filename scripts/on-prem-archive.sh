@@ -97,13 +97,14 @@ download_hart_if_missing() {
   local local_file=$1
   local slash_ident=$2
   local status_line=$3
+  local target=$4
 
   if [ -f "$local_file"  ]; then
     echo "$status_line $slash_ident is already present in our local directory. Skipping download."
     return 1
   else
     echo "$status_line Downloading $slash_ident"
-    curl -s -H "Accept: application/json" -o "$local_file" "$upstream_depot/v1/depot/pkgs/$slash_ident/download"
+    curl -s -H "Accept: application/json" -o "$local_file" "$upstream_depot/v1/depot/pkgs/$slash_ident/download?target=$target"
   fi
 }
 
@@ -140,16 +141,32 @@ case "${1:-}" in
 
     git clone https://github.com/habitat-sh/core-plans.git "$core"
     cd "$core"
-    dir_list=$(find . -type f -name "plan.sh" -printf "%h\n" | xargs basename -a | sort -u)
+
+    # we want both the directory name and the file name here
+    dir_list=$(find . -type f -name "plan.*" -printf "%h~%f\n" | xargs basename -a | sort -u)
     pkg_total=$(echo "$dir_list" | wc -l)
     pkg_count="0"
 
+    # p now looks something like redis~plan.sh
     for p in $dir_list
     do
+      IFS='~' read -ra parts <<< "$p"
+      pkg_name=${parts[0]}
+      plan_name=${parts[1]}
       pkg_count=$((pkg_count+1))
+
+      if [ "$plan_name" == "plan.sh" ]; then
+        target="x86_64-linux"
+      elif [ "$plan_name" == "plan.ps1" ]; then
+        target="x86_64-windows"
+      else
+        echo "Unsupported plan: $plan_name"
+        exit 1
+      fi
+
       echo
-      echo "[$pkg_count/$pkg_total] Resolving latest stable version of core/$p"
-      latest=$(curl -s -H "Accept: application/json" "$upstream_depot/v1/depot/channels/core/stable/pkgs/$p/latest")
+      echo "[$pkg_count/$pkg_total] Resolving latest stable version of core/$pkg_name"
+      latest=$(curl -s -H "Accept: application/json" "$upstream_depot/v1/depot/channels/core/stable/pkgs/$pkg_name/latest?target=$target")
       raw_ident=$(echo "$latest" | jq ".ident")
 
       if [ "$raw_ident" = "null" ]; then
@@ -158,18 +175,16 @@ case "${1:-}" in
       fi
 
       slash_ident=$(jq '"\(.origin)/\(.name)/\(.version)/\(.release)"' <<< $raw_ident | tr -d '"')
-      target=$(jq ".target" <<< $latest | tr -d '"')
 
       # check to see if we have this file before fetching it again
       local_file="$tmp_dir/harts/$(tr '/' '-' <<< $slash_ident)-$target.hart"
 
-      if download_hart_if_missing "$local_file" "$slash_ident" "[$pkg_count/$pkg_total]"; then
-        # now extract the target and tdeps and download those too
+      if download_hart_if_missing "$local_file" "$slash_ident" "[$pkg_count/$pkg_total]" "$target"; then
+        # now extract the tdeps and download those too
         local_tar=$(basename "$local_file" .hart).tar
         tail -n +6 "$local_file" | unxz > "$local_tar"
 
-        if tar tf "$local_tar" --no-anchored TARGET TDEPS > /dev/null 2>&1; then
-          target=$(tail -n +6 $local_file | xzcat | tar xfO - --no-anchored TARGET)
+        if tar tf "$local_tar" --no-anchored TDEPS > /dev/null 2>&1; then
           tdeps=$(tail -n +6 $local_file | xzcat | tar xfO - --no-anchored TDEPS)
           dep_total=$(echo "$tdeps" | wc -l)
           dep_count="0"
@@ -184,11 +199,11 @@ case "${1:-}" in
           for dep in $tdeps
           do
             dep_count=$((dep_count+1))
-            file_to_check="$tmp_dir/harts/$(echo $dep | tr '/' '-')-$target.hart"
-            download_hart_if_missing "$file_to_check" "$dep" "[$pkg_count/$pkg_total] [$dep_count/$dep_total]" || true
+            file_to_check="$tmp_dir/harts/$(tr '/' '-' <<< $dep)-$target.hart"
+            download_hart_if_missing "$file_to_check" "$dep" "[$pkg_count/$pkg_total] [$dep_count/$dep_total]" "$target" || true
           done
         else
-          echo "[$pkg_count/$pkg_total] $slash_ident either has no TARGET or no TDEPS file. Skipping processing of dependencies."
+          echo "[$pkg_count/$pkg_total] $slash_ident has no TDEPS file. Skipping processing of dependencies."
         fi
       fi
     done
