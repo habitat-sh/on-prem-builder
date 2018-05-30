@@ -1,4 +1,11 @@
+.DS_Store
 bldr.env
 .vagrant
 .secrets/**
 !.secrets/.gitkeep
+results/
+.terraform/
+*.tfstate*
+*.tfvars
+*.crt
+*.key
