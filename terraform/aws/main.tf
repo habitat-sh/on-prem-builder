@@ -189,6 +189,16 @@ resource "aws_instance" "builder" {
   }
 
   provisioner "file" {
+    source      = "${path.module}/../../ssl-certificate.key"
+    destination = "/home/centos/builder/ssl-certificate.key"
+  }
+
+  provisioner "file" {
+    source      = "${path.module}/../../ssl-certificate.crt"
+    destination = "/home/centos/builder/ssl-certificate.crt"
+  }
+
+  provisioner "file" {
     source      = "${path.module}/../../scripts/hab-sup.service.sh"
     destination = "/home/centos/builder/scripts/hab-sup.service.sh"
   }
@@ -216,9 +226,9 @@ resource "aws_instance" "builder" {
   provisioner "remote-exec" {
     inline = [
       "cd /home/centos/builder/scripts",
-      "sudo -E sh ./install-hab.sh",
-      "sudo -E sh ./hab-sup.service.sh",
-      "sudo -E sh ./provision.sh",
+      "sudo -E ./install-hab.sh",
+      "sudo -E ./hab-sup.service.sh",
+      "sudo -E ./provision.sh",
     ]
   }
 }

@@ -33,7 +33,7 @@ usage() {
 }
 
 exists() {
-  if command -v $1 >/dev/null 2>&1
+  if command -v "$1" >/dev/null 2>&1
   then
     return 0
   else
@@ -42,7 +42,7 @@ exists() {
 }
 
 s3_cp() {
-  aws s3 cp --acl=public-read ${1} ${2} >&2
+  aws s3 cp --acl=public-read "${1}" "${2}" >&2
 }
 
 check_tools() {
@@ -134,8 +134,8 @@ case "${1:-}" in
     keys=$(curl -s -H "Accept: application/json" "$upstream_depot/v1/depot/origins/core/keys" | jq ".[] | .location")
     for k in $keys
     do
-      key=$(tr -d '"' <<< $k)
-      release=$(cut -d '/' -f 5 <<< $key)
+      key=$(tr -d '"' <<< "$k")
+      release=$(cut -d '/' -f 5 <<< "$key")
       curl -s -H "Accept: application/json" -o "$tmp_dir/keys/$release.pub" "$upstream_depot/v1/depot$key"
     done
 
@@ -143,7 +143,7 @@ case "${1:-}" in
     cd "$core"
 
     # we want both the directory name and the file name here
-    dir_list=$(find . -type f -name "plan.*" -printf "%h~%f\n" | xargs basename -a | sort -u)
+    dir_list=$(find . -type f -name "plan.*" -printf "%h~%f\\n" | xargs basename -a | sort -u)
     pkg_total=$(echo "$dir_list" | wc -l)
     pkg_count="0"
 
@@ -174,10 +174,10 @@ case "${1:-}" in
         continue
       fi
 
-      slash_ident=$(jq '"\(.origin)/\(.name)/\(.version)/\(.release)"' <<< $raw_ident | tr -d '"')
+      slash_ident=$(jq '"\(.origin)/\(.name)/\(.version)/\(.release)"' <<< "$raw_ident" | tr -d '"')
 
       # check to see if we have this file before fetching it again
-      local_file="$tmp_dir/harts/$(tr '/' '-' <<< $slash_ident)-$target.hart"
+      local_file="$tmp_dir/harts/$(tr '/' '-' <<< "$slash_ident")-$target.hart"
 
       if download_hart_if_missing "$local_file" "$slash_ident" "[$pkg_count/$pkg_total]" "$target"; then
         # now extract the tdeps and download those too
@@ -185,7 +185,7 @@ case "${1:-}" in
         tail -n +6 "$local_file" | unxz > "$local_tar"
 
         if tar tf "$local_tar" --no-anchored TDEPS > /dev/null 2>&1; then
-          tdeps=$(tail -n +6 $local_file | xzcat | tar xfO - --no-anchored TDEPS)
+          tdeps=$(tail -n +6 "$local_file" | xzcat | tar xfO - --no-anchored TDEPS)
           dep_total=$(echo "$tdeps" | wc -l)
           dep_count="0"
 
@@ -199,7 +199,7 @@ case "${1:-}" in
           for dep in $tdeps
           do
             dep_count=$((dep_count+1))
-            file_to_check="$tmp_dir/harts/$(tr '/' '-' <<< $dep)-$target.hart"
+            file_to_check="$tmp_dir/harts/$(tr '/' '-' <<< "$dep")-$target.hart"
             download_hart_if_missing "$file_to_check" "$dep" "[$pkg_count/$pkg_total] [$dep_count/$dep_total]" "$target" || true
           done
         else
@@ -209,10 +209,10 @@ case "${1:-}" in
     done
 
     cd /tmp
-    tar zcvf $tar_file -C $tmp_dir .
+    tar zcvf "$tar_file" -C "$tmp_dir" .
     echo "Uploading tar file to S3."
-    s3_cp $tar_file s3://$bucket/
-    s3_cp s3://$bucket/$bootstrap_file s3://$bucket/$marker
+    s3_cp "$tar_file" "s3://$bucket/"
+    s3_cp "s3://$bucket/$bootstrap_file" "s3://$bucket/$marker"
     echo "Upload to S3 finished."
 
     ;;
@@ -251,7 +251,7 @@ case "${1:-}" in
       key_count=$((key_count+1))
       echo
       echo "[$key_count/$key_total] Importing $key"
-      hab origin key import < $key
+      hab origin key import < "$key"
     done
 
     echo

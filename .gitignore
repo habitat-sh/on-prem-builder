@@ -7,3 +7,5 @@ results/
 .terraform/
 *.tfstate*
 *.tfvars
+*.crt
+*.key
