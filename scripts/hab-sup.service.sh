@@ -1,3 +1,5 @@
+#!/bin/bash
+
 mkdir -p /etc/systemd/system
 
 environment_proxy=""
