@@ -22,7 +22,7 @@ The following are minimum requirements for installation/deployment of the Habita
 * Services should be deployed single-node - scale out is not yet supported
 * Outbound network (HTTPS) connectivity to WAN is required for the _initial_ install
 * Inbound network connectivity from LAN (HTTP/HTTPS) is required for internal clients to access the depot
-* OAuth2 authentication provider (Azure AD, GitHub, GitHub Enterprise, GitLab, Okta and Bitbucket have been verified - additional providers may be added on request)
+* OAuth2 authentication provider (Azure AD, GitHub, GitHub Enterprise, GitLab, Okta and Bitbucket (cloud) have been verified - additional providers may be added on request)
 
 ## Functionality
 
@@ -56,7 +56,7 @@ You may need to work with your enterprise network admin to enable the appropriat
 
 ### OAuth Application
 
-We currently support Azure AD (OpenId Connect), GitHub, GitLab (OpenId Connect), Okta (OpenId Connect) and Atlassian Bitbucket OAuth providers for authentication. You will need to set up an OAuth application for the instance of the depot you are setting up.
+We currently support Azure AD (OpenId Connect), GitHub, GitLab (OpenId Connect), Okta (OpenId Connect) and Atlassian Bitbucket (cloud) OAuth providers for authentication. You will need to set up an OAuth application for the instance of the depot you are setting up.
 
 Refer to the steps that are specific to your OAuth provider to create and configure your OAuth application. The below steps illustrate setting up the OAuth application using Github as the identity provider:
 
