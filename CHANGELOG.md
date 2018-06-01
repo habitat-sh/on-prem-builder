@@ -1,6 +1,15 @@
 # Changelog
 
-## v0.1.0 (22/05/2018)
+## v0.1.1 (01/06/2018)
+- [**closed**] Patch install script for hab 0.56.0 [#58](https://github.com/habitat-sh/on-prem-builder/pull/58)
+- [**closed**] Revert "Terraform" [#56](https://github.com/habitat-sh/on-prem-builder/pull/56)
+- [**closed**] Terraform [#55](https://github.com/habitat-sh/on-prem-builder/pull/55)
+- [**closed**] Add Windows packages to the on-prem bootstrap archive. [#51](https://github.com/habitat-sh/on-prem-builder/pull/51)
+- [**closed**] Add license, etc [#49](https://github.com/habitat-sh/on-prem-builder/pull/49)
+
+---
+
+## v0.1.0 (01/06/2018)
 - [**closed**] Fix README title [#48](https://github.com/habitat-sh/on-prem-builder/pull/48)
 - [**closed**] Update README, add a version file [#47](https://github.com/habitat-sh/on-prem-builder/pull/47)
 - [**closed**] Update README, remove un-needed files [#46](https://github.com/habitat-sh/on-prem-builder/pull/46)
