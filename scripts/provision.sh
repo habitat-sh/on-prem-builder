@@ -2,7 +2,14 @@
 
 set -eou pipefail
 
-source ../bldr.env
+if [ -f ../bldr.env ]; then
+  source ../bldr.env
+elif [ -f /vagrant/bldr.env ]; then
+  source /vagrant/bldr.env
+else
+  echo "ERROR: bldr.env file is missing!"
+  exit 1
+fi
 
 init_datastore() {
   mkdir -p /hab/svc/builder-datastore

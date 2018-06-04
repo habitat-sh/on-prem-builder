@@ -102,20 +102,6 @@ resource "aws_security_group" "default" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  ingress {
-    from_port   = 9631
-    to_port     = 9631
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 9638
-    to_port     = 9638
-    protocol    = "udp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
   egress {
     from_port   = 0
     to_port     = 0
@@ -174,58 +160,58 @@ resource "aws_instance" "builder" {
 
   provisioner "remote-exec" {
     inline = [
-      "mkdir -p /home/centos/builder/scripts",
+      "mkdir -p /home/${var.aws_image_user}/builder/scripts",
     ]
   }
 
   provisioner "file" {
     source      = "${path.module}/../../install.sh"
-    destination = "/home/centos/builder/install.sh"
+    destination = "/home/${var.aws_image_user}/builder/install.sh"
   }
 
   provisioner "file" {
     source      = "${path.module}/../../uninstall.sh"
-    destination = "/home/centos/builder/uninstall.sh"
+    destination = "/home/${var.aws_image_user}/builder/uninstall.sh"
   }
 
   provisioner "file" {
     source      = "${path.module}/../../ssl-certificate.key"
-    destination = "/home/centos/builder/ssl-certificate.key"
+    destination = "/home/${var.aws_image_user}/builder/ssl-certificate.key"
   }
 
   provisioner "file" {
     source      = "${path.module}/../../ssl-certificate.crt"
-    destination = "/home/centos/builder/ssl-certificate.crt"
+    destination = "/home/${var.aws_image_user}/builder/ssl-certificate.crt"
   }
 
   provisioner "file" {
     source      = "${path.module}/../../scripts/hab-sup.service.sh"
-    destination = "/home/centos/builder/scripts/hab-sup.service.sh"
+    destination = "/home/${var.aws_image_user}/builder/scripts/hab-sup.service.sh"
   }
 
   provisioner "file" {
     source      = "${path.module}/../../scripts/install-hab.sh"
-    destination = "/home/centos/builder/scripts/install-hab.sh"
+    destination = "/home/${var.aws_image_user}/builder/scripts/install-hab.sh"
   }
 
   provisioner "file" {
     source      = "${path.module}/../../scripts/on-prem-archive.sh"
-    destination = "/home/centos/builder/scripts/on-prem-archive.sh"
+    destination = "/home/${var.aws_image_user}/builder/scripts/on-prem-archive.sh"
   }
 
   provisioner "file" {
     source      = "${path.module}/../../scripts/provision.sh"
-    destination = "/home/centos/builder/scripts/provision.sh"
+    destination = "/home/${var.aws_image_user}/builder/scripts/provision.sh"
   }
 
   provisioner "file" {
     source      = "${path.module}/../../bldr.env"
-    destination = "/home/centos/builder/bldr.env"
+    destination = "/home/${var.aws_image_user}/builder/bldr.env"
   }
 
   provisioner "remote-exec" {
     inline = [
-      "cd /home/centos/builder/scripts",
+      "cd /home/${var.aws_image_user}/builder/scripts",
       "chmod +x ./install-hab.sh ./hab-sup.service.sh ./provision.sh",
       "sudo -E ./install-hab.sh",
       "sudo -E ./hab-sup.service.sh",
