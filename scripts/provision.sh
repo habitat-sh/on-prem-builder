@@ -11,7 +11,7 @@ else
   exit 1
 fi
 
-init-datastore() {
+init_datastore() {
   mkdir -p /hab/svc/builder-datastore
   cat <<EOT > /hab/svc/builder-datastore/user.toml
 max_locks_per_transaction = 128
@@ -357,38 +357,38 @@ database = "builder_sessionsrv"
 EOT
 }
 
-start-api() {
+start_api() {
   sudo -E hab svc load habitat/builder-api --bind router:builder-router.default --channel "${BLDR_CHANNEL}" --force
 }
 
-start-api-proxy() {
+start_api_proxy() {
   sudo -E hab svc load habitat/builder-api-proxy --bind http:builder-api.default --channel "${BLDR_CHANNEL}" --force
 }
 
-start-datastore() {
+start_datastore() {
   sudo -E hab svc load habitat/builder-datastore --channel "${BLDR_CHANNEL}" --force
 }
 
-start-originsrv() {
+start_originsrv() {
   sudo -E hab svc load habitat/builder-originsrv --bind router:builder-router.default --bind datastore:builder-datastore.default --channel "${BLDR_CHANNEL}" --force
 }
 
-start-router() {
+start_router() {
   sudo -E hab svc load habitat/builder-router --channel "${BLDR_CHANNEL}" --force
 }
 
-start-sessionsrv() {
+start_sessionsrv() {
   sudo -E hab svc load habitat/builder-sessionsrv --bind router:builder-router.default --bind datastore:builder-datastore.default --channel "${BLDR_CHANNEL}" --force
 }
 
 generate_bldr_keys() {
-  keys=( $(find /hab/cache/keys -name "bldr-*.pub") )
+  mapfile -t keys < <(find /hab/cache/keys -name "bldr-*.pub")
 
   if [ "${#keys[@]}" -gt 0 ]; then
-    KEY_NAME=$(echo $keys[0] | grep -Po "bldr-\d+")
+    KEY_NAME=$(echo "${keys[0]}" | grep -Po "bldr-\\d+")
     echo "Re-using existing builder key: $KEY_NAME"
   else
-    KEY_NAME=$(hab user key generate bldr | grep -Po "bldr-\d+")
+    KEY_NAME=$(hab user key generate bldr | grep -Po "bldr-\\d+")
     echo "Generated new builder key: $KEY_NAME"
   fi
 
@@ -400,7 +400,7 @@ upload_ssl_certificate() {
   if [ ${APP_SSL_ENABLED} = true ]; then
     echo "SSL enabled - uploading certificate files"
     if ! [ -f "../ssl-certificate.crt" ] || ! [ -f "../ssl-certificate.key" ]; then
-      echo "$(pwd)"
+      pwd
       echo "ERROR: Certificate file(s) not found!"
       exit 1
     fi
@@ -409,15 +409,15 @@ upload_ssl_certificate() {
   fi
 }
 
-start-builder() {
-  init-datastore
-  start-datastore
+start_builder() {
+  init_datastore
+  start_datastore
   configure
-  start-router
-  start-api
-  start-api-proxy
-  start-originsrv
-  start-sessionsrv
+  start_router
+  start_api
+  start_api_proxy
+  start_originsrv
+  start_sessionsrv
   sleep 2
   generate_bldr_keys
   upload_ssl_certificate
@@ -436,4 +436,4 @@ fi
 
 systemctl start hab-sup
 sleep 2
-start-builder
+start_builder
