@@ -64,7 +64,7 @@ data "aws_ami" "centos" {
 
   filter {
     name   = "name"
-    values = ["indellient-bluepipeline-habitat-*"]
+    values = ["${var.os_filter_name}"]
   }
 
   filter {
@@ -72,7 +72,7 @@ data "aws_ami" "centos" {
     values = ["hvm"]
   }
 
-  owners = ["454860694652"]
+  owners = ["${var.os_filter_account}"]
 }
 
 resource "aws_instance" "builder" {
@@ -82,7 +82,7 @@ resource "aws_instance" "builder" {
   }
 
   ami                         = "${data.aws_ami.centos.id}"
-  instance_type               = "m4.xlarge"                          // Test: c4.xlarge Prod: c4.4xlarge
+  instance_type               = "${var.instance_type}"                          // Test: c4.xlarge Prod: c4.4xlarge
   key_name                    = "${var.aws_key_pair_name}"
   subnet_id                   = "${var.subnet_id}"
   vpc_security_group_ids      = ["${aws_security_group.default.id}"]

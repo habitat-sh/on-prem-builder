@@ -69,8 +69,24 @@ variable "subnet_id" {
   description = "Subnet ID"
 }
 
-
 variable "vpc_id" {
   type        = "string"
   description = "VPC ID"
+}
+
+variable "instance_type" {
+  type        = "string"
+  description = "Depot Instance Size"
+}
+
+variable "os_filter_name" {
+  type        = "string"
+  description = "OS Search Name"
+  default     = "indellient-bluepipeline-habitat-*"
+}
+
+variable "os_filter_account" {
+  type        = "string"
+  description = "OS Search Account"
+  default     = "454860694652"
 }
