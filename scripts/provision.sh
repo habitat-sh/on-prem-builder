@@ -434,6 +434,9 @@ else
   sudo -E addgroup --system hab || true
 fi
 
+chown -R hab: /hab
+chmod u+rwx /hab
+
 systemctl start hab-sup
 sleep 2
 start_builder
