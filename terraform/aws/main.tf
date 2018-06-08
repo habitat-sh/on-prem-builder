@@ -1,8 +1,3 @@
-terraform {
-  // Always hard pin, Terraform frequently introduces breaking changes in minor/patch versions.
-  required_version = "0.11.7"
-}
-
 provider "aws" {
   profile                 = "${var.aws_profile}"
   shared_credentials_file = "~/.aws/credentials"
@@ -13,55 +8,6 @@ resource "random_id" "hash" {
   byte_length = 4
 }
 
-resource "aws_vpc" "default" {
-  cidr_block = "10.0.0.0/16"
-
-  tags {
-    Name          = "${var.tag_customer}_${var.tag_project}_${var.tag_application}_${random_id.hash.hex}"
-    X-Dept        = "${var.tag_dept}"
-    X-Customer    = "${var.tag_customer}"
-    X-Project     = "${var.tag_project}"
-    X-Application = "${var.tag_application}"
-    X-Contact     = "${var.tag_contact}"
-    X-TTL         = "${var.tag_ttl}"
-  }
-}
-
-resource "aws_internet_gateway" "default" {
-  vpc_id = "${aws_vpc.default.id}"
-
-  tags {
-    Name          = "${var.tag_customer}_${var.tag_project}_${var.tag_application}_${random_id.hash.hex}"
-    X-Dept        = "${var.tag_dept}"
-    X-Customer    = "${var.tag_customer}"
-    X-Project     = "${var.tag_project}"
-    X-Application = "${var.tag_application}"
-    X-Contact     = "${var.tag_contact}"
-    X-TTL         = "${var.tag_ttl}"
-  }
-}
-
-resource "aws_route" "internet_access" {
-  route_table_id         = "${aws_vpc.default.main_route_table_id}"
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = "${aws_internet_gateway.default.id}"
-}
-
-resource "aws_subnet" "default" {
-  vpc_id                  = "${aws_vpc.default.id}"
-  cidr_block              = "10.0.1.0/24"
-  map_public_ip_on_launch = true
-
-  tags {
-    Name          = "${var.tag_customer}_${var.tag_project}_${var.tag_application}_${random_id.hash.hex}"
-    X-Dept        = "${var.tag_dept}"
-    X-Customer    = "${var.tag_customer}"
-    X-Project     = "${var.tag_project}"
-    X-Application = "${var.tag_application}"
-    X-Contact     = "${var.tag_contact}"
-    X-TTL         = "${var.tag_ttl}"
-  }
-}
 
 ////////////////////////////////
 // Firewalls
@@ -69,7 +15,7 @@ resource "aws_subnet" "default" {
 resource "aws_security_group" "default" {
   name        = "${var.tag_application}"
   description = "${var.tag_application}"
-  vpc_id      = "${aws_vpc.default.id}"
+  vpc_id      = "${var.vpc_id}"
 
   tags {
     Name          = "${var.tag_customer}_${var.tag_project}_${var.tag_application}_${random_id.hash.hex}"
@@ -118,7 +64,7 @@ data "aws_ami" "centos" {
 
   filter {
     name   = "name"
-    values = ["chef-highperf-centos7-*"]
+    values = ["indellient-bluepipeline-habitat-*"]
   }
 
   filter {
@@ -126,7 +72,7 @@ data "aws_ami" "centos" {
     values = ["hvm"]
   }
 
-  owners = ["446539779517"]
+  owners = ["454860694652"]
 }
 
 resource "aws_instance" "builder" {
@@ -136,9 +82,9 @@ resource "aws_instance" "builder" {
   }
 
   ami                         = "${data.aws_ami.centos.id}"
-  instance_type               = "c4.xlarge"                          // Test: c4.xlarge Prod: c4.4xlarge
+  instance_type               = "m4.xlarge"                          // Test: c4.xlarge Prod: c4.4xlarge
   key_name                    = "${var.aws_key_pair_name}"
-  subnet_id                   = "${aws_subnet.default.id}"
+  subnet_id                   = "${var.subnet_id}"
   vpc_security_group_ids      = ["${aws_security_group.default.id}"]
   associate_public_ip_address = true
 
@@ -172,16 +118,6 @@ resource "aws_instance" "builder" {
   provisioner "file" {
     source      = "${path.module}/../../uninstall.sh"
     destination = "/home/${var.aws_image_user}/builder/uninstall.sh"
-  }
-
-  provisioner "file" {
-    source      = "${path.module}/../../ssl-certificate.key"
-    destination = "/home/${var.aws_image_user}/builder/ssl-certificate.key"
-  }
-
-  provisioner "file" {
-    source      = "${path.module}/../../ssl-certificate.crt"
-    destination = "/home/${var.aws_image_user}/builder/ssl-certificate.crt"
   }
 
   provisioner "file" {
