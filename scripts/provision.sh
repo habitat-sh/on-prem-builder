@@ -42,6 +42,12 @@ configure() {
     ANALYTICS_COMPANY_ID=${ANALYTICS_COMPANY_ID:="builder-on-prem"}
   fi
 
+  mkdir -p /hab/svc/builder-minio
+  cat <<EOT > /hab/svc/builder-minio/user.toml
+key_id = "depot"
+secret_key = "password"
+EOT
+
   mkdir -p /hab/svc/builder-api
   cat <<EOT > /hab/svc/builder-api/user.toml
 log_level="info"
@@ -61,6 +67,13 @@ client_secret = "$OAUTH_CLIENT_SECRET"
 [segment]
 url = "https://api.segment.io"
 write_key = "$ANALYTICS_WRITE_KEY"
+
+[s3]
+backend = "minio"
+key_id = "$MINIO_ACCESS_KEY"
+secret_key = "$MINIO_SECRET_KEY"
+endpoint = "$MINIO_ENDPOINT"
+bucket_name = "$MINIO_BUCKET"
 EOT
 
   mkdir -p /hab/svc/builder-api-proxy
@@ -401,6 +414,21 @@ start_sessionsrv() {
   sudo -E hab svc load habitat/builder-sessionsrv --bind router:builder-router.default --bind datastore:builder-datastore.default --channel "${BLDR_CHANNEL}" --force
 }
 
+start_minio() {
+  hab pkg install -bf core/aws-cli
+  export AWS_ACCESS_KEY_ID="$MINIO_ACCESS_KEY"
+  export AWS_SECRET_ACCESS_KEY="$MINIO_SECRET_KEY"
+
+  sudo -E hab svc load habitat/builder-minio --channel "${BLDR_CHANNEL}" --force
+
+  if aws --endpoint-url $MINIO_ENDPOINT s3api list-buckets | grep "$MINIO_BUCKET" > /dev/null; then
+    echo "Minio already configured"
+  else
+    echo "Creating bucket in Minio"
+    aws --endpoint-url $MINIO_ENDPOINT s3api create-bucket --bucket "$MINIO_BUCKET"
+  fi
+}
+
 generate_bldr_keys() {
   mapfile -t keys < <(find /hab/cache/keys -name "bldr-*.pub")
 
@@ -433,6 +461,7 @@ start_builder() {
   init_datastore
   start_datastore
   configure
+  start_minio
   start_router
   start_api
   start_api_proxy
