@@ -32,6 +32,10 @@ configure() {
   export PGPASSWORD
   PGPASSWORD=$(cat /hab/svc/builder-datastore/config/pwfile)
 
+  export ANALYTICS_ENABLED=${ANALYTICS_ENABLED:="false"}
+  export ANALYTICS_COMPANY_ID=${ANALYTICS_COMPANY_ID:="builder-on-prem"}
+  export ANALYTICS_WRITE_KEY=${ANALYTICS_WRITE_KEY:="NAwVPW04CeESMW3vtyqjJZmVMNBSQ1K1"}
+
   mkdir -p /hab/svc/builder-api
   cat <<EOT > /hab/svc/builder-api/user.toml
 log_level="info"
@@ -47,6 +51,10 @@ token_url = "$OAUTH_TOKEN_URL"
 redirect_url = "$OAUTH_REDIRECT_URL"
 client_id = "$OAUTH_CLIENT_ID"
 client_secret = "$OAUTH_CLIENT_SECRET"
+
+[segment]
+url = "https://api.segment.io"
+write_key = "$ANALYTICS_WRITE_KEY"
 EOT
 
   mkdir -p /hab/svc/builder-api-proxy
@@ -71,6 +79,12 @@ keepalive_timeout = "180s"
 
 [server]
 listen_tls = $APP_SSL_ENABLED
+
+[analytics]
+enabled = $ANALYTICS_ENABLED
+company_id = "$ANALYTICS_COMPANY_ID"
+company_name = "$ANALYTICS_COMPANY_NAME"
+write_key = "$ANALYTICS_WRITE_KEY"
 EOT
 
   mkdir -p /hab/svc/builder-originsrv
