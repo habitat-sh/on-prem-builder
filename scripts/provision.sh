@@ -33,8 +33,14 @@ configure() {
   PGPASSWORD=$(cat /hab/svc/builder-datastore/config/pwfile)
 
   export ANALYTICS_ENABLED=${ANALYTICS_ENABLED:="false"}
-  export ANALYTICS_COMPANY_ID=${ANALYTICS_COMPANY_ID:="builder-on-prem"}
-  export ANALYTICS_WRITE_KEY=${ANALYTICS_WRITE_KEY:="NAwVPW04CeESMW3vtyqjJZmVMNBSQ1K1"}
+  export ANALYTICS_COMPANY_ID
+  export ANALYTICS_COMPANY_NAME
+  export ANALYTICS_WRITE_KEY
+
+  if [ $ANALYTICS_ENABLED = "true" ]; then
+    ANALYTICS_WRITE_KEY=${ANALYTICS_WRITE_KEY:="NAwVPW04CeESMW3vtyqjJZmVMNBSQ1K1"}
+    ANALYTICS_COMPANY_ID=${ANALYTICS_COMPANY_ID:="builder-on-prem"}
+  fi
 
   mkdir -p /hab/svc/builder-api
   cat <<EOT > /hab/svc/builder-api/user.toml
