@@ -1,9 +1,3 @@
-provider "aws" {
-  profile                 = "${var.aws_profile}"
-  shared_credentials_file = "~/.aws/credentials"
-  region                  = "${var.aws_region}"
-}
-
 resource "random_id" "hash" {
   byte_length = 4
 }
@@ -141,7 +135,7 @@ resource "aws_instance" "builder" {
   }
 
   provisioner "file" {
-    source      = "${path.module}/../../bldr.env"
+    source      = "./bldr.env"
     destination = "/home/${var.aws_image_user}/builder/bldr.env"
   }
 
