@@ -110,7 +110,7 @@ sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/privat
 1. Clone this repo (or unzip the archive you have been given) at the desired machine where you will stand up the Habitat Builder Depot
 1. `cd ${SRC_ROOT}`
 1. `cp bldr.env.sample bldr.env`
-1. Edit `bldr.env` with a text editor and replace the values appropriately
+1. Edit `bldr.env` with a text editor and replace the values appropriately. Consider helping us to improve Habitat as well by changing the `ANALYTICS_ENABLED` setting to `true` and providing an optional company name.
 1. `./install.sh`
 
 If everything goes well, you should see output similar to the following showing that the depot services are loaded:
