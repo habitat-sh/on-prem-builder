@@ -69,7 +69,7 @@ variable "subnet_id" {
   description = "Subnet ID"
 }
 
-variable "vpc_id" {
+variable "depot_vpc_id" {
   type        = "string"
   description = "VPC ID"
 }
