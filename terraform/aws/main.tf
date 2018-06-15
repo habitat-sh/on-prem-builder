@@ -2,14 +2,13 @@ resource "random_id" "hash" {
   byte_length = 4
 }
 
-
 ////////////////////////////////
 // Firewalls
 
 resource "aws_security_group" "default" {
   name        = "${var.tag_application}"
   description = "${var.tag_application}"
-  vpc_id      = "${var.vpc_id}"
+  vpc_id      = "${var.depot_vpc_id}"
 
   tags {
     Name          = "${var.tag_customer}_${var.tag_project}_${var.tag_application}_${random_id.hash.hex}"
@@ -76,7 +75,7 @@ resource "aws_instance" "builder" {
   }
 
   ami                         = "${data.aws_ami.centos.id}"
-  instance_type               = "${var.instance_type}"                          // Test: c4.xlarge Prod: c4.4xlarge
+  instance_type               = "${var.instance_type}"               // Test: c4.xlarge Prod: c4.4xlarge
   key_name                    = "${var.aws_key_pair_name}"
   subnet_id                   = "${var.subnet_id}"
   vpc_security_group_ids      = ["${aws_security_group.default.id}"]
