@@ -1,5 +1,9 @@
 # On Premise Habitat Builder Depot
 
+## IMPORTANT NOTICE
+
+Please see the `Migrating Package Artifacts to Minio` section if your existing On-Premise Depot was installed *prior* to June 15th 2018. The package artifacts are now stored in a Minio instance, and running a migration script will be required in order to properly transition over to newer versions of On-Premise Depot.
+
 ## Introduction
 
 This repository contains scripts to install Habitat Builder Depot services. These services (referred to as the On-Premise Habitat Builder Depot) allow privately hosting Habitat packages (and associated artifacts such as keys) on-premise. Habitat clients (such as the `hab` cli, Supervisors and Studios) can be pointed to the on-premise depot and allow for development, execution and management without depending on the public Habitat services.
@@ -107,7 +111,7 @@ sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/privat
 
 ## Setup
 
-1. Clone this repo (or unzip the archive you have been given) at the desired machine where you will stand up the Habitat Builder Depot
+1. Clone this repo (or unzip the archive you have downloaded from the Github release page) at the desired machine where you will stand up the Habitat Builder Depot
 1. `cd ${SRC_ROOT}`
 1. `cp bldr.env.sample bldr.env`
 1. Edit `bldr.env` with a text editor and replace the values appropriately. Consider helping us to improve Habitat as well by changing the `ANALYTICS_ENABLED` setting to `true` and providing an optional company name.
@@ -128,9 +132,13 @@ Do a `hab svc status` to check the status of all the services. They may take a f
 
 If things don't work as expected (eg, if all the services are not in the `up` state), please see the Troubleshooting section below.
 
-## Web UI
+## Minio Web UI
 
-Once the services are running successfully, the Builder UI will become available at the configured hostname or IP address.
+The On-Premise Depot stores package artifacts in Minio (https://github.com/minio/minio). By default, the Minio instance will be available on port 9000 (or whatever port you specified in your `bldr.env`). Please confirm that the Minio UI is available, and that you can log in with the credentials that were specified in your `bldr.env` file. There should already be a bucket created in which to host the artifacts.
+
+## Depot Web UI
+
+Once the services are running successfully, the Builder Depot UI will become available at the configured hostname or IP address.
 
 Navigate to `http://${APP_HOSTNAME_OR_IP}/#/sign-in` to access the Builder UI.
 
@@ -212,13 +220,38 @@ Once the services are uninstalled, you may re-install them by running `./install
 
 *IMPORTANT*: Running the uninstall script will *NOT* remove any user data, so you can freely uninstall and re-install the services.
 
+## Migrating Package Artifacts to Minio
+
+This section is for installations of On-Premise Depot that were done *prior* to June 15, 2018. If you re-install or upgrade to a newer version of the On-Premise Depot, you will be required to also migrate your package artifacts to a local instance of Minio (the new object store we are using). Please follow the steps below.
+
+### Pre-requisites
+1. Install the following Habitat packages:
+```
+hab pkg install -b core/aws-cli
+hab pkg install -b core/jq-static
+hab pkg install -b habitat/s3-bulk-uploader
+```
+If you are running in an "air-gapped" environment, you may need to download the hart files and do a `hab pkg install -b <HART FILE>` instead.  Don't forget the `-b` parameter to binlink the binaries into your path.
+1. Please make sure that you have appropriate values for Minio in your `bldr.env`.  Check the 'bldr.env.sample' for the new required values.
+
+### Migration
+1. Run the `install.sh` script so that Minio is appropriately configured
+1. Check that you can log into your Minio instance at the URL specified in the `bldr.env`
+1. If all looks good, run the artifact migration script: `sudo ./scripts/s3migrate.sh minio`
+
+Once the migration script starts, you will be presented with some questions to specify the Minio instance, the credentials, and the Minio bucket name to migrate your package artifacts to. The script will attempt to automatically detect all of these from the running service, so you can usually just accept the defaults. Please refer to your `bldr.env` file if you need to explicitly type in any values.
+
+The migration script may take a while to move over the artifacts into Minio. During the script migration, the Depot services will continue to run as normal, however packages will not be downloadable until the artifacts are migrated over to Minio.  
+
+Once the migration is complete, you will be presented with an option to remove the files in your `hab/svc/builder-api/data/pkgs` directory. You may want to preserve the files until you have verified that all operations are completing successfully.
+
 ## Support
 
 You can also post any questions or issues on the [Habitat Forum](https://forums.habitat.sh/), on our [Slack channel](https://habitat-sh.slack.com), or file issues directly at the [Github repo](https://github.com/habitat-sh/on-prem-builder/issues).
 
 ## Troubleshooting
 
-### Network access
+### Network access / proxy configuration
 
 If the initial install fails, please check that you have outgoing connectivity, and that you can successfully ping the following:
 * `raw.githubusercontent.com`
