@@ -11,10 +11,10 @@ resource "aws_security_group" "default" {
   vpc_id      = "${var.depot_vpc_id}"
 
   tags {
-    Name          = "${var.tag_customer}_${var.tag_project}_${var.tag_application}_${random_id.hash.hex}"
+    Name          = "${var.depot_tag_customer}_${var.depot_tag_project}_${var.tag_application}_${random_id.hash.hex}"
     X-Dept        = "${var.tag_dept}"
-    X-Customer    = "${var.tag_customer}"
-    X-Project     = "${var.tag_project}"
+    X-Customer    = "${var.depot_tag_customer}"
+    X-Project     = "${var.depot_tag_project}"
     X-Application = "${var.tag_application}"
     X-Contact     = "${var.tag_contact}"
     X-TTL         = "${var.tag_ttl}"
@@ -88,10 +88,10 @@ resource "aws_instance" "builder" {
   }
 
   tags {
-    Name          = "${var.tag_customer}_${var.tag_project}_${var.tag_application}_${random_id.hash.hex}"
+    Name          = "${var.depot_tag_customer}_${var.depot_tag_project}_${var.tag_application}_${random_id.hash.hex}"
     X-Dept        = "${var.tag_dept}"
-    X-Customer    = "${var.tag_customer}"
-    X-Project     = "${var.tag_project}"
+    X-Customer    = "${var.depot_tag_customer}"
+    X-Project     = "${var.depot_tag_project}"
     X-Application = "${var.tag_application}"
     X-Contact     = "${var.tag_contact}"
     X-TTL         = "${var.tag_ttl}"

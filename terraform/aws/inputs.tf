@@ -34,16 +34,14 @@ variable "tag_dept" {
   default     = "DevOps"
 }
 
-variable "tag_customer" {
+variable "depot_tag_customer" {
   type        = "string"
   description = "X-Customer: A tag for identifying resources associated with a customer."
-  default     = "Indellient"
 }
 
-variable "tag_project" {
+variable "depot_tag_project" {
   type        = "string"
   description = "X-Project: A tag for identifying resources associated with a project."
-  default     = "Bluepipeline"
 }
 
 variable "tag_application" {
