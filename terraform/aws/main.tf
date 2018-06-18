@@ -104,12 +104,12 @@ resource "aws_instance" "builder" {
   }
 
   provisioner "file" {
-    source      = "${path.module}/../../install.sh"
+    source      = "${path.module}/files/install.sh"
     destination = "/home/${var.aws_image_user}/builder/install.sh"
   }
 
   provisioner "file" {
-    source      = "${path.module}/../../uninstall.sh"
+    source      = "${path.module}/files/uninstall.sh"
     destination = "/home/${var.aws_image_user}/builder/uninstall.sh"
   }
 
