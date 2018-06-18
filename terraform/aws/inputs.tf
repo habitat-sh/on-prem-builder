@@ -13,7 +13,6 @@ variable "aws_profile" {
 variable "aws_key_pair_file" {
   type        = "string"
   description = "The path on disk to your private key. This key will be used to establish connectivity to resources."
-  default     = "~/.ssh/bluepipeline.pem"
 }
 
 variable "aws_key_pair_name" {
