@@ -134,7 +134,7 @@ resource "aws_instance" "builder" {
   }
 
   provisioner "file" {
-    source      = "./bldr.env"
+    source      = "${var.bldr_env_path}"
     destination = "/home/${var.aws_image_user}/builder/bldr.env"
   }
 

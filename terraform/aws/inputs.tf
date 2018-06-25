@@ -87,3 +87,9 @@ variable "os_filter_account" {
   description = "OS Search Account"
   default     = "454860694652"
 }
+
+variable "bldr_env_path" {
+  type        = "string"
+  description = "The builder environment file"
+  default     = "./bldr.env"
+}
