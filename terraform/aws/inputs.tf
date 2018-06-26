@@ -88,8 +88,6 @@ variable "os_filter_account" {
   default     = "454860694652"
 }
 
-variable "bldr_env_path" {
-  type        = "string"
-  description = "The builder environment file"
-  default     = "./bldr.env"
+variable "bldr_env_data" {
+  description = "The builder environment file data"
 }
