@@ -7,18 +7,19 @@ variable "aws_region" {
 variable "aws_profile" {
   type        = "string"
   description = "The profile on disk. Typically stored in your ~/.aws/config file."
-  default     = "bluepipeline"
+  default     = "egifter"
 }
 
 variable "aws_key_pair_file" {
   type        = "string"
   description = "The path on disk to your private key. This key will be used to establish connectivity to resources."
+  
 }
 
 variable "aws_key_pair_name" {
   type        = "string"
   description = "The name in AWS associated with the public key on your AWS account. Used to allow access to your private key file by placing your public key on resources."
-  default     = "bluepipeline"
+  default     = "egifter"
 }
 
 variable "aws_image_user" {
