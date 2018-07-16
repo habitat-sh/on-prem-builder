@@ -74,7 +74,7 @@ resource "aws_instance" "builder" {
     private_key = "${file("${var.aws_key_pair_file}")}"
   }
 
-  ami                         = "ami-d7e1d2bd"
+  ami                         = "${var.bldr_ami}"
   instance_type               = "${var.instance_type}"               // Test: c4.xlarge Prod: c4.4xlarge
   key_name                    = "${var.aws_key_pair_name}"
   subnet_id                   = "${var.subnet_id}"
