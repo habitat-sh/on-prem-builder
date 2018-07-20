@@ -415,7 +415,8 @@ start_sessionsrv() {
 }
 
 start_minio() {
-  hab pkg install -bf core/aws-cli
+  hab pkg install core/aws-cli
+  hab pkg binlink core/aws-cli -f aws
   export AWS_ACCESS_KEY_ID="$MINIO_ACCESS_KEY"
   export AWS_SECRET_ACCESS_KEY="$MINIO_SECRET_KEY"
 
