@@ -49,25 +49,6 @@ resource "aws_security_group" "default" {
   }
 }
 
-////////////////////////////////
-// On Prem Builder - Single Instance
-
-// data "aws_ami" "centos" {
-//   most_recent = true
-
-//   filter {
-//     name   = "name"
-//     values = ["${var.os_filter_name}"]
-//   }
-
-//   filter {
-//     name   = "virtualization-type"
-//     values = ["hvm"]
-//   }
-
-//   owners = ["${var.os_filter_account}"]
-// }
-
 resource "aws_instance" "builder" {
   connection {
     user        = "${var.aws_image_user}"
