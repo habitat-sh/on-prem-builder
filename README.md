@@ -26,7 +26,7 @@ The following are minimum requirements for installation/deployment of the Habita
 * Services should be deployed single-node - scale out is not yet supported
 * Outbound network (HTTPS) connectivity to WAN is required for the _initial_ install
 * Inbound network connectivity from LAN (HTTP/HTTPS) is required for internal clients to access the depot
-* OAuth2 authentication provider (Azure AD, GitHub, GitHub Enterprise, GitLab, Okta and Bitbucket (cloud) have been verified - additional providers may be added on request)
+* OAuth2 authentication provider (Chef Automate v2, Azure AD, GitHub, GitHub Enterprise, GitLab, Okta and Bitbucket (cloud) have been verified - additional providers may be added on request)
 
 ## Functionality
 
@@ -60,7 +60,7 @@ You may need to work with your enterprise network admin to enable the appropriat
 
 ### OAuth Application
 
-We currently support Azure AD (OpenId Connect), GitHub, GitLab (OpenId Connect), Okta (OpenId Connect) and Atlassian Bitbucket (cloud) OAuth providers for authentication. You will need to set up an OAuth application for the instance of the depot you are setting up.
+We currently support Chef Automate v2, Azure AD (OpenId Connect), GitHub, GitLab (OpenId Connect), Okta (OpenId Connect) and Atlassian Bitbucket (cloud) OAuth providers for authentication. You will need to set up an OAuth application for the instance of the depot you are setting up.
 
 Refer to the steps that are specific to your OAuth provider to create and configure your OAuth application. The below steps illustrate setting up the OAuth application using Github as the identity provider:
 
@@ -75,6 +75,7 @@ For the configuration below, you will also need to know following *fully qualifi
 * API Endpoint (example: `https://api.github.com`)
 
 For more information, please refer to the developer documentation of these services:
+* [Chef Automate](https://automate.chef.io/docs/configuration/#setting-up-automate-as-an-oauth-provider-for-builder)
 * [Azure Active Directory](https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-protocols-oauth-code)
 * [GitHub](https://developer.github.com/apps/building-oauth-apps/authorization-options-for-oauth-apps/)
 * [GitLab](https://docs.gitlab.com/ee/integration/oauth_provider.html)
@@ -82,6 +83,8 @@ For more information, please refer to the developer documentation of these servi
 * [BitBucket](https://confluence.atlassian.com/bitbucket/oauth-on-bitbucket-cloud-238027431.html)
 
 Further information on the OAuth endpoints can also be found [here](https://tools.ietf.org/html/rfc6749#page-21).
+
+*Note*: When setting Chef Automate as your OAuth provider, you will need to add your Automate instance's TLS certificate (found at the `load_balancer.v1.sys.frontend_tls` entry in your Chef Automate `config.toml` file), to your Builder instance's list of accepted certs. Currently, this can be done by modifying the `core/cacert` package and appending the cert to the cert.pem file at the following location: `$(hab pkg path core/cacerts)/ssl/cert.pem`.
 
 ### Preparing your filesystem (Optional)
 
