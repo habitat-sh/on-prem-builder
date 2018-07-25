@@ -40,6 +40,10 @@ configure() {
   if [ $ANALYTICS_ENABLED = "true" ]; then
     ANALYTICS_WRITE_KEY=${ANALYTICS_WRITE_KEY:="NAwVPW04CeESMW3vtyqjJZmVMNBSQ1K1"}
     ANALYTICS_COMPANY_ID=${ANALYTICS_COMPANY_ID:="builder-on-prem"}
+  else
+    ANALYTICS_WRITE_KEY=""
+    ANALYTICS_COMPANY_ID=""
+    ANALYTICS_COMPANY_NAME=""
   fi
 
   mkdir -p /hab/svc/builder-minio
