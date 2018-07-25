@@ -49,32 +49,13 @@ resource "aws_security_group" "default" {
   }
 }
 
-////////////////////////////////
-// On Prem Builder - Single Instance
-
-data "aws_ami" "centos" {
-  most_recent = true
-
-  filter {
-    name   = "name"
-    values = ["${var.os_filter_name}"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-
-  owners = ["${var.os_filter_account}"]
-}
-
 resource "aws_instance" "builder" {
   connection {
     user        = "${var.aws_image_user}"
     private_key = "${file("${var.aws_key_pair_file}")}"
   }
 
-  ami                         = "${data.aws_ami.centos.id}"
+  ami                         = "${var.bldr_ami}"
   instance_type               = "${var.instance_type}"               // Test: c4.xlarge Prod: c4.4xlarge
   key_name                    = "${var.aws_key_pair_name}"
   subnet_id                   = "${var.subnet_id}"
@@ -114,22 +95,22 @@ resource "aws_instance" "builder" {
   }
 
   provisioner "file" {
-    source      = "${path.module}/../../scripts/hab-sup.service.sh"
+    source      = "${path.module}/scripts/hab-sup.service.sh"
     destination = "/home/${var.aws_image_user}/builder/scripts/hab-sup.service.sh"
   }
 
   provisioner "file" {
-    source      = "${path.module}/../../scripts/install-hab.sh"
+    source      = "${path.module}/scripts/install-hab.sh"
     destination = "/home/${var.aws_image_user}/builder/scripts/install-hab.sh"
   }
 
   provisioner "file" {
-    source      = "${path.module}/../../scripts/on-prem-archive.sh"
+    source      = "${path.module}/scripts/on-prem-archive.sh"
     destination = "/home/${var.aws_image_user}/builder/scripts/on-prem-archive.sh"
   }
 
   provisioner "file" {
-    source      = "${path.module}/../../scripts/provision.sh"
+    source      = "${path.module}/scripts/provision.sh"
     destination = "/home/${var.aws_image_user}/builder/scripts/provision.sh"
   }
 
@@ -144,6 +125,7 @@ resource "aws_instance" "builder" {
       "chmod +x ./install-hab.sh ./hab-sup.service.sh ./provision.sh",
       "sudo -E ./install-hab.sh",
       "sudo -E ./hab-sup.service.sh",
+      "sleep 10",
       "sudo -E ./provision.sh",
     ]
   }

@@ -7,7 +7,7 @@ variable "aws_region" {
 variable "aws_profile" {
   type        = "string"
   description = "The profile on disk. Typically stored in your ~/.aws/config file."
-  default     = "bluepipeline"
+  default     = ""
 }
 
 variable "aws_key_pair_file" {
@@ -18,7 +18,7 @@ variable "aws_key_pair_file" {
 variable "aws_key_pair_name" {
   type        = "string"
   description = "The name in AWS associated with the public key on your AWS account. Used to allow access to your private key file by placing your public key on resources."
-  default     = "bluepipeline"
+  default     = ""
 }
 
 variable "aws_image_user" {
@@ -90,4 +90,8 @@ variable "os_filter_account" {
 
 variable "bldr_env_data" {
   description = "The builder environment file data"
+}
+
+variable "bldr_ami" {
+  description = "The ami to use for the builder instance"
 }
