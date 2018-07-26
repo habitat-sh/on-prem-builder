@@ -360,9 +360,13 @@ If you have turned on the automated package fetch from an upstream, and are not 
 
 If you want to turn on and examine the services debug logging, you can do so by doing the following on your install location:
 
-`for svc in originsrv api router sessionsrv; do echo 'log_level="debug"' | hab config apply "builder-${svc}.default" $(date +%s) ; done`
+`for svc in originsrv api router sessionsrv; do echo 'log_level="debug"' | sudo hab config apply "builder-${svc}.default" $(date +%s) ; done`
 
 Once the logging is enabled, you can examine it via `journalctl -fu hab-sup`
+
+*Tip*: If debugging an authentication issue, you may want to turn on debug only for the builder-api service, as normally the other services' debug logging is not needed. In that case, you can do the following:
+
+`echo 'log_level="debug"' | sudo hab config apply "builder-api.default" $(date +%s)`
 
 When you are done with debugging, you can set the logging back to the default setting by running:
 
