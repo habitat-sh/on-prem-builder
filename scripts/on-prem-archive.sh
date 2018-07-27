@@ -18,6 +18,9 @@
 # Setting this variable to any value will cause the cleanup to be skipped. By
 # default, the script will clean up after itself.
 #
+# HAB_ON_PREM_BOOTSTRAP_KEEP_ARCHIVE_FILE: Sometimes you don't want to delete the
+# archive file you just spent many minutes creating. Setting this keeps the file.
+#
 # Additionally, if you're using this script to populate an existing depot, and you
 # don't have network connectivity to download a tarball from S3, you can pass the
 # path to your existing tarball as the third argument and that will be used to
@@ -28,7 +31,7 @@
 set -euo pipefail
 
 usage() {
-  echo "Usage: on-prem-archive.sh {create-archive | populate-depot <DEPOT_URL> [PATH_TO_EXISTING_TARBALL] | download-archive}"
+  echo "Usage: on-prem-archive.sh {create-archive | populate-depot <DEPOT_URL> [PATH_TO_EXISTING_TARBALL] | download-archive | upload-archive <PATH_TO_EXISTING_TARBALL>}"
   exit 1
 }
 
@@ -79,7 +82,7 @@ cleanup() {
         rm -fr "$core_tmp"
       fi
 
-      if [ -f "${tar_file:-}" ]; then
+      if [ -z "${HAB_ON_PREM_BOOTSTRAP_KEEP_ARCHIVE_FILE:-}" ] && [ -f "${tar_file:-}" ]; then
         rm "$tar_file"
       fi
     fi
@@ -108,9 +111,36 @@ download_hart_if_missing() {
   fi
 }
 
+populate_packages() {
+  local dir_list=$1
+
+  for p in $dir_list
+  do
+    IFS='~' read -ra parts <<< "$p"
+    pkg_name=${parts[0]}
+    plan_name=${parts[1]}
+    actual_pkg_name=$(grep -m 1 pkg_name "$pkg_name/$plan_name" | cut -d = -f 2 | tr -d ' "' | tr '[:upper:]' '[:lower:]')
+    packages+=("$actual_pkg_name~$plan_name")
+  done
+
+  # re-sort and unique the array, otherwise we end up with dupes
+  IFS=" " read -ra packages <<< "$(echo "${packages[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' ')"
+}
+
+upload_archive() {
+  local archive=$1
+  local bs_file
+  bs_file=$(basename "$1")
+  echo "Uploading tar file to S3."
+  s3_cp "$archive" "s3://$bucket/"
+  s3_cp "s3://$bucket/$bs_file" "s3://$bucket/$marker"
+  echo "Upload to S3 finished."
+}
+
 bucket="${HAB_ON_PREM_BOOTSTRAP_BUCKET_NAME:-habitat-on-prem-builder-bootstrap}"
 s3_root_url="${HAB_ON_PREM_BOOTSTRAP_S3_ROOT_URL:-https://s3-us-west-2.amazonaws.com}/$bucket"
 marker="LATEST.tar.gz"
+declare -a packages
 
 case "${1:-}" in
   create-archive)
@@ -120,6 +150,7 @@ case "${1:-}" in
     core_tmp=$(mktemp -d)
     upstream_depot="https://bldr.habitat.sh"
     core="$core_tmp/core-plans"
+    habitat="$core_tmp/habitat"
     bootstrap_file="on-prem-bootstrap-$(date +%Y%m%d%H%M%S).tar.gz"
     tar_file="/tmp/$bootstrap_file"
     tmp_dir=$(mktemp -d)
@@ -143,12 +174,20 @@ case "${1:-}" in
     cd "$core"
 
     # we want both the directory name and the file name here
-    dir_list=$(find . -type f -name "plan.*" -printf "%h~%f\\n" | xargs basename -a | sort -u)
-    pkg_total=$(echo "$dir_list" | wc -l)
+    cp_dir_list=$(find . -type f -name "plan.*" -printf "%h~%f\\n" | sort -u)
+    populate_packages "$cp_dir_list"
+
+    # let's also pull in any hab components that might have a hart file
+    git clone https://github.com/habitat-sh/habitat.git "$habitat"
+    cd "$habitat/components"
+
+    hb_dir_list=$(find . -type f -name "plan.*" -printf "%h~%f\\n" | sort -u)
+    populate_packages "$hb_dir_list"
+
+    pkg_total=${#packages[@]}
     pkg_count="0"
 
-    # p now looks something like redis~plan.sh
-    for p in $dir_list
+    for p in "${packages[@]}"
     do
       IFS='~' read -ra parts <<< "$p"
       pkg_name=${parts[0]}
@@ -208,12 +247,10 @@ case "${1:-}" in
       fi
     done
 
+    # done downloading stuff. let's package it up.
     cd /tmp
     tar zcvf "$tar_file" -C "$tmp_dir" .
-    echo "Uploading tar file to S3."
-    s3_cp "$tar_file" "s3://$bucket/"
-    s3_cp "s3://$bucket/$bootstrap_file" "s3://$bucket/$marker"
-    echo "Upload to S3 finished."
+    upload_archive "$tar_file"
 
     ;;
   populate-depot)
@@ -281,6 +318,13 @@ case "${1:-}" in
     ;;
   download-archive)
     download_latest_archive
+    ;;
+  upload-archive)
+    if [ -z "${2:-}" ]; then
+      usage
+    fi
+
+    upload_archive "$2"
     ;;
   *)
     usage
