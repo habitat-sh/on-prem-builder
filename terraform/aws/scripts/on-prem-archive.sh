@@ -109,7 +109,7 @@ download_hart_if_missing() {
 }
 
 bucket="${HAB_ON_PREM_BOOTSTRAP_BUCKET_NAME:-habitat-on-prem-builder-bootstrap}"
-s3_root_url="${HAB_ON_PREM_BOOTSTRAP_S3_ROOT_URL:-s3://bluepipeline-plans}/$bucket"
+s3_root_url="${HAB_ON_PREM_BOOTSTRAP_S3_ROOT_URL:-https://s3-us-west-2.amazonaws.com}/$bucket"
 marker="LATEST.tar.gz"
 
 case "${1:-}" in
