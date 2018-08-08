@@ -183,8 +183,11 @@ If your on-premise instance will have continued outgoing Internet connectivity, 
 
 In order to do so, please create a file called `upstream.toml` with the following content:
 ```
-[depot]
-upstream_depot = "https://bldr.habitat.sh"
+[api]
+features_enabled = "upstream"
+
+[upstream]
+endpoint = "https://bldr.habitat.sh"
 ```
 
 Then, issue the following command:
@@ -355,6 +358,18 @@ If you have turned on the automated package fetch from an upstream, and are not 
 5. Check the upstream log file for any errors or other status - this log file is located at 'hab/svc/builder-api/var/builder-upstream.log'.
 
 6. Make sure you have triggered the automated fetch for the package you are interested in by doing a `hab pkg install` of the package, or searching for the package via the web UI.
+
+### Package shows up in the UI and `hab pkg search`, but `hab pkg install` fails
+
+If you run into a situation where you have a package populated in the depot, but it is failing to install with a `Not Found` status, it is possible that there was a prior problem with populating the Minio backend with the package artifact.
+
+If you have the package artifact on-disk (for example, in the `hab/cache/artifacts` directory), you can try to upload the missing package again with the following command (update the parameters as appropriate):
+
+```
+hab pkg upload -u http://localhost -z <your auth token> --force <package hart file>
+```
+
+Note: the --force option above is only available in versions of the `hab` client greater than 0.59.
 
 ### Debug Logging
 

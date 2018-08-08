@@ -57,6 +57,9 @@ EOT
 log_level="info"
 jobsrv_enabled = false
 
+[api]
+features_enabled = ""
+
 [depot]
 jobsrv_enabled = false
 
