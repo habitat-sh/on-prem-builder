@@ -128,5 +128,16 @@ resource "aws_instance" "builder" {
       "sleep 10",
       "sudo -E ./provision.sh",
     ]
+
+    provisioner "file" {
+      source      = "${path.module}/upstream.toml"
+      destination = "/home/${var.aws_image_user}/builder/upstream.toml"
+    }
+
+    provisioner "remote-exec" {
+      inline = [
+        "sudo -E hab config apply builder-api.default $(date +%s) /home/${var.aws_image_user}/builder/upstream.toml",
+      ]
+    }
   }
 }
