@@ -69,7 +69,7 @@ resource "aws_instance" "builder" {
   }
 
   tags {
-    Name          = "${var.depot_tag_customer}_${var.depot_tag_project}_${var.tag_application}_${random_id.hash.hex}"
+    Name          = "${var.depot_tag_prefix}-${var.depot_tag_project}-${var.tag_application}-${var.depot_tag_environment}-${random_id.hash.hex}"
     X-Dept        = "${var.tag_dept}"
     X-Customer    = "${var.depot_tag_customer}"
     X-Project     = "${var.depot_tag_project}"

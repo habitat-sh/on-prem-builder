@@ -43,10 +43,14 @@ variable "depot_tag_project" {
   description = "X-Project: A tag for identifying resources associated with a project."
 }
 
+variable "depot_tag_environment" {}
+
+variable "depot_tag_prefix" {}
+
 variable "tag_application" {
   type        = "string"
   description = "X-Application: A tag for identifying resources associated with your application."
-  default     = "Habitat Depot"
+  default     = "habitat-depot"
 }
 
 variable "tag_contact" {
