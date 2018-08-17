@@ -2,7 +2,12 @@
 
 ## IMPORTANT NOTICE
 
-Please see the `Migrating Package Artifacts to Minio` section if your existing On-Premise Depot was installed *prior* to June 15th 2018. The package artifacts are now stored in a Minio instance, and running a migration script will be required in order to properly transition over to newer versions of On-Premise Depot.
+Please see the [Migrating Package Artifacts to Minio](#migrating-package-artifacts-to-minio) section if your existing On-Premise Depot was installed *prior* to June 15th 2018. The package artifacts are now stored in a Minio instance, and running a migration script will be required in order to properly transition over to newer versions of On-Premise Depot.
+
+Please see the [Merging database shards](#merging-database-shards) section if
+your existing On-Premise Depot was installed *prior* to August 17th 2018. All
+of the database schemas and data are now stored in the Postgres `public`
+schema, instead of spread across various shard schemas.
 
 ## Introduction
 
@@ -247,9 +252,71 @@ If you are running in an "air-gapped" environment, you may need to download the 
 
 Once the migration script starts, you will be presented with some questions to specify the Minio instance, the credentials, and the Minio bucket name to migrate your package artifacts to. The script will attempt to automatically detect all of these from the running service, so you can usually just accept the defaults. Please refer to your `bldr.env` file if you need to explicitly type in any values.
 
-The migration script may take a while to move over the artifacts into Minio. During the script migration, the Depot services will continue to run as normal, however packages will not be downloadable until the artifacts are migrated over to Minio.  
+The migration script may take a while to move over the artifacts into Minio. During the script migration, the Depot services will continue to run as normal, however packages will not be downloadable until the artifacts are migrated over to Minio.
 
 Once the migration is complete, you will be presented with an option to remove the files in your `hab/svc/builder-api/data/pkgs` directory. You may want to preserve the files until you have verified that all operations are completing successfully.
+
+## Merging Database Shards
+
+This section is for installations of On-Premise Depot that were done *prior* to
+August 17th 2018. If you re-install or upgrade to a newer version of the
+On-Premise Depot, you will be required to also merge your database shards into
+the `public` Postgres database schema. Please follow the steps below.
+
+### Pre-requisites
+1. The password to your Postgres database. By default, this is located at
+   `/hab/svc/builder-datastore/config/pwfile`
+1. A fresh backup of the two databases present in the On-Premise Depot,
+   `builder_sessionsrv` and `builder_originsrv`. You can create such a backup
+   with `pg_dump`:
+
+   ```shell
+   PGPASSWORD=$(sudo cat /hab/svc/builder-datastore/config/pwfile) hab pkg exec core/postgresql pg_dump -h 127.0.0.1 -p 5432 -U hab builder_originsrv > builder-originsrv.sql
+   ```
+
+### Migration
+1. Uninstall existing services by running `sudo -E ./uninstall.sh`
+1. Install new services by running `./install.sh`
+1. If you check your logs at this point, you will likely see lines like this:
+   `Shard migration hasn't been completed successfully` repeated over and over
+   again, as the supervisor tries to start the new service, but the service
+   dies because the migration hasn't been run.
+1. Optionally, if you want to be extra sure that you're in a good spot to perform the
+   migration, log into the Postgres console and verify that you have empty
+   tables in the `public` schema. A command to do this might look like:
+
+   ```shell
+   PGPASSWORD=$(sudo cat /hab/svc/builder-datastore/config/pwfile) hab pkg exec core/postgresql psql -h 127.0.0.1 -p 5432 -U hab builder_originsrv`
+   ```
+
+   That should drop you into a prompt where you can type `\d` and hopefully see
+   a list of tables where the schema says `public`. If you try to select data
+   from any of those tables, they should be empty. Note that this step is
+   definitely not required, but can be done if it provides you extra peace of
+   mind.
+1. Now you're ready to migrate the data itself. The following command will do
+   that for `builder-originsrv`:
+
+   ```shell
+   PGPASSWORD=$(sudo cat /hab/svc/builder-datastore/config/pwfile) ./scripts/migrate.sh originsrv migrate
+   ```
+
+   After confirming that you have fresh database backups, the script
+   should run and at the end, you should see several notices that everything is
+   great, row counts check out, and your database has been marked as migrated.
+1. Do the same migration for `builder-sessionsrv`.
+
+   ```shell
+   PGPASSWORD=$(sudo cat /hab/svc/builder-datastore/config/pwfile) ./scripts/migrate.sh sessionsrv migrate
+   ```
+
+1. Double check the logs for `builder-originsrv` and `builder-sessionsrv` to
+   make sure things look normal again. If there are still errors, restart the
+   services.
+1. At this point, all data is stored in the `public` schema. All of the other
+   schemas, from `shard_0` up to `shard_127` will still be present in your
+   database, and the data in them will remain intact, but the services will no
+   longer reference those shards.
 
 ## Support
 
