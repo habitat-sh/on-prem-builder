@@ -286,7 +286,7 @@ the `public` Postgres database schema. Please follow the steps below.
    tables in the `public` schema. A command to do this might look like:
 
    ```shell
-   PGPASSWORD=$(sudo cat /hab/svc/builder-datastore/config/pwfile) hab pkg exec core/postgresql psql -h 127.0.0.1 -p 5432 -U hab builder_originsrv`
+   PGPASSWORD=$(sudo cat /hab/svc/builder-datastore/config/pwfile) hab pkg exec core/postgresql psql -h 127.0.0.1 -p 5432 -U hab builder_originsrv
    ```
 
    That should drop you into a prompt where you can type `\d` and hopefully see
@@ -294,7 +294,7 @@ the `public` Postgres database schema. Please follow the steps below.
    from any of those tables, they should be empty. Note that this step is
    definitely not required, but can be done if it provides you extra peace of
    mind.
-1. Now you're ready to migrate the data itself. The following command will do
+1. Now you are ready to migrate the data itself. The following command will do
    that for `builder-originsrv`:
 
    ```shell
@@ -317,6 +317,26 @@ the `public` Postgres database schema. Please follow the steps below.
    schemas, from `shard_0` up to `shard_127` will still be present in your
    database, and the data in them will remain intact, but the services will no
    longer reference those shards.
+
+## Log Rotation
+
+The `builder-api-proxy` service will log (via Nginx) all access and errors to log files in your service directory. Since these files may get large, you may want to add a log rotation script. Below is a sample logrotate file that you can use as an example for your needs:
+
+```
+/hab/svc/builder-api-proxy/logs/host.access.log
+/hab/svc/builder-api-proxy/logs/host.error.log
+{
+        rotate 7
+        daily
+        missingok
+        notifempty
+        delaycompress
+        compress
+        postrotate
+                /bin/kill -USR1 `cat /hab/svc/builder-api-proxy/var/pid 2>/dev/null` 2>/dev/null || true
+        endscript
+}
+```
 
 ## Support
 
