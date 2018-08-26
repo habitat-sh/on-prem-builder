@@ -1,0 +1,17 @@
+apiVersion: habitat.sh/v1beta1
+kind: Habitat
+customVersion: v1beta2
+metadata:
+  name: {{ template "habitat-builder.fullname" . }}-memcached
+  labels:
+    app: {{ template "habitat-builder.name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+spec:
+  v1beta2:
+    image: "{{ .Values.image.registry }}/habitat/builder-memcached:{{ .Values.image.tag }}"
+    count: 1
+    service:
+      name: builder-memcached
+      topology: standalone

@@ -1,0 +1,32 @@
+{{- if .Values.debug }}
+log_level="debug"
+{{- else }}
+log_level="info"
+{{- end }}
+enable_builder = false
+app_url = {{ template "habitat-builder.app_url" . }}
+
+[oauth]
+provider = {{ .Values.oauth.provider | quote }}
+client_id = {{ .Values.oauth.client_id | quote }}
+authorize_url = {{ .Values.oauth.authorize_url | quote }}
+redirect_url = {{ template "habitat-builder.app_url" . }}
+
+[nginx]
+max_body_size = "2048m"
+proxy_send_timeout = 180
+proxy_read_timeout = 180
+enable_gzip = true
+enable_caching = true
+
+[http]
+keepalive_timeout = "180s"
+
+[server]
+listen_tls = {{ .Values.app.ssl.enabled }}
+
+[analytics]
+enabled = {{ .Values.analytics.enabled }}
+company_id = {{ .Values.analytics.company_id | quote }}
+company_name = {{ .Values.analytics.company_name | quote }}
+write_key = {{ .Values.analytics.write_key | quote }}

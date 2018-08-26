@@ -1,0 +1,17 @@
+{{- if .Values.app.ssl.enabled }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name:  {{ template "habitat-builder.fullname" . }}-api-proxy-files
+  labels:
+    app: {{ template "habitat-builder.name" . }}
+    chart: {{ template "habitat-builder.chart" . }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+type: Opaque
+data:
+  ssl-certificate.crt: |-
+    {{ required "A SSL certificate is required!" .Values.app.ssl.crt | b64enc }}
+  ssl-certificate.key: |-
+    {{ required "A SSL private key is required!" .Values.app.ssl.key | b64enc }}
+{{- end }}

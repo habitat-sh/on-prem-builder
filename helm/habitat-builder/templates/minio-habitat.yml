@@ -1,0 +1,29 @@
+---
+apiVersion: habitat.sh/v1beta1
+kind: Habitat
+customVersion: v1beta2
+metadata:
+  name: {{ template "habitat-builder.fullname" . }}-minio
+  labels:
+    app: {{ template "habitat-builder.name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+spec:
+  v1beta2:
+    image: "{{ .Values.image.registry }}/habitat/builder-minio:{{ .Values.image.tag }}"
+    count: 1
+    {{- if .Values.minio.persistentStorage.enabled }}
+    persistentStorage:
+      size: {{ .Values.minio.persistentStorage.size }}
+      {{- if .Values.minio.persistentStorage.storageClass }}
+      storageClassName: {{ .Values.minio.persistentStorage.storageClass }}
+      {{- else }}
+      storageClassName: ""
+      {{- end }}
+      mountPath: /hab/svc/builder-minio/data
+    {{- end }}
+    service:
+      name: builder-minio
+      topology: standalone
+      configSecretName: {{ template "habitat-builder.fullname" . }}-minio-toml

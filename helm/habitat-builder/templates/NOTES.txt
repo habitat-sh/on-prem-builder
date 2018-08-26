@@ -1,0 +1,26 @@
+When the on-premises depot has started it can be accessed at:
+{{ if .Values.app.ssl.enabled }}
+{{ printf "  https://%s" .Values.app.fqdn }}
+{{- else }}
+{{ printf "  http://%s" .Values.app.fqdn }}
+{{- end }}
+
+You can check if the service is configured and available by checking for an available EXTERNAL-IP:
+
+  kubectl get services --namespace {{ .Release.Namespace }} {{ template "habitat-builder.fullname" . }}-api-ext
+
+{{ if not .Values.api.keys.name }}
+WARNING: The on-premises depot requires builder keys and these have not been
+installed yet as part of the installation process e.g:
+
+    KEY_NAME=$(hab user key generate on-prem-bldr | grep -Po "on-prem-bldr-\\d+")
+    echo "Generated new builder key: $KEY_NAME"
+
+    helm upgrade {{ .Release.Name }} \
+      --set api.keys.name=${KEY_NAME} \
+      --set-file api.keys.public_key=$HOME/.hab/cache/keys/${KEY_NAME}.pub \
+      --set-file api.keys.private_key=$HOME/.hab/cache/keys/${KEY_NAME}.box.key
+{{- end }}
+
+To bootstrap the core packages origin on your depot follow the instructions at
+https://github.com/habitat-sh/on-prem-builder/blob/master/README.md#depot-web-ui

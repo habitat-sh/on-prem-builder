@@ -1,0 +1,29 @@
+---
+apiVersion: habitat.sh/v1beta1
+kind: Habitat
+customVersion: v1beta2
+metadata:
+  name: {{ template "habitat-builder.fullname" . }}-api
+  labels:
+    app: {{ template "habitat-builder.name" . }}
+    chart: {{ template "habitat-builder.chart" . }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+spec:
+  v1beta2:
+    image: "{{ .Values.image.registry }}/habitat/builder-api:{{ .Values.image.tag }}"
+    count: 1
+    service:
+      name: builder-api
+      topology: standalone
+      configSecretName:  {{ template "habitat-builder.fullname" . }}-api-toml
+      {{- if .Values.api.keys.name }}
+      filesSecretName:  {{ template "habitat-builder.fullname" . }}-api-files
+      {{- end }}
+      bind:
+        - name: memcached
+          service: builder-memcached
+          group: default
+        - name: datastore
+          service: builder-datastore
+          group: default

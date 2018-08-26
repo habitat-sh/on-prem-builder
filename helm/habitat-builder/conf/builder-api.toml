@@ -1,0 +1,42 @@
+{{- if .Values.debug }}
+log_level="debug,tokio_core=error,tokio_reactor=error,zmq=error,hyper=error"
+{{- else }}
+log_level="error,tokio_core=error,tokio_reactor=error,zmq=error,hyper=error"
+{{- end }}
+jobsrv_enabled = false
+
+[http]
+handler_count = 10
+
+[api]
+features_enabled = ""
+targets = ["x86_64-linux", "x86_64-linux-kernel2", "x86_64-windows"]
+
+[depot]
+jobsrv_enabled = false
+
+[oauth]
+provider = {{ .Values.oauth.provider | quote }}
+userinfo_url = {{ .Values.oauth.userinfo_url | quote }}
+token_url = {{ .Values.oauth.token_url | quote}}
+redirect_url = {{ template "habitat-builder.app_url" . }}
+client_id = {{ .Values.oauth.client_id | quote }}
+client_secret = {{ .Values.oauth.client_secret | quote }}
+
+[segment]
+url = "https://api.segment.io"
+write_key = {{ .Values.analytics.write_key | quote }}
+
+[s3]
+backend = "minio"
+key_id = {{ .Values.minio.key_id | quote }}
+secret_key = {{ .Values.minio.secret_key | quote }}
+endpoint = 'http://{{ template "habitat-builder.fullname" . }}-minio-int:9000'
+bucket_name = {{ .Values.minio.bucket_name | quote }}
+
+[memcache]
+ttl = 1
+
+[datastore]
+password = {{ required "A valid datastore.superuserPassword required!" .Values.datastore.superuserPassword | quote }}
+connection_timeout_sec = 5

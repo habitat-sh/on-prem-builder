@@ -1,0 +1,3 @@
+key_id = {{ .Values.minio.key_id | quote }}
+secret_key = {{ .Values.minio.secret_key | quote }}
+bucket_name = {{ .Values.minio.bucket_name | quote }}

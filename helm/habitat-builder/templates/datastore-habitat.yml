@@ -1,0 +1,28 @@
+apiVersion: habitat.sh/v1beta1
+kind: Habitat
+customVersion: v1beta2
+metadata:
+  name: {{ template "habitat-builder.fullname" . }}-datastore
+  labels:
+    app: {{ template "habitat-builder.name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+spec:
+  v1beta2:
+    image: "{{ .Values.image.registry }}/habitat/builder-datastore:{{ .Values.image.tag }}"
+    count: 1
+    {{- if .Values.datastore.persistentStorage.enabled }}
+    persistentStorage:
+      size: {{ .Values.datastore.persistentStorage.size }}
+      {{- if .Values.datastore.persistentStorage.storageClass }}
+      storageClassName: {{ .Values.datastore.persistentStorage.storageClass }}
+      {{- else }}
+      storageClassName: ""
+      {{- end }}
+      mountPath: /hab/svc/builder-datastore/data
+    {{- end }}
+    service:
+      name: builder-datastore
+      topology: standalone
+      configSecretName: {{ template "habitat-builder.fullname" . }}-datastore-toml

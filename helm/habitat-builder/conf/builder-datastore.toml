@@ -1,0 +1,4 @@
+max_locks_per_transaction = 128
+
+[init]
+superuser_password = {{ required "A valid datastore.superuserPassword required!" .Values.datastore.superuserPassword | quote }}

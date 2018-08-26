@@ -1,0 +1,25 @@
+apiVersion: habitat.sh/v1beta1
+kind: Habitat
+customVersion: v1beta2
+metadata:
+  name: {{ template "habitat-builder.fullname" . }}-api-proxy
+  labels:
+    app: {{ template "habitat-builder.name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+spec:
+  v1beta2:
+    image: "{{ .Values.image.registry }}/habitat/builder-api-proxy:{{ .Values.image.tag }}"
+    count: 1
+    service:
+      name: builder-api-proxy
+      topology: standalone
+      configSecretName: {{ template "habitat-builder.fullname" . }}-api-proxy-toml
+      {{- if .Values.app.ssl.enabled }}
+      filesSecretName:  {{ template "habitat-builder.fullname" . }}-api-proxy-files
+      {{- end }}
+      bind:
+        - name: http
+          service: builder-api
+          group: default

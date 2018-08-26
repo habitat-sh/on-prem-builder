@@ -1,0 +1,111 @@
+# Default values for habitat-builder.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+image:
+  registry: hub.docker.com
+  tag: on-prem-stable
+
+datastore:
+  ## The datastore password is required to be set in order to install the helm chart.
+  ## There is no default
+  # superuserPassword: ""
+
+  persistentStorage:
+    enabled: false
+    size: 32Gi
+    storageClass: "default"
+
+
+## The key and secret for your Minio instance (see README)
+## Change these before the first install if needed
+minio:
+  bucket_name: "habitat-builder-artifact-store.local"
+  key_id: "depot"
+  secret_key: "password"
+  persistentStorage:
+    enabled: false
+    size: 100Gi
+    storageClass: "default"
+
+app:
+  ## Whether SSL is enabled for the on-prem depot.  If ssl.enabled is true
+  ## then you should provide the contents of .crt and .key files too
+  ssl:
+    enabled: false
+    crt:
+    key:
+  ## THe FQDN for this instance of the on-prem depot
+  fqdn: "localhost"
+
+api:
+  # keys:
+  #   name: "bldr-20180827040405"
+  #   public_key: |-
+  #     BOX-PUB-1
+  #     bldr-20180827040405
+
+  #     qw9CXWK4N3yMhD6Qhya21ohDH0ZIbl0myZ8j8R4uOQk=
+  #   private_key: |-
+  #     BOX-SEC-1
+  #     bldr-20180827040405
+
+  #     4VT5l4yeDaG11wvIWrw/RhkEyH+dZSRo4HlCatgWwEE=
+
+## Modify these as needed for the on-premise OAuth2 provider.
+## The variables below are configured for GitHub by default,
+## but appropriate values for Bitbucket, GitLab, Azure AD and Okta
+## are also included as comments.
+oauth:
+  ## The .Values.oauth.provider value can be "github", "gitlab", "bitbucket",
+  ## "azure-ad","okta" or "chef-automate"
+  provider: "github"
+
+  ## The .Values.oauth.userinfo is the API endpoint that will be used for user info
+  ##
+  # userinfo_url: https://api.bitbucket.org/1.0/user
+  # userinfo_url: https://gitlab.com/oauth/userinfo
+  # userinfo_url: https://login.microsoftonline.com/<tenant-id>/openid/userinfo
+  # userinfo_url: https://<your.okta.domain>.com/oauth2/v1/userinfo
+  # userinfo_url: https://<your.automate.domain>/session/userinfo
+  userinfo_url: "https://api.github.com/user"
+
+  ## The .Values.oauth.authorize_url is the *fully qualified* OAuth2 authorization endpoint
+  ##
+  # authorize_url: https://bitbucket.org/site/oauth2/authorize
+  # authorize_url: https://gitlab.com/oauth/authorize
+  # authorize_url: https://login.microsoftonline.com/<tenant-id>/oauth2/authorize
+  # authorize_url: https://<your.okta.domain>.com/oauth2/v1/authorize
+  # authorize_url: https://<your.automate.domain>/session/new
+  authorize_url: "https://github.com/login/oauth/authorize"
+
+  ## The .Values.oauth.token_url is the *fully qualified* OAuth2 token endpoint
+  ##
+  # token_url: https://bitbucket.org/site/oauth2/access_token
+  # token_url: https://gitlab.com/oauth/token
+  # token_url: https://login.microsoftonline.com/tenant-id/oauth2/token
+  # token_url: https://your.okta.domain.com/oauth2/v1/token
+  # token_url: https://<your.automate.domain>/session/token
+  token_url: "https://github.com/login/oauth/access_token"
+
+  ## The .Values.oauth.client_id is the registered OAuth2 client id
+  client_id: "0123456789abcdef0123"
+
+  ## The .Values.oauth.client_secret is the registerd OAuth2 client secret
+  client_secret: "0123456789abcdef0123456789abcdef01234567"
+
+## Help us make Habitat better! Opt into analytics by changing the ANALYTICS_ENABLED
+## setting below to true, then optionally provide your company name. (Analytics is
+## disabled by default. See our privacy policy at https://www.habitat.sh/legal/privacy-policy/.)
+analytics:
+  enabled: false
+  company_id: "builder-on-prem"
+  write_key: "NAwVPW04CeESMW3vtyqjJZmVMNBSQ1K1"
+  company_name: ""
+
+service:
+  type: LoadBalancer
+  ## Set if you've got a statically assigned IP
+  # loadBalancerIP:
+
+debug: false

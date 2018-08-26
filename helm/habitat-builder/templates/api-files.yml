@@ -1,0 +1,17 @@
+{{- if .Values.api.keys.name }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name:  {{ template "habitat-builder.fullname" . }}-api-files
+  labels:
+    app: {{ template "habitat-builder.name" . }}
+    chart: {{ template "habitat-builder.chart" . }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+type: Opaque
+data:
+  {{ .Values.api.keys.name }}.pub: |-
+    {{ required "An API public_key is required!" .Values.api.keys.public_key | b64enc }}
+  {{ .Values.api.keys.name }}.box.key: |-
+    {{ required "An API pricvate_key is required!" .Values.api.keys.private_key | b64enc }}
+{{- end }}
