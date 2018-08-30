@@ -80,7 +80,7 @@ For the configuration below, you will also need to know following *fully qualifi
 * API Endpoint (example: `https://api.github.com`)
 
 For more information, please refer to the developer documentation of these services:
-* [Chef Automate](https://automate.chef.io/docs/configuration/#setting-up-automate-as-an-oauth-provider-for-builder)
+* [Chef Automate (ALPHA)](https://automate.chef.io/docs/configuration/#setting-up-automate-as-an-oauth-provider-for-builder)
 * [Azure Active Directory](https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-protocols-oauth-code)
 * [GitHub](https://developer.github.com/apps/building-oauth-apps/authorization-options-for-oauth-apps/)
 * [GitLab](https://docs.gitlab.com/ee/integration/oauth_provider.html)
