@@ -285,19 +285,7 @@ start_router() {
 }
 
 start_minio() {
-  hab pkg install core/aws-cli
-  hab pkg binlink core/aws-cli -f aws
-  export AWS_ACCESS_KEY_ID="$MINIO_ACCESS_KEY"
-  export AWS_SECRET_ACCESS_KEY="$MINIO_SECRET_KEY"
-
-  sudo -E hab svc load "${BLDR_ORIGIN}/builder-minio" --channel "${BLDR_CHANNEL}" --force
-
-  if aws --endpoint-url $MINIO_ENDPOINT s3api list-buckets | grep "$MINIO_BUCKET" > /dev/null; then
-    echo "Minio already configured"
-  else
-    echo "Creating bucket in Minio"
-    aws --endpoint-url $MINIO_ENDPOINT s3api create-bucket --bucket "$MINIO_BUCKET"
-  fi
+  sudo -E hab svc load habitat/builder-minio --channel "${BLDR_CHANNEL}" --force
 }
 
 start_memcached() {
