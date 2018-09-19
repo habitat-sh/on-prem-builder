@@ -99,6 +99,8 @@ redirect_url = "$OAUTH_REDIRECT_URL"
 max_body_size = "2048m"
 proxy_send_timeout = 180
 proxy_read_timeout = 180
+enable_gzip = true
+enable_caching = true
 
 [http]
 keepalive_timeout = "180s"
