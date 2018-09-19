@@ -11,6 +11,9 @@ else
   exit 1
 fi
 
+# Defaults
+BLDR_ORIGIN=${BLDR_ORIGIN:="habitat"}
+
 init_datastore() {
   mkdir -p /hab/svc/builder-datastore
   cat <<EOT > /hab/svc/builder-datastore/user.toml
@@ -400,27 +403,27 @@ EOT
 }
 
 start_api() {
-  sudo -E hab svc load habitat/builder-api --bind router:builder-router.default --channel "${BLDR_CHANNEL}" --force
+  sudo -E hab svc load "${BLDR_ORIGIN}/builder-api" --bind router:builder-router.default --channel "${BLDR_CHANNEL}" --force
 }
 
 start_api_proxy() {
-  sudo -E hab svc load habitat/builder-api-proxy --bind http:builder-api.default --channel "${BLDR_CHANNEL}" --force
+  sudo -E hab svc load "${BLDR_ORIGIN}/builder-api-proxy" --bind http:builder-api.default --channel "${BLDR_CHANNEL}" --force
 }
 
 start_datastore() {
-  sudo -E hab svc load habitat/builder-datastore --channel "${BLDR_CHANNEL}" --force
+  sudo -E hab svc load "${BLDR_ORIGIN}/builder-datastore" --channel "${BLDR_CHANNEL}" --force
 }
 
 start_originsrv() {
-  sudo -E hab svc load habitat/builder-originsrv --bind router:builder-router.default --bind datastore:builder-datastore.default --channel "${BLDR_CHANNEL}" --force
+  sudo -E hab svc load "${BLDR_ORIGIN}/builder-originsrv" --bind router:builder-router.default --bind datastore:builder-datastore.default --channel "${BLDR_CHANNEL}" --force
 }
 
 start_router() {
-  sudo -E hab svc load habitat/builder-router --channel "${BLDR_CHANNEL}" --force
+  sudo -E hab svc load "${BLDR_ORIGIN}/builder-router" --channel "${BLDR_CHANNEL}" --force
 }
 
 start_sessionsrv() {
-  sudo -E hab svc load habitat/builder-sessionsrv --bind router:builder-router.default --bind datastore:builder-datastore.default --channel "${BLDR_CHANNEL}" --force
+  sudo -E hab svc load "${BLDR_ORIGIN}/builder-sessionsrv" --bind router:builder-router.default --bind datastore:builder-datastore.default --channel "${BLDR_CHANNEL}" --force
 }
 
 start_minio() {
@@ -429,7 +432,7 @@ start_minio() {
   export AWS_ACCESS_KEY_ID="$MINIO_ACCESS_KEY"
   export AWS_SECRET_ACCESS_KEY="$MINIO_SECRET_KEY"
 
-  sudo -E hab svc load habitat/builder-minio --channel "${BLDR_CHANNEL}" --force
+  sudo -E hab svc load "${BLDR_ORIGIN}/builder-minio" --channel "${BLDR_CHANNEL}" --force
 
   if aws --endpoint-url $MINIO_ENDPOINT s3api list-buckets | grep "$MINIO_BUCKET" > /dev/null; then
     echo "Minio already configured"
