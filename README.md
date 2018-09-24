@@ -298,7 +298,7 @@ the `public` Postgres database schema. Please follow the steps below.
    that for `builder-originsrv`:
 
    ```shell
-   PGPASSWORD=$(sudo cat /hab/svc/builder-datastore/config/pwfile) ./scripts/migrate.sh originsrv migrate
+   PGPASSWORD=$(sudo cat /hab/svc/builder-datastore/config/pwfile) ./scripts/merge-shards.sh originsrv migrate
    ```
 
    After confirming that you have fresh database backups, the script
@@ -307,7 +307,7 @@ the `public` Postgres database schema. Please follow the steps below.
 1. Do the same migration for `builder-sessionsrv`.
 
    ```shell
-   PGPASSWORD=$(sudo cat /hab/svc/builder-datastore/config/pwfile) ./scripts/migrate.sh sessionsrv migrate
+   PGPASSWORD=$(sudo cat /hab/svc/builder-datastore/config/pwfile) ./scripts/merge-shards.sh sessionsrv migrate
    ```
 
 1. Double check the logs for `builder-originsrv` and `builder-sessionsrv` to
