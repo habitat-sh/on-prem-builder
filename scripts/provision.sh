@@ -62,6 +62,7 @@ jobsrv_enabled = false
 
 [api]
 features_enabled = ""
+targets = ["x86_64-linux", "x86_64-linux-kernel2", "x86_64-windows"]
 
 [depot]
 jobsrv_enabled = false
