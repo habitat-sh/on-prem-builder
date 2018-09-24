@@ -12,4 +12,7 @@ For installations prior to June 15, 2018:
 For installations prior to August 17, 2018
 * Database migration to merge shards
 
+For installations prior to September 24th, 2018
+* Database merge to a single 'builder' database
+
 Further details can be found in the README.
