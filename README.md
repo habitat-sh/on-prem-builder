@@ -9,6 +9,11 @@ your existing On-Premise Depot was installed *prior* to August 17th 2018. All
 of the database schemas and data are now stored in the Postgres `public`
 schema, instead of spread across various shard schemas.
 
+Please see the [Merging databases](#merging-databases) section if
+your existing On-Premise Depot was installed *prior* to September 24th 2018. All
+data is now stored in a single Postgres database `builder` instead of spread across
+multiple databases.
+
 ## Introduction
 
 This repository contains scripts to install Habitat Builder Depot services. These services (referred to as the On-Premise Habitat Builder Depot) allow privately hosting Habitat packages (and associated artifacts such as keys) on-premise. Habitat clients (such as the `hab` cli, Supervisors and Studios) can be pointed to the on-premise depot and allow for development, execution and management without depending on the public Habitat services.

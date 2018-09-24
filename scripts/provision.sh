@@ -84,6 +84,9 @@ key_id = "$MINIO_ACCESS_KEY"
 secret_key = "$MINIO_SECRET_KEY"
 endpoint = "$MINIO_ENDPOINT"
 bucket_name = "$MINIO_BUCKET"
+
+[memcached]
+ttl = 1
 EOT
 
   mkdir -p /hab/svc/builder-api-proxy
@@ -257,153 +260,11 @@ shards = [
 
 [datastore]
 password = "$PGPASSWORD"
-database = "builder_originsrv"
-EOT
-
-  mkdir -p /hab/svc/builder-sessionsrv
-  cat <<EOT > /hab/svc/builder-sessionsrv/user.toml
-log_level="info"
-
-[app]
-shards = [
-  0,
-  1,
-  2,
-  3,
-  4,
-  5,
-  6,
-  7,
-  8,
-  9,
-  10,
-  11,
-  12,
-  13,
-  14,
-  15,
-  16,
-  17,
-  18,
-  19,
-  20,
-  21,
-  22,
-  23,
-  24,
-  25,
-  26,
-  27,
-  28,
-  29,
-  30,
-  31,
-  32,
-  33,
-  34,
-  35,
-  36,
-  37,
-  38,
-  39,
-  40,
-  41,
-  42,
-  43,
-  44,
-  45,
-  46,
-  47,
-  48,
-  49,
-  50,
-  51,
-  52,
-  53,
-  54,
-  55,
-  56,
-  57,
-  58,
-  59,
-  60,
-  61,
-  62,
-  63,
-  64,
-  65,
-  66,
-  67,
-  68,
-  69,
-  70,
-  71,
-  72,
-  73,
-  74,
-  75,
-  76,
-  77,
-  78,
-  79,
-  80,
-  81,
-  82,
-  83,
-  84,
-  85,
-  86,
-  87,
-  88,
-  89,
-  90,
-  91,
-  92,
-  93,
-  94,
-  95,
-  96,
-  97,
-  98,
-  99,
-  100,
-  101,
-  102,
-  103,
-  104,
-  105,
-  106,
-  107,
-  108,
-  109,
-  110,
-  111,
-  112,
-  113,
-  114,
-  115,
-  116,
-  117,
-  118,
-  119,
-  120,
-  121,
-  122,
-  123,
-  124,
-  125,
-  126,
-  127
-]
-
-[datastore]
-password = "$PGPASSWORD"
-database = "builder_sessionsrv"
 EOT
 }
 
 start_api() {
-  sudo -E hab svc load "${BLDR_ORIGIN}/builder-api" --bind router:builder-router.default --channel "${BLDR_CHANNEL}" --force
+  sudo -E hab svc load "${BLDR_ORIGIN}/builder-api" --bind router:builder-router.default --bind memcached:builder-memcached.default --channel "${BLDR_CHANNEL}" --force
 }
 
 start_api_proxy() {
@@ -422,10 +283,6 @@ start_router() {
   sudo -E hab svc load "${BLDR_ORIGIN}/builder-router" --channel "${BLDR_CHANNEL}" --force
 }
 
-start_sessionsrv() {
-  sudo -E hab svc load "${BLDR_ORIGIN}/builder-sessionsrv" --bind router:builder-router.default --bind datastore:builder-datastore.default --channel "${BLDR_CHANNEL}" --force
-}
-
 start_minio() {
   hab pkg install core/aws-cli
   hab pkg binlink core/aws-cli -f aws
@@ -440,6 +297,10 @@ start_minio() {
     echo "Creating bucket in Minio"
     aws --endpoint-url $MINIO_ENDPOINT s3api create-bucket --bucket "$MINIO_BUCKET"
   fi
+}
+
+start_memcached() {
+  sudo -E hab svc load "${BLDR_ORIGIN}/builder-memcached" --channel "${BLDR_CHANNEL}" --force
 }
 
 generate_bldr_keys() {
@@ -475,11 +336,11 @@ start_builder() {
   start_datastore
   configure
   start_minio
+  start_memcached
   start_router
   start_api
   start_api_proxy
   start_originsrv
-  start_sessionsrv
   sleep 2
   generate_bldr_keys
   upload_ssl_certificate
