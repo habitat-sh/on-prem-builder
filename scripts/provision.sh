@@ -285,7 +285,7 @@ start_router() {
 }
 
 start_minio() {
-  sudo -E hab svc load habitat/builder-minio --channel "${BLDR_CHANNEL}" --force
+  sudo -E hab svc load "${BLDR_ORIGIN}/builder-minio" --channel "${BLDR_CHANNEL}" --force
 }
 
 start_memcached() {
