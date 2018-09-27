@@ -86,7 +86,7 @@ secret_key = "$MINIO_SECRET_KEY"
 endpoint = "$MINIO_ENDPOINT"
 bucket_name = "$MINIO_BUCKET"
 
-[memcached]
+[memcache]
 ttl = 1
 EOT
 
