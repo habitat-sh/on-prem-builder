@@ -53,6 +53,7 @@ configure() {
   cat <<EOT > /hab/svc/builder-minio/user.toml
 key_id = "depot"
 secret_key = "password"
+bucket_name = "$MINIO_BUCKET"
 EOT
 
   mkdir -p /hab/svc/builder-api
