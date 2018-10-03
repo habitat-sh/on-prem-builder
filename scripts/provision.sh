@@ -58,7 +58,7 @@ EOT
 
   mkdir -p /hab/svc/builder-api
   cat <<EOT > /hab/svc/builder-api/user.toml
-log_level="info"
+log_level="info,tokio_core=error,tokio_reactor=error,zmq=error,hyper=error"
 jobsrv_enabled = false
 
 [api]
@@ -89,6 +89,9 @@ bucket_name = "$MINIO_BUCKET"
 
 [memcache]
 ttl = 1
+
+[datastore]
+password = "$PGPASSWORD"
 EOT
 
   mkdir -p /hab/svc/builder-api-proxy
@@ -266,7 +269,7 @@ EOT
 }
 
 start_api() {
-  sudo -E hab svc load "${BLDR_ORIGIN}/builder-api" --bind router:builder-router.default --bind memcached:builder-memcached.default --channel "${BLDR_CHANNEL}" --force
+  sudo -E hab svc load "${BLDR_ORIGIN}/builder-api" --bind router:builder-router.default --bind memcached:builder-memcached.default --bind datastore:builder-datastore.default --channel "${BLDR_CHANNEL}" --force
 }
 
 start_api_proxy() {
