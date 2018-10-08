@@ -195,56 +195,60 @@ case "${1:-}" in
       pkg_count=$((pkg_count+1))
 
       if [ "$plan_name" == "plan.sh" ]; then
-        target="x86_64-linux"
+        targets=("x86_64-linux" "x86_64-linux-kernel2")
       elif [ "$plan_name" == "plan.ps1" ]; then
-        target="x86_64-windows"
+        targets=("x86_64-windows")
       else
         echo "Unsupported plan: $plan_name"
         exit 1
       fi
 
-      echo
-      echo "[$pkg_count/$pkg_total] Resolving latest stable version of core/$pkg_name"
-      latest=$(curl -s -H "Accept: application/json" "$upstream_depot/v1/depot/channels/core/stable/pkgs/$pkg_name/latest?target=$target")
-      raw_ident=$(echo "$latest" | jq ".ident")
+      for target in "${targets[@]}"
+      do 
 
-      if [ "$raw_ident" = "null" ]; then
-        echo "Failed to find a latest version. Skipping."
-        continue
-      fi
+        echo
+        echo "[$pkg_count/$pkg_total] Resolving latest stable version of core/$pkg_name for $target"
+        latest=$(curl -s -H "Accept: application/json" "$upstream_depot/v1/depot/channels/core/stable/pkgs/$pkg_name/latest?target=$target")
+        raw_ident=$(echo "$latest" | jq ".ident")
 
-      slash_ident=$(jq '"\(.origin)/\(.name)/\(.version)/\(.release)"' <<< "$raw_ident" | tr -d '"')
-
-      # check to see if we have this file before fetching it again
-      local_file="$tmp_dir/harts/$(tr '/' '-' <<< "$slash_ident")-$target.hart"
-
-      if download_hart_if_missing "$local_file" "$slash_ident" "[$pkg_count/$pkg_total]" "$target"; then
-        # now extract the tdeps and download those too
-        local_tar=$(basename "$local_file" .hart).tar
-        tail -n +6 "$local_file" | unxz > "$local_tar"
-
-        if tar tf "$local_tar" --no-anchored TDEPS > /dev/null 2>&1; then
-          tdeps=$(tail -n +6 "$local_file" | xzcat | tar xfO - --no-anchored TDEPS)
-          dep_total=$(echo "$tdeps" | wc -l)
-          dep_count="0"
-
-          echo "[$pkg_count/$pkg_total] $slash_ident has the following $dep_total transitive dependencies:"
-          echo
-          echo "$tdeps"
-          echo
-          echo "Processing dependencies now."
-          echo
-
-          for dep in $tdeps
-          do
-            dep_count=$((dep_count+1))
-            file_to_check="$tmp_dir/harts/$(tr '/' '-' <<< "$dep")-$target.hart"
-            download_hart_if_missing "$file_to_check" "$dep" "[$pkg_count/$pkg_total] [$dep_count/$dep_total]" "$target" || true
-          done
-        else
-          echo "[$pkg_count/$pkg_total] $slash_ident has no TDEPS file. Skipping processing of dependencies."
+        if [ "$raw_ident" = "" ]; then
+          echo "Failed to find a latest version. Skipping."
+          continue
         fi
-      fi
+
+        slash_ident=$(jq '"\(.origin)/\(.name)/\(.version)/\(.release)"' <<< "$raw_ident" | tr -d '"')
+
+        # check to see if we have this file before fetching it again
+        local_file="$tmp_dir/harts/$(tr '/' '-' <<< "$slash_ident")-$target.hart"
+
+        if download_hart_if_missing "$local_file" "$slash_ident" "[$pkg_count/$pkg_total]" "$target"; then
+          # now extract the tdeps and download those too
+          local_tar=$(basename "$local_file" .hart).tar
+          tail -n +6 "$local_file" | unxz > "$local_tar"
+
+          if tar tf "$local_tar" --no-anchored TDEPS > /dev/null 2>&1; then
+            tdeps=$(tail -n +6 "$local_file" | xzcat | tar xfO - --no-anchored TDEPS)
+            dep_total=$(echo "$tdeps" | wc -l)
+            dep_count="0"
+
+            echo "[$pkg_count/$pkg_total] $slash_ident has the following $dep_total transitive dependencies:"
+            echo
+            echo "$tdeps"
+            echo
+            echo "Processing dependencies now."
+            echo
+
+            for dep in $tdeps
+            do
+              dep_count=$((dep_count+1))
+              file_to_check="$tmp_dir/harts/$(tr '/' '-' <<< "$dep")-$target.hart"
+              download_hart_if_missing "$file_to_check" "$dep" "[$pkg_count/$pkg_total] [$dep_count/$dep_total]" "$target" || true
+            done
+          else
+            echo "[$pkg_count/$pkg_total] $slash_ident has no TDEPS file. Skipping processing of dependencies."
+          fi
+        fi
+      done
     done
 
     # done downloading stuff. let's package it up.
