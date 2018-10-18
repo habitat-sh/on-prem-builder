@@ -31,7 +31,7 @@
 set -euo pipefail
 
 usage() {
-  echo "Usage: on-prem-archive.sh {create-archive | populate-depot <DEPOT_URL> [PATH_TO_EXISTING_TARBALL] | download-archive | upload-archive <PATH_TO_EXISTING_TARBALL>}"
+  echo "Usage: on-prem-archive.sh {create-archive | populate-depot <DEPOT_URL> [PATH_TO_EXISTING_TARBALL] | download-archive | upload-archive <PATH_TO_EXISTING_TARBALL>} | sync-packages <DEPOT_URL> [base-plans]"
   exit 1
 }
 
@@ -137,6 +137,76 @@ upload_archive() {
   echo "Upload to S3 finished."
 }
 
+populate_dirs() {
+  core_tmp=$(mktemp -d)
+  upstream_depot="https://bldr.habitat.sh"
+  core="$core_tmp/core-plans"
+  habitat="$core_tmp/habitat"
+  bootstrap_file="on-prem-bootstrap-$(date +%Y%m%d%H%M%S).tar.gz"
+  tar_file="/tmp/$bootstrap_file"
+  tmp_dir=$(mktemp -d)
+
+  # we need to store both harts and keys because hab will try to upload public keys
+  # when it uploads harts and will panic if the key that a hart was built with doesn't
+  # exist.
+  mkdir -p "$tmp_dir/harts"
+  mkdir -p "$tmp_dir/keys"
+
+  # download keys first
+  keys=$(curl -s -H "Accept: application/json" "$upstream_depot/v1/depot/origins/core/keys" | jq ".[] | .location")
+  for k in $keys
+  do
+    key=$(tr -d '"' <<< "$k")
+    release=$(cut -d '/' -f 5 <<< "$key")
+    curl -s -H "Accept: application/json" -o "$tmp_dir/keys/$release.pub" "$upstream_depot/v1/depot$key"
+  done
+
+  git clone --depth 1 https://github.com/habitat-sh/core-plans.git "$core"
+  cd "$core"
+
+  # we want both the directory name and the file name here
+  cp_dir_list=$(find . -type f -name "plan.*" -printf "%h~%f\\n" | sort -u)
+  populate_packages "$cp_dir_list"
+
+  # let's also pull in any hab components that might have a hart file
+  git clone --depth 1 https://github.com/habitat-sh/habitat.git "$habitat"
+  cd "$habitat/components"
+
+  hb_dir_list=$(find . -type f -name "plan.*" -printf "%h~%f\\n" | sort -u)
+  populate_packages "$hb_dir_list"
+
+  pkg_total=${#packages[@]}
+  pkg_count="0"
+}
+
+read_base_plans() {
+  base_plans=()
+  cd "$core"
+  while read -r line
+  do
+    first=( $line )
+    base_plans+=(${first##*/})
+  done < base-plans.txt
+}
+
+upload_keys() {
+    echo
+    echo "Uploading keys to ${depot_url}"
+
+    cd "$tmp_dir/keys"
+    keys=$(find . -type f -name "*.pub")
+    key_total=$(echo "$keys" | wc -l)
+    key_count="0"
+
+    for key in $keys
+    do
+      key_count=$((key_count+1))
+      echo
+      echo "[$key_count/$key_total] Uploading $key"
+      hab origin key upload -u ${depot_url} --pubfile "$key"
+    done
+}
+
 bucket="${HAB_ON_PREM_BOOTSTRAP_BUCKET_NAME:-habitat-on-prem-builder-bootstrap}"
 s3_root_url="${HAB_ON_PREM_BOOTSTRAP_S3_ROOT_URL:-https://s3-us-west-2.amazonaws.com}/$bucket"
 marker="LATEST.tar.gz"
@@ -146,46 +216,7 @@ case "${1:-}" in
   create-archive)
     check_tools aws git curl jq xzcat
     check_vars AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY
-
-    core_tmp=$(mktemp -d)
-    upstream_depot="https://bldr.habitat.sh"
-    core="$core_tmp/core-plans"
-    habitat="$core_tmp/habitat"
-    bootstrap_file="on-prem-bootstrap-$(date +%Y%m%d%H%M%S).tar.gz"
-    tar_file="/tmp/$bootstrap_file"
-    tmp_dir=$(mktemp -d)
-
-    # we need to store both harts and keys because hab will try to upload public keys
-    # when it uploads harts and will panic if the key that a hart was built with doesn't
-    # exist.
-    mkdir -p "$tmp_dir/harts"
-    mkdir -p "$tmp_dir/keys"
-
-    # download keys first
-    keys=$(curl -s -H "Accept: application/json" "$upstream_depot/v1/depot/origins/core/keys" | jq ".[] | .location")
-    for k in $keys
-    do
-      key=$(tr -d '"' <<< "$k")
-      release=$(cut -d '/' -f 5 <<< "$key")
-      curl -s -H "Accept: application/json" -o "$tmp_dir/keys/$release.pub" "$upstream_depot/v1/depot$key"
-    done
-
-    git clone https://github.com/habitat-sh/core-plans.git "$core"
-    cd "$core"
-
-    # we want both the directory name and the file name here
-    cp_dir_list=$(find . -type f -name "plan.*" -printf "%h~%f\\n" | sort -u)
-    populate_packages "$cp_dir_list"
-
-    # let's also pull in any hab components that might have a hart file
-    git clone https://github.com/habitat-sh/habitat.git "$habitat"
-    cd "$habitat/components"
-
-    hb_dir_list=$(find . -type f -name "plan.*" -printf "%h~%f\\n" | sort -u)
-    populate_packages "$hb_dir_list"
-
-    pkg_total=${#packages[@]}
-    pkg_count="0"
+    populate_dirs
 
     for p in "${packages[@]}"
     do
@@ -257,6 +288,84 @@ case "${1:-}" in
     upload_archive "$tar_file"
 
     ;;
+
+  sync-packages)
+    if [ -z "${2:-}" ]; then
+      usage
+    fi
+
+    depot_url=$2
+    check_tools git curl jq b2sum
+    check_vars HAB_AUTH_TOKEN
+    populate_dirs
+    read_base_plans
+    upload_keys
+
+    for p in "${packages[@]}"
+    do
+      IFS='~' read -ra parts <<< "$p"
+      pkg_name=${parts[0]}
+      plan_name=${parts[1]}
+      pkg_count=$((pkg_count+1))
+
+      if [ "${3:-}" == "base-plans" ]; then
+        if ! [[ " ${base_plans[@]} " =~ " ${pkg_name} " ]]; then
+          echo "[$pkg_count/$pkg_total] ${pkg_name} is not a base plan. Skipping."
+          continue
+        fi
+      fi
+
+      if [ "$plan_name" == "plan.sh" ]; then
+        targets=("x86_64-linux" "x86_64-linux-kernel2")
+      elif [ "$plan_name" == "plan.ps1" ]; then
+        targets=("x86_64-windows")
+      else
+        echo "Unsupported plan: $plan_name"
+        exit 1
+      fi
+
+      for target in "${targets[@]}"
+      do
+        echo
+        echo "[$pkg_count/$pkg_total] Checking upstream version of core/$pkg_name for $target"
+        latest=$(curl -s -H "Accept: application/json" "$upstream_depot/v1/depot/channels/core/stable/pkgs/$pkg_name/latest?target=$target")
+        raw_ident=$(echo "$latest" | jq ".ident")
+
+        if [ "$raw_ident" = "" ]; then
+          echo "[$pkg_count/$pkg_total] Failed to find a latest stable version on upstream. Skipping."
+          continue
+        fi
+
+        slash_ident=$(jq '"\(.origin)/\(.name)/\(.version)/\(.release)"' <<< "$raw_ident" | tr -d '"')
+
+        # get the latest version in the local depot
+        echo "[$pkg_count/$pkg_total] Checking local version of core/$pkg_name for $target"
+        latest_local=$(curl -s -H "Accept: application/json" "${depot_url}/v1/depot/channels/core/stable/pkgs/$pkg_name/latest?target=$target")
+        raw_ident_local=$(echo "$latest_local" | jq ".ident")
+        if [ "$raw_ident_local" != "" ]; then
+          slash_ident_local=$(jq '"\(.origin)/\(.name)/\(.version)/\(.release)"' <<< "$raw_ident_local" | tr -d '"')
+          release=$(echo ${raw_ident} | jq -r '.release') 
+          release_local=$(echo ${raw_ident_local} | jq -r '.release')
+
+          if (( "$release" <= "$release_local" )); then
+            echo "[$pkg_count/$pkg_total] Upstream has an older or equal release timestamp. Skipping."
+            continue
+          fi
+        fi
+
+        # check to see if we have this file before fetching it again
+        local_file="$tmp_dir/harts/$(tr '/' '-' <<< "$slash_ident")-$target.hart"
+
+        if download_hart_if_missing "$local_file" "$slash_ident" "[$pkg_count/$pkg_total]" "$target"; then
+          echo "[$pkg_count/$pkg_total] Uploading ${slash_ident} to local depot"
+          checksum=$(b2sum -s=32 ${local_file} | cut -d ' ' -f 4-)
+          curl -so /dev/null -H "Accept: application/json" -H "Content-Type: application/json" -H "Authorization: Bearer $HAB_AUTH_TOKEN" --data-binary "@$local_file" ${depot_url}/v1/depot/pkgs/$slash_ident\?checksum=$checksum
+          hab pkg promote --url ${depot_url} ${slash_ident} stable || true
+        fi
+      done
+    done
+    ;;
+
   populate-depot)
     if [ -z "${2:-}" ]; then
       usage

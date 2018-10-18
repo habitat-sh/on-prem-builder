@@ -184,37 +184,28 @@ This is quite a lengthy process, so be patient. It will download a *large* (~ 5G
 
 Please ensure that you have plenty of free drive space available, for hosting the `core` packages as well as your own packages.
 
-## Setting up a package upstream
+## Synchronizing 'core' packages from an upstream
 
-It is possible to configure the on-premise builder to point to the hosted Builder site as an 'upstream'.
-This allows new packages from the upstream to get created in the on-premise instance automatically.
+*Important*: Please make sure you have created a `core` origin before starting this process.
 
-If your on-premise instance will have continued outgoing Internet connectivity, you may wish to configure an upstream.
+*Important*: Please make sure you have installed the 'b2sum' tool in your path - see https://github.com/dchest/b2sum.
 
-In order to do so, please create a file called `upstream.toml` with the following content:
-```
-[api]
-features_enabled = "upstream"
+It is possible to also use the 'on-prem-archive.sh' script to syncronize the on-premise builder using the public Builder site as an 'upstream'.
 
-[upstream]
-endpoint = "https://bldr.habitat.sh"
-```
+This allows new stable core packages from the upstream to get created in the on-premise instance automatically.
 
-Then, issue the following command:
-```
-hab config apply builder-api.default $(date +%s) upstream.toml
-```
-After the config is successfully applied, the services should be configured to use the upstream.
+If your on-premise instance will have continued outgoing Internet connectivity, you may wish to periodically run the script to check for updates.
 
-Now, you can test out that the upstream works by trying to install a package that you know exists in the upstream (in the _stable_ channel), but not in the local on-premise builder.
+1. Export your Personal Access Token as `HAB_AUTH_TOKEN` to
+   your environment (e.g, `export HAB_AUTH_TOKEN=<your token>`)
+1. `./scripts/on-prem-archive.sh sync-packages http://${APP_HOSTNAME_OR_IP} base-packages`, passing the
+   root URL of your new depot as the last argument  (Replace `http` with `https` in the URL if SSL is enabled)
 
-```
-hab pkg install -u http://localhost -z <auth-token> <package>
-```
+The 'base-packages' parameter restricts the sync to a smaller subset of the core packages. If you wish to synchronize all core packages, omit the 'base-packages' parameter from the script. Note that it will take much longer for the synchronization of all packages. Generally, it will only take a few minutes for base packages to synchronize.
 
-Initially, you will get a `Package Not Found` error.  Wait for a bit (the package will get synchronized in the background) and try again - this time the install should succeed!
+You can also run the sync-packages functionality to initially populate the local depot.
 
-*NOTE*: It is important to understand how the upstream cache is working. Packages that are requested (either via a `hab pkg install`, or even searching or browsing packages in the Web UI) in the local on-premise depot that have newer (or existing) versions in the upstream in the *stable* channel are marked for retrieval in the background. It is only after the background retrieval of the package succeeds that the package then becomes available in the local instance. If there is any failure to retrieve or submit the package, the next retrieval attempt will be triggered only by another request for that package. This functionality is new, and will be refined over time.
+*NOTE*: This functionality is being provided as an alpha - please log any issues found in the on-prem-builder repo.
 
 ## Configuring a user workstation
 
@@ -485,22 +476,6 @@ You can do that via an environment variable: `HAB_CLIENT_SOCKET_TIMEOUT`. The va
 ```
 HAB_CLIENT_SOCKET_TIMEOUT=360 hab pkg upload -u http://localhost -z <your auth token> <file>
 ```
-
-### Updated upstream packages not showing up in the on-premise depot
-
-If you have turned on the automated package fetch from an upstream, and are not seeing updated packages, please check the following:
-
-1. Check that the package you are trying to retrieve is public (private packages will not be retrieved currently).
-
-2. Check that there are updated packages in the `stable` channel in the upstream, that are newer than the latest version you have on-premise.
-
-3. Make sure you have allowed sufficient time for package download (large packages may take a while).
-
-4. Check that the upstream configuration is correctly applied - you should see an `upstream_depot` setting in the builder-api configuration - check the `hab/svc/builder-api/config/config.toml` file.  If you don't see an 'upstream_depot' setting, you may need to re-apply it following the setup instructions.
-
-5. Check the upstream log file for any errors or other status - this log file is located at 'hab/svc/builder-api/var/builder-upstream.log'.
-
-6. Make sure you have triggered the automated fetch for the package you are interested in by doing a `hab pkg install` of the package, or searching for the package via the web UI.
 
 ### Package shows up in the UI and `hab pkg search`, but `hab pkg install` fails
 
