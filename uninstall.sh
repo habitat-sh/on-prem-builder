@@ -1,4 +1,4 @@
 #!/bin/bash
-hab svc status | tail -n +2 | grep "^habitat\/" | awk -F'/' '{print $2}' | xargs -I{} hab svc stop habitat/{}
-hab svc status | tail -n +2 | grep "^habitat\/" | awk -F'/' '{print $2}' | xargs -I{} hab svc unload habitat/{}
+systemctl stop hab-sup
+rm -rf /hab/sup/default/specs/builder-*
 rm -rf /hab/pkgs/habitat
