@@ -333,36 +333,19 @@ the `builder` Postgres database. Please follow the steps below.
    ```
 
 ### Migration
-1. Uninstall existing services by running `sudo -E ./uninstall.sh`
-1. Install new services by running `./install.sh`
-1. Stop builder api by running `sudo hab svc stop habitat/builder-api`
-1. Optionally, if you want to be extra sure that you're in a good spot to perform the
-   migration, log into the Postgres console and verify that you have empty
-   tables in the `builder` database. A command to do this might look like:
-
-   ```shell
-   PGPASSWORD=$(sudo cat /hab/svc/builder-datastore/config/pwfile) hab pkg exec core/postgresql psql -h 127.0.0.1 -p 5432 -U hab builder
-   ```
-
-   That should drop you into a prompt where you can type `\d` and hopefully see
-   a list of tables. If you try to select data from any of those tables,
-   they should be empty. Note that this step is definitely not required,
-   but can be done if it provides you extra peace of mind.
-1. Now you are ready to migrate the data itself. The following command will do
-   that:
-
+1. With all services running your *current* versions, execute the following command from the root of the repo directory:
    ```shell
    PGPASSWORD=$(sudo cat /hab/svc/builder-datastore/config/pwfile) ./scripts/merge-databases.sh
    ```
-
    After confirming that you have fresh database backups, the script
-   should run and at the end, you should see several notices that everything is
-   great.
+   should run and create a new 'builder' database, and then migrate the data.
 1. At this point, all data is stored in the `builder` database. Both of the other
    databases (`builder_originsrv` and `builder_sessionsrv`) will still be present,
-   and the data in them will remain intact, but the services will no
+   and the data in them will remain intact, but new services will no
    longer reference those databases.
-1. Start builder api by running `sudo hab svc start habitat/builder-api`
+1. Now, stop and uninstall the existing services by running `sudo -E ./uninstall.sh`
+1. Install new services by running `./install.sh`
+1. Once the new services come up, you should be able to log back into the depot UI and confirm that everything is as expected.
 
 
 ## Log Rotation

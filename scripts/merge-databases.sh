@@ -35,31 +35,26 @@ execute_sql() {
   hab pkg exec core/postgresql psql -t -U hab -h 127.0.0.1 -p "${port}" -c "${sql}" -d "${database}" -X
 }
 
-# before we do anything, let's check to see if this has already been done
+# before we do anything, let's check to see if the shard migration has already been done
 echo "Checking to see if the shard migration has already happened"
 if ! execute_sql "builder_originsrv" "SELECT shard_migration_complete FROM flags;" | grep -q 't'; then
 echo "The flags table is not present in the database, which is required for this script to run."
-echo "It's possible something is amiss with your Builder database migrations."
+echo "Please make sure that you have run the shard migration and try this script again."
 exit 1
 fi
 
-# before we do anything part 2, let's check to see if this has already been done
-echo "Checking to see if the db migration has already happened"
-if [ "$(execute_sql "builder" "SELECT count(*) from origins;")" -gt 0 ]; then
-echo "Looks like the db migration has already happened"
-echo "It's possible something is amiss with your Builder database migrations."
+# check to make sure that the builder DB does not exist
+echo "Checking to see if builder database already exists"
+if hab pkg exec core/postgresql psql -t -U hab -h 127.0.0.1 -p 5432 -lqt | cut -d \| -f 1 | grep -qw builder ; then
+echo "Looks like the builder database already exists"
+echo "It's possible that the database merge has already happened."
+echo "If not, please delete the builder database and try this script again."
 exit 1
 fi
 
-# before we do anything part 3, let's check to see if anyone has logged in mid-migration
-echo "Checking to see if the db migration has already happened"
-if [ "$(execute_sql "builder" "SELECT count(*) from accounts;")" -gt 0 ]; then
-echo "Looks like the db migration has already happened"
-echo "It's possible somebody logged in mid-migration."
-echo "If this is the case, stop all builder services, delete the builder database, recreate it, start all services and retry this script."
-exit 1
-fi
-
+# Create the builder db and schema
+hab pkg exec core/postgresql createdb -U hab -h 127.0.0.1 -p 5432 builder
+hab pkg exec core/postgresql psql -t -U hab -h 127.0.0.1 -p 5432 -d builder < "$PWD/scripts/schema-migration.sql"
 
 # This is a bit of a special case since we deleted a column
 execute_sql builder_originsrv "\\copy origins (id, name, owner_id, created_at, updated_at, default_package_visibility) to stdout" | \
@@ -76,7 +71,6 @@ originsrv_tables=(
     origin_projects origin_project_integrations origin_public_encryption_keys origin_public_keys
     origin_secret_keys origin_secrets
 )
-
 
 for table in "${sessionsrv_tables[@]}"; do
     echo "Copying ${table} from builder_sessionsrv to builder"
