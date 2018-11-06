@@ -58,7 +58,7 @@ EOT
 
   mkdir -p /hab/svc/builder-api
   cat <<EOT > /hab/svc/builder-api/user.toml
-log_level="info,tokio_core=error,tokio_reactor=error,zmq=error,hyper=error"
+log_level="error,tokio_core=error,tokio_reactor=error,zmq=error,hyper=error"
 jobsrv_enabled = false
 
 [api]
@@ -125,19 +125,10 @@ company_id = "$ANALYTICS_COMPANY_ID"
 company_name = "$ANALYTICS_COMPANY_NAME"
 write_key = "$ANALYTICS_WRITE_KEY"
 EOT
-
-  mkdir -p /hab/svc/builder-originsrv
-  cat <<EOT > /hab/svc/builder-originsrv/user.toml
-log_level="info"
-jobsrv_enabled = false
-
-[datastore]
-password = "$PGPASSWORD"
-EOT
 }
 
 start_api() {
-  sudo -E hab svc load "${BLDR_ORIGIN}/builder-api" --bind router:builder-router.default --bind memcached:builder-memcached.default --bind datastore:builder-datastore.default --channel "${BLDR_CHANNEL}" --force
+  sudo -E hab svc load "${BLDR_ORIGIN}/builder-api" --bind memcached:builder-memcached.default --bind datastore:builder-datastore.default --channel "${BLDR_CHANNEL}" --force
 }
 
 start_api_proxy() {
@@ -146,14 +137,6 @@ start_api_proxy() {
 
 start_datastore() {
   sudo -E hab svc load "${BLDR_ORIGIN}/builder-datastore" --channel "${BLDR_CHANNEL}" --force
-}
-
-start_originsrv() {
-  sudo -E hab svc load "${BLDR_ORIGIN}/builder-originsrv" --bind router:builder-router.default --bind datastore:builder-datastore.default --channel "${BLDR_CHANNEL}" --force
-}
-
-start_router() {
-  sudo -E hab svc load "${BLDR_ORIGIN}/builder-router" --channel "${BLDR_CHANNEL}" --force
 }
 
 start_minio() {
@@ -198,10 +181,8 @@ start_builder() {
   configure
   start_minio
   start_memcached
-  start_router
   start_api
   start_api_proxy
-  start_originsrv
   sleep 2
   generate_bldr_keys
   upload_ssl_certificate
