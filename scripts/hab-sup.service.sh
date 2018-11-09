@@ -2,13 +2,16 @@ mkdir -p /etc/systemd/system
 
 environment_proxy=""
 if [ ! -z "$HTTP_PROXY" ]; then
-  environment_proxy="\"HTTP_PROXY=${HTTP_PROXY}\" "
+  environment_proxy="${environment_proxy}
+Environment=\"HTTP_PROXY=${HTTP_PROXY}\""
 fi
 if [ ! -z "$HTTPS_PROXY" ]; then
-  environment_proxy="\"HTTPS_PROXY=${HTTPS_PROXY}\" "
+  environment_proxy="${environment_proxy}
+Environment=\"HTTPS_PROXY=${HTTPS_PROXY}\""
 fi
-if [ ! -z "${environment_proxy}" ]; then
-  environment_proxy="Environment=${environment_proxy}"
+if [ ! -z "$NO_PROXY" ]; then
+  environment_proxy="${environment_proxy}
+Environment=\"NO_PROXY=${NO_PROXY}\""
 fi
 
 cat <<EOT > /etc/systemd/system/hab-sup.service
