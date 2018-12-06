@@ -61,6 +61,9 @@ EOT
 log_level="error,tokio_core=error,tokio_reactor=error,zmq=error,hyper=error"
 jobsrv_enabled = false
 
+[http]
+handler_count = 10
+
 [api]
 features_enabled = ""
 targets = ["x86_64-linux", "x86_64-linux-kernel2", "x86_64-windows"]
@@ -92,6 +95,7 @@ ttl = 1
 
 [datastore]
 password = "$PGPASSWORD"
+connection_timeout_sec = 5
 EOT
 
   mkdir -p /hab/svc/builder-api-proxy
