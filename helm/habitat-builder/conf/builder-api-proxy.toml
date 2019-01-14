@@ -4,6 +4,7 @@ log_level="debug"
 log_level="info"
 {{- end }}
 enable_builder = false
+load_balanced = true
 app_url = {{ template "habitat-builder.app_url" . }}
 
 [oauth]
