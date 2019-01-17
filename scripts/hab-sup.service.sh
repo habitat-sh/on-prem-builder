@@ -13,13 +13,16 @@ if [ ! -z "$NO_PROXY" ]; then
   environment_proxy="${environment_proxy}
 Environment=\"NO_PROXY=${NO_PROXY}\""
 fi
+if [ -z "$SSL_CERT_FILE" ]; then
+  SSL_CERT_FILE="$(hab pkg path core/cacerts)/ssl/cert.pem"
+fi
 
 cat <<EOT > /etc/systemd/system/hab-sup.service
 [Unit]
 Description=Habitat Supervisor
 
 [Service]
-ExecStartPre=/bin/bash -c "/bin/systemctl set-environment SSL_CERT_FILE=$(hab pkg path core/cacerts)/ssl/cert.pem"
+ExecStartPre=/bin/bash -c "/bin/systemctl set-environment SSL_CERT_FILE="${SSL_CERT_FILE}"
 ExecStart=/bin/hab run
 ${environment_proxy}
 
