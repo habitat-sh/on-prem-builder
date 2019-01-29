@@ -111,6 +111,24 @@ download_hart_if_missing() {
   fi
 }
 
+latest_ident() {
+  local pkg_name_=$1
+  local target_=$2
+  local latest_
+  local raw_ident_
+
+  latest_=$(curl -s -H "Accept: application/json" "$upstream_depot/v1/depot/channels/core/stable/pkgs/$pkg_name_/latest?target=$target_")
+  set +e
+  raw_ident_=$(echo "$latest_" | jq ".ident")
+  retVal=$?
+  if [ $retVal -ne 0 ]; then
+    echo "-1"
+  else
+    echo "$raw_ident_"
+  fi
+  set -e
+}
+
 populate_packages() {
   local dir_list=$1
 
@@ -236,14 +254,18 @@ case "${1:-}" in
 
       for target in "${targets[@]}"
       do 
-
         echo
         echo "[$pkg_count/$pkg_total] Resolving latest stable version of core/$pkg_name for $target"
-        latest=$(curl -s -H "Accept: application/json" "$upstream_depot/v1/depot/channels/core/stable/pkgs/$pkg_name/latest?target=$target")
-        raw_ident=$(echo "$latest" | jq ".ident")
+
+        raw_ident=$(latest_ident "$pkg_name" "$target")
 
         if [ "$raw_ident" = "" ]; then
           echo "Failed to find a latest version. Skipping."
+          continue
+        fi
+
+        if [ "$raw_ident" = "-1" ]; then
+          echo "Failed to parse the response for $pkg_name. Skipping."
           continue
         fi
 
@@ -285,6 +307,7 @@ case "${1:-}" in
     # done downloading stuff. let's package it up.
     cd /tmp
     tar zcvf "$tar_file" -C "$tmp_dir" .
+
     upload_archive "$tar_file"
 
     ;;
@@ -328,11 +351,16 @@ case "${1:-}" in
       do
         echo
         echo "[$pkg_count/$pkg_total] Checking upstream version of core/$pkg_name for $target"
-        latest=$(curl -s -H "Accept: application/json" "$upstream_depot/v1/depot/channels/core/stable/pkgs/$pkg_name/latest?target=$target")
-        raw_ident=$(echo "$latest" | jq ".ident")
+
+        raw_ident=$(latest_ident "$pkg_name" "$target")
 
         if [ "$raw_ident" = "" ]; then
           echo "[$pkg_count/$pkg_total] Failed to find a latest stable version on upstream. Skipping."
+          continue
+        fi
+
+        if [ "$raw_ident" = "-1" ]; then
+          echo "[$pkg_count/$pkg_total] Failed to parse the response for $pkg_name. Skipping."
           continue
         fi
 
