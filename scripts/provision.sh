@@ -14,6 +14,11 @@ fi
 # Defaults
 BLDR_ORIGIN=${BLDR_ORIGIN:="habitat"}
 
+sudo () {
+    [[ $EUID = 0 ]] || set -- command sudo -E "$@"
+    "$@"
+}
+
 init_datastore() {
   mkdir -p /hab/svc/builder-datastore
   cat <<EOT > /hab/svc/builder-datastore/user.toml
@@ -132,23 +137,23 @@ EOT
 }
 
 start_api() {
-  sudo -E hab svc load "${BLDR_ORIGIN}/builder-api" --bind memcached:builder-memcached.default --bind datastore:builder-datastore.default --channel "${BLDR_CHANNEL}" --force
+  sudo hab svc load "${BLDR_ORIGIN}/builder-api" --bind memcached:builder-memcached.default --bind datastore:builder-datastore.default --channel "${BLDR_CHANNEL}" --force
 }
 
 start_api_proxy() {
-  sudo -E hab svc load "${BLDR_ORIGIN}/builder-api-proxy" --bind http:builder-api.default --channel "${BLDR_CHANNEL}" --force
+  sudo hab svc load "${BLDR_ORIGIN}/builder-api-proxy" --bind http:builder-api.default --channel "${BLDR_CHANNEL}" --force
 }
 
 start_datastore() {
-  sudo -E hab svc load "${BLDR_ORIGIN}/builder-datastore" --channel "${BLDR_CHANNEL}" --force
+  sudo hab svc load "${BLDR_ORIGIN}/builder-datastore" --channel "${BLDR_CHANNEL}" --force
 }
 
 start_minio() {
-  sudo -E hab svc load "${BLDR_ORIGIN}/builder-minio" --channel "${BLDR_CHANNEL}" --force
+  sudo hab svc load "${BLDR_ORIGIN}/builder-minio" --channel "${BLDR_CHANNEL}" --force
 }
 
 start_memcached() {
-  sudo -E hab svc load "${BLDR_ORIGIN}/builder-memcached" --channel "${BLDR_CHANNEL}" --force
+  sudo hab svc load "${BLDR_ORIGIN}/builder-memcached" --channel "${BLDR_CHANNEL}" --force
 }
 
 generate_bldr_keys() {
@@ -193,14 +198,14 @@ start_builder() {
 }
 
 if command -v useradd > /dev/null; then
-  sudo -E useradd --system --no-create-home hab || true
+  sudo useradd --system --no-create-home hab || true
 else
-  sudo -E adduser --system hab || true
+  sudo adduser --system hab || true
 fi
 if command -v groupadd > /dev/null; then
-  sudo -E groupadd --system hab || true
+  sudo groupadd --system hab || true
 else
-  sudo -E addgroup --system hab || true
+  sudo addgroup --system hab || true
 fi
 
 sudo systemctl start hab-sup
