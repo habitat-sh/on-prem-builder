@@ -61,10 +61,25 @@ secret_key = "$MINIO_SECRET_KEY"
 bucket_name = "$MINIO_BUCKET"
 EOT
 
+  mkdir -p /hab/svc/builder-jobsrv
+  cat <<EOT > /hab/svc/builder-jobsrv/user.toml
+log_level="error,tokio_core=error,tokio_reactor=error,zmq=error,hyper=error,postgres=error"
+
+[http]
+handler_count = 2
+
+[datastore]
+password = "$PGPASSWORD"
+connection_timeout_sec = 5
+
+[archive]
+backend = "local"
+EOT
+
   mkdir -p /hab/svc/builder-api
   cat <<EOT > /hab/svc/builder-api/user.toml
-log_level="error,tokio_core=error,tokio_reactor=error,zmq=error,hyper=error"
-jobsrv_enabled = false
+log_level="error,tokio_core=error,tokio_reactor=error,zmq=error,hyper=error,postgres=error"
+features_enabled = "jobsrv"
 
 [http]
 handler_count = 10
@@ -72,9 +87,8 @@ handler_count = 10
 [api]
 features_enabled = ""
 targets = ["x86_64-linux", "x86_64-linux-kernel2", "x86_64-windows"]
-
-[depot]
-jobsrv_enabled = false
+build_targets = []
+build_on_upload = false
 
 [oauth]
 provider = "$OAUTH_PROVIDER"
@@ -137,11 +151,15 @@ EOT
 }
 
 start_api() {
-  sudo hab svc load "${BLDR_ORIGIN}/builder-api" --bind memcached:builder-memcached.default --bind datastore:builder-datastore.default --channel "${BLDR_CHANNEL}" --force
+  sudo hab svc load "${BLDR_ORIGIN}/builder-api" --bind memcached:builder-memcached.default --bind datastore:builder-datastore.default --bind jobsrv:builder-jobsrv.default --channel "${BLDR_CHANNEL}" --force
 }
 
 start_api_proxy() {
   sudo hab svc load "${BLDR_ORIGIN}/builder-api-proxy" --bind http:builder-api.default --channel "${BLDR_CHANNEL}" --force
+}
+
+start_jobsrv() {
+  sudo hab svc load "${BLDR_ORIGIN}/builder-jobsrv" --bind datastore:builder-datastore.default --channel "${BLDR_CHANNEL}" --force
 }
 
 start_datastore() {
@@ -192,6 +210,7 @@ start_builder() {
   start_memcached
   start_api
   start_api_proxy
+  start_jobsrv
   sleep 2
   generate_bldr_keys
   upload_ssl_certificate
