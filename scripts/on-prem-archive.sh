@@ -21,6 +21,10 @@
 # HAB_ON_PREM_BOOTSTRAP_KEEP_ARCHIVE_FILE: Sometimes you don't want to delete the
 # archive file you just spent many minutes creating. Setting this keeps the file.
 #
+# HAB_ON_PREM_BOOTSTRAP_NO_UPLOAD: This controls whether the script will upload
+# the archive file to AWS S3 bucket.  Very handy when your company does not have 
+# access to AWS.
+# 
 # Additionally, if you're using this script to populate an existing depot, and you
 # don't have network connectivity to download a tarball from S3, you can pass the
 # path to your existing tarball as the third argument and that will be used to
@@ -148,11 +152,18 @@ populate_packages() {
 upload_archive() {
   local archive=$1
   local bs_file
-  bs_file=$(basename "$1")
-  echo "Uploading tar file to S3."
-  s3_cp "$archive" "s3://$bucket/"
-  s3_cp "s3://$bucket/$bs_file" "s3://$bucket/$marker"
-  echo "Upload to S3 finished."
+
+  if [ "${HAB_ON_PREM_BOOTSTRAP_NO_UPLOAD:-}" ]; then
+    echo "Uploading skipped."
+  else
+    echo "Uploading $archive"
+
+    bs_file=$(basename "$1")
+    echo "Uploading tar file to S3."
+    s3_cp "$archive" "s3://$bucket/"
+    s3_cp "s3://$bucket/$bs_file" "s3://$bucket/$marker"
+    echo "Upload to S3 finished."
+  fi
 }
 
 populate_dirs() {
@@ -232,8 +243,13 @@ declare -a packages
 
 case "${1:-}" in
   create-archive)
-    check_tools aws git curl jq xzcat
-    check_vars AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY
+    check_tools git curl jq xzcat
+
+    if [ -z "${HAB_ON_PREM_BOOTSTRAP_NO_UPLOAD:-}" ]; then
+      check_tools aws
+      check_vars AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY
+    fi
+
     populate_dirs
 
     for p in "${packages[@]}"
