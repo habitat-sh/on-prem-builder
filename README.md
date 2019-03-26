@@ -100,7 +100,7 @@ Further information on the OAuth endpoints can also be found [here](https://tool
 
 Since substantial storage may be required for holding packages, please ensure you have an appropriate amount of free space on your filesystem.
 
-For reference, the package artifacts will be stored at the following location: `/hab/svc/builder-api/data`
+The package artifacts will be stored in your Minio instance, typically at the following location: `/hab/svc/builder-minio/data`
 
 If you need to add additional storage, it is recommended that you create a mount at `/hab` and point it to your external storage. This is not required if you already have sufficient free space.
 
@@ -410,6 +410,17 @@ In order to do that, run the following:
 `echo 'max_connections=200' | hab config apply "builder-datastore.default" $(date +%s)`
 
 Wait for a bit for the datastore service to restart. If the service does not restart on it's own, you can do a 'sudo systemctl restart hab-sup' to restart things.
+
+### Error "Too many open files"
+
+If you see this error message in the supervisor logs, that may indicate that you need to increase the file ulimit on your system. The On-Prem Depot systemd configuration includes an expanded file limit, however some distributions (eg, on CentOS 7) may require additional system configuration.
+
+For example, add the following to the end of your `/etc/security/limits.conf` file, and restart your system.
+
+```
+*    soft    nofile 65535
+*    hard    nofile 65535
+```
 
 ### Error "Text file busy"
 
