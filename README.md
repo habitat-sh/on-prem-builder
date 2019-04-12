@@ -180,7 +180,7 @@ The freshly installed Builder Depot does not contain any packages. In order to b
 1. `sudo -E ./scripts/on-prem-archive.sh populate-depot http://${APP_HOSTNAME_OR_IP}`, passing the
    root URL of your new depot as the last argument  (Replace `http` with `https` in the URL if SSL is enabled)
 
-This is quite a lengthy process, so be patient. It will download a *large* (~ 5GB currently) archive of the latest stable core plans, and then install them to your on-premise depot.
+This is quite a lengthy process, so be patient. It will download a *large* (~ 13GB currently) archive of the latest stable core plans, and then install them to your on-premise depot.
 
 Please ensure that you have plenty of free drive space available, for hosting the `core` packages as well as your own packages.
 
