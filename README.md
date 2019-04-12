@@ -1,5 +1,13 @@
 # On Premise Habitat Builder Depot
 
+**Umbrella Project**: [Habitat](https://github.com/habitat-sh/habitat)
+
+**Project State**: [Active](https://github.com/chef/chef-oss-practices/blob/master/repo-management/repo-states.md#active)
+
+**Issues Response SLA**: 5 business days
+
+**Pull Request Response SLA**: 5 business days
+
 ## IMPORTANT NOTICE
 
 Please see the [Migrating Package Artifacts to Minio](#migrating-package-artifacts-to-minio) section if your existing On-Premise Depot was installed *prior* to June 15th 2018. The package artifacts are now stored in a Minio instance, and running a migration script will be required in order to properly transition over to newer versions of On-Premise Depot.
