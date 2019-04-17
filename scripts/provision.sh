@@ -62,6 +62,14 @@ bucket_name = "$MINIO_BUCKET"
 EOT
 
   mkdir -p /hab/svc/builder-api
+  if [ ${ARTIFACTORY_ENABLED:-false} = "true" ]; then
+    FEATURES_ENABLED="ARTIFACTORY"
+  else
+    FEATURES_ENABLED=""
+    ARTIFACTORY_API_URL=""
+    ARTIFACTORY_API_KEY=""
+    ARTIFACTORY_REPO=""
+  fi
   cat <<EOT > /hab/svc/builder-api/user.toml
 log_level="error,tokio_core=error,tokio_reactor=error,zmq=error,hyper=error"
 jobsrv_enabled = false
@@ -70,7 +78,7 @@ jobsrv_enabled = false
 handler_count = 10
 
 [api]
-features_enabled = ""
+features_enabled = "$FEATURES_ENABLED"
 targets = ["x86_64-linux", "x86_64-linux-kernel2", "x86_64-windows"]
 
 [depot]
@@ -94,6 +102,11 @@ key_id = "$MINIO_ACCESS_KEY"
 secret_key = "$MINIO_SECRET_KEY"
 endpoint = "$MINIO_ENDPOINT"
 bucket_name = "$MINIO_BUCKET"
+
+[artifactory]
+api_url = "$ARTIFACTORY_API_URL"
+api_key = "$ARTIFACTORY_API_KEY"
+repo = "$ARTIFACTORY_REPO"
 
 [memcache]
 ttl = 1
@@ -188,7 +201,9 @@ start_builder() {
   init_datastore
   start_datastore
   configure
-  start_minio
+  if ! [ ${ARTIFACTORY_ENABLED:-false} = "true" ]; then
+    start_minio
+  fi
   start_memcached
   start_api
   start_api_proxy
