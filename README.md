@@ -100,9 +100,11 @@ Further information on the OAuth endpoints can also be found [here](https://tool
 
 Since substantial storage may be required for holding packages, please ensure you have an appropriate amount of free space on your filesystem.
 
-The package artifacts will be stored in your Minio instance, typically at the following location: `/hab/svc/builder-minio/data`
+The package artifacts will be stored in your Minio instance by default, typically at the following location: `/hab/svc/builder-minio/data`
 
 If you need to add additional storage, it is recommended that you create a mount at `/hab` and point it to your external storage. This is not required if you already have sufficient free space.
+
+*Note*: If you would prefer to Artifactory instead of Minio for the object storage, please see the [Artifactory](#using-artifactory-as-the-object-store-(alpha)) section below.
 
 ### Procuring SSL certificate (Recommended)
 
@@ -367,6 +369,32 @@ The `builder-api-proxy` service will log (via Nginx) all access and errors to lo
         endscript
 }
 ```
+
+## Using Artifactory as the object store (Alpha)
+
+If you are interested in using an existing instance of Artifactory as your object store instead of Minio,
+we are providing this capability as an early preview/alpha for testing.
+
+To set this up, you will need to have the following:
+* Know the URL to the Artifactory instance
+* Know (or generate) an API key to authenticate to the instance
+* Create a repo for the Habitat artifacts
+
+Once you have the above, modify the your `bldr.env` based on the same config in `bldr.env.sample` in order to enable Artifactory.
+
+Once you have `bldr.env` updated, you can do an install normally using the `install.sh` script.
+
+After logging into the Depot Web UI and creating your origins, you can try uploading some packages and check your Artifactory instance to ensure that they are present in the repo you specified.
+
+If you run into any issues, please see the Support section below.
+
+### Running a local Artifactory
+
+If you just want to do a quick test, you can also run a local Artifactory instance. In order to do that, you can do the following:
+```
+sudo hab svc load core/artifactory
+```
+This will spin up an Artifactory instance, and you can use the following to log in: http://localhost:8081/artifactory/webapp/#/home
 
 ## Support
 
