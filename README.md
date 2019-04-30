@@ -132,6 +132,8 @@ sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/privat
 
 *Important*: Make sure that the certificate files are named exactly `ssl-certificate.key` and `ssl-certificate.crt`. If you have procured the certificate from a different source, rename them to the prescribed filenames, and ensure that they are located in the same folder as the `install.sh` script. They will get uploaded to the Habitat supervisor during the install.
 
+*Important*: If you get authentication failures with a self-signed cert, you may need to either update the cert package that the habitat services are using (in the `/etc/systemd/system/hab-sup.service` file), or modify the hab `core/cacerts` package (in the `/hab/pkgs/core/cacerts/...` folder) to add your self-signed cert chain to the `cert.pem` file. Restart the hab services with `systemctl restart hab-sup` after updating the cert file.
+
 ## Setup
 
 1. Clone this repo (or unzip the archive you have downloaded from the Github release page) at the desired machine where you will stand up the Habitat Builder Depot
@@ -523,19 +525,13 @@ Note: the --force option above is only available in versions of the `hab` client
 
 If you want to turn on and examine the services debug logging, you can do so by doing the following on your install location:
 
-`for svc in originsrv api router sessionsrv; do echo 'log_level="debug"' | sudo hab config apply "builder-${svc}.default" $(date +%s) ; done`
+Edit the `/hab/svc/builder-api/user.toml` file and update the `log_level` entry to start with `debug`
+
+After making the edit, restart the habitat services with `sudo systemctl restart hab-sup`, or just stop and start the builder-api service with `hab svc stop habitat/builder-api` and `hab svc start habitat/builder-api`.
 
 Once the logging is enabled, you can examine it via `journalctl -fu hab-sup`
 
-*Tip*: If debugging an authentication issue, you may want to turn on debug only for the builder-api service, as normally the other services' debug logging is not needed. In that case, you can do the following:
-
-`echo 'log_level="debug"' | sudo hab config apply "builder-api.default" $(date +%s)`
-
-When you are done with debugging, you can set the logging back to the default setting by running:
-
-`for svc in originsrv api router sessionsrv; do echo 'log_level="info"' | hab config apply "builder-${svc}.default" $(date +%s) ; done`
-
-*WARNING*: If you turn on debug logging as above, it will remove any other configuration that you might have applied via `hab config apply`.  If you have made other configuration changes via `hab config apply`, you should turn on debug logging by adding the `log_level="debug"` entry to your other configuration file and applying that file, instead of using the script above.
+When you are done with debugging, you can set the logging back to the default setting by modifying the user.toml and restarting the services.
 
 ## License
 
