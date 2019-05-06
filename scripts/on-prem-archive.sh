@@ -22,9 +22,9 @@
 # archive file you just spent many minutes creating. Setting this keeps the file.
 #
 # HAB_ON_PREM_BOOTSTRAP_NO_UPLOAD: This controls whether the script will upload
-# the archive file to AWS S3 bucket.  Very handy when your company does not have 
+# the archive file to AWS S3 bucket.  Very handy when your company does not have
 # access to AWS.
-# 
+#
 # Additionally, if you're using this script to populate an existing depot, and you
 # don't have network connectivity to download a tarball from S3, you can pass the
 # path to your existing tarball as the third argument and that will be used to
@@ -111,7 +111,7 @@ download_hart_if_missing() {
     return 1
   else
     echo "$status_line Downloading $slash_ident"
-    curl -s -H "Accept: application/json" -o "$local_file" "$upstream_depot/v1/depot/pkgs/$slash_ident/download?target=$target"
+    curl -s -S --retry 6 --retry-delay 10 -H "Accept: application/json" -o "$local_file" "$upstream_depot/v1/depot/pkgs/$slash_ident/download?target=$target"
   fi
 }
 
@@ -201,7 +201,9 @@ populate_dirs() {
   git clone --depth 1 https://github.com/habitat-sh/habitat.git "$habitat"
   cd "$habitat/components"
 
-  hb_dir_list=$(find . -type f -name "plan.*" -printf "%h~%f\\n" | sort -u)
+  hb_dir_list=$(find . \( \( -type f -a -name "plan.sh" \) -o \
+                       \( -name "plan.ps1" \) \
+                       \) -not -path "./core/*" -printf "%h~%f\\n" | sort -u)
   populate_packages "$hb_dir_list"
 
   pkg_total=${#packages[@]}
@@ -269,7 +271,7 @@ case "${1:-}" in
       fi
 
       for target in "${targets[@]}"
-      do 
+      do
         echo
         echo "[$pkg_count/$pkg_total] Resolving latest stable version of core/$pkg_name for $target"
 
@@ -388,7 +390,7 @@ case "${1:-}" in
         raw_ident_local=$(echo "$latest_local" | jq ".ident")
         if [ "$raw_ident_local" != "" ]; then
           slash_ident_local=$(jq '"\(.origin)/\(.name)/\(.version)/\(.release)"' <<< "$raw_ident_local" | tr -d '"')
-          release=$(echo ${raw_ident} | jq -r '.release') 
+          release=$(echo ${raw_ident} | jq -r '.release')
           release_local=$(echo ${raw_ident_local} | jq -r '.release')
 
           if (( "$release" <= "$release_local" )); then
