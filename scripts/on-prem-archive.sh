@@ -408,7 +408,7 @@ case "${1:-}" in
           echo "[$pkg_count/$pkg_total] Uploading ${slash_ident} to local depot"
           checksum=$(b2sum -s=32 ${local_file} | cut -d ' ' -f 4-)
           curl -so /dev/null -H "Accept: application/json" -H "Content-Type: application/json" -H "Authorization: Bearer $HAB_AUTH_TOKEN" --data-binary "@$local_file" ${depot_url}/v1/depot/pkgs/$slash_ident\?checksum=$checksum
-          hab pkg promote --url ${depot_url} ${slash_ident} stable || true
+          hab pkg promote --url ${depot_url} ${slash_ident} stable ${target} || true
         fi
       done
     done
