@@ -66,9 +66,9 @@ EOT
     FEATURES_ENABLED="ARTIFACTORY"
   else
     FEATURES_ENABLED=""
-    ARTIFACTORY_API_URL=""
-    ARTIFACTORY_API_KEY=""
-    ARTIFACTORY_REPO=""
+    ARTIFACTORY_API_URL="http://localhost:8081"
+    ARTIFACTORY_API_KEY="none"
+    ARTIFACTORY_REPO="habitat-builder-artifact-store"
   fi
   cat <<EOT > /hab/svc/builder-api/user.toml
 log_level="error,tokio_core=error,tokio_reactor=error,zmq=error,hyper=error"
