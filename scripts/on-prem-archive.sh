@@ -311,9 +311,11 @@ case "${1:-}" in
 
             for dep in $tdeps
             do
+              # Windows TDEPs will have carriage returns, which we need to remove
+              dep_fixed=`echo $dep | sed 's/\\r//g'`
               dep_count=$((dep_count+1))
-              file_to_check="$tmp_dir/harts/$(tr '/' '-' <<< "$dep")-$target.hart"
-              download_hart_if_missing "$file_to_check" "$dep" "[$pkg_count/$pkg_total] [$dep_count/$dep_total]" "$target" || true
+              file_to_check="$tmp_dir/harts/$(tr '/' '-' <<< "$dep_fixed")-$target.hart"
+              download_hart_if_missing "$file_to_check" "$dep_fixed" "[$pkg_count/$pkg_total] [$dep_count/$dep_total]" "$target" || true
             done
           else
             echo "[$pkg_count/$pkg_total] $slash_ident has no TDEPS file. Skipping processing of dependencies."
