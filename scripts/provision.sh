@@ -32,13 +32,14 @@ EOT
 }
 
 configure() {
-  while [ ! -f /hab/svc/builder-datastore/config/pwfile ]
-  do
-    sleep 2
-  done
-
-  export PGPASSWORD
-  PGPASSWORD=$(cat /hab/svc/builder-datastore/config/pwfile)
+  if [ ${DATASTORE_ENABLED:-true} = "true" ]; then
+    while [ ! -f /hab/svc/builder-datastore/config/pwfile ]
+    do
+      sleep 2
+    done
+    export PGPASSWORD
+    PGPASSWORD=$(cat /hab/svc/builder-datastore/config/pwfile)
+  fi
 
   export ANALYTICS_ENABLED=${ANALYTICS_ENABLED:="false"}
   export ANALYTICS_COMPANY_ID
@@ -70,6 +71,7 @@ EOT
     ARTIFACTORY_API_KEY="none"
     ARTIFACTORY_REPO="habitat-builder-artifact-store"
   fi
+  PG_IP_ADDR=${POSTGRES_IP:-127.0.0.1}
   cat <<EOT > /hab/svc/builder-api/user.toml
 log_level="error,tokio_core=error,tokio_reactor=error,zmq=error,hyper=error"
 jobsrv_enabled = false
@@ -114,6 +116,7 @@ ttl = 1
 [datastore]
 password = "$PGPASSWORD"
 connection_timeout_sec = 5
+host = "$PG_IP_ADDR"
 EOT
 
   mkdir -p /hab/svc/builder-api-proxy
@@ -150,7 +153,7 @@ EOT
 }
 
 start_api() {
-  sudo hab svc load "${BLDR_ORIGIN}/builder-api" --bind memcached:builder-memcached.default --bind datastore:builder-datastore.default --channel "${BLDR_CHANNEL}" --force
+  sudo hab svc load "${BLDR_ORIGIN}/builder-api" --bind memcached:builder-memcached.default --channel "${BLDR_CHANNEL}" --force
 }
 
 start_api_proxy() {
@@ -198,8 +201,10 @@ upload_ssl_certificate() {
 }
 
 start_builder() {
-  init_datastore
-  start_datastore
+  if [ ${DATASTORE_ENABLED:-true} = "true" ]; then
+    init_datastore
+    start_datastore
+  fi
   configure
   if ! [ ${ARTIFACTORY_ENABLED:-false} = "true" ]; then
     start_minio
