@@ -104,6 +104,11 @@ Further information on the OAuth endpoints can also be found [here](https://tool
 
 *Note*: When setting Chef Automate as your OAuth provider, you will need to add your Automate instance's TLS certificate (found at the `load_balancer.v1.sys.frontend_tls` entry in your Chef Automate `config.toml` file), to your Builder instance's list of accepted certs. Currently, this can be done by modifying the `core/cacert` package and appending the cert to the cert.pem file at the following location: `$(hab pkg path core/cacerts)/ssl/cert.pem`.
 
+*Note*: If your OAuth provider's endpoints use a self-signed certificate, you
+will need to add it, or your root CA, to the cert bundle.  You can find the
+bundle in `/hab/pkgs/core/cacerts/`.  Add your cert or CA to the bottom of the
+file `/ssl/cert.pem`.
+
 ### Preparing your filesystem (Optional)
 
 Since substantial storage may be required for holding packages, please ensure you have an appropriate amount of free space on your filesystem.
@@ -428,6 +433,10 @@ Please work with your enterprise network admin to ensure the appropriate firewal
 ### Authentication failure when logging in
 
 If you are not able to log in, please double check the settings that you have configured your OAuth application with, as well as the URLs that you have specified in your `bldr.env` file.
+
+If you are using an _internal_ OAuth provider, check that the certificate it
+uses on its endpoints is trusted in the hab package `/hab/pkgs/core/cacerts/`.
+Add your cert or CA to the bottom of the file `/ssl/cert.pem`.
 
 You can also turn on debug logging (section below) and check to see that the authenticate endpoint is getting called at the Builder API backend, and whether there is any additional information in the logs that may be helpful.
 
