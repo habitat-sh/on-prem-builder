@@ -173,7 +173,7 @@ At that point you should be able to log in using your configured OAuth provider.
 
 Once you are logged in, you should be able to create an origin by clicking on the 'Create Origin' button.
 
-You will need to at least create a `core` origin for an initial set of base packages (see section below). Go ahead and create a new origin now, and type in `core` as the origin name.
+**NOTE** _You will need to at least create a `core` origin for an initial set of base packages (see section below). Go ahead and create a new origin now, and type in `core` as the origin name. It's important to do this prior to populating your depot with the `core` upstream packages, or else the upload will fail._
 
 ### Generate a Personal Access Token
 
@@ -520,6 +520,21 @@ hab pkg upload -u http://localhost -z <your auth token> --force <package hart fi
 ```
 
 Note: the --force option above is only available in versions of the `hab` client greater than 0.59.
+
+### on-prem-archive.sh Fails during `populate-depot` with `403` error during core package uploads 
+
+When populating your on-prem depot with upstream core packages, you may run into an error that looks like this:
+
+```
+Uploading hart files.
+
+[1/958] Uploading ./core-img-0.5.4-20190201011741-x86_64-linux.hart to the depot at https://hab-depot.dbright.io
+    75 B / 75 B | [=======================================================================================================================================================================================================================] 100.00 % 384 B/s
+✗✗✗
+✗✗✗ [403 Forbidden]
+✗✗✗
+```
+And repeats for every package. Check to make sure you've created the `core` origin and then try again, if you haven't, then the upload will fail.
 
 ### Debug Logging
 
