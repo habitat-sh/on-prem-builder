@@ -528,7 +528,7 @@ When populating your on-prem depot with upstream core packages, you may run into
 ```
 Uploading hart files.
 
-[1/958] Uploading ./core-img-0.5.4-20190201011741-x86_64-linux.hart to the depot at https://hab-depot.dbright.io
+[1/958] Uploading ./core-img-0.5.4-20190201011741-x86_64-linux.hart to the depot at https://your.awesome.depot
     75 B / 75 B | [=======================================================================================================================================================================================================================] 100.00 % 384 B/s
 ✗✗✗
 ✗✗✗ [403 Forbidden]
