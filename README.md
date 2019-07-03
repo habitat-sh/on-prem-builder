@@ -93,7 +93,7 @@ For the configuration below, you will also need to know following *fully qualifi
 * API Endpoint (example: `https://api.github.com`)
 
 For more information, please refer to the developer documentation of these services:
-* [Chef Automate (ALPHA)](https://automate.chef.io/docs/configuration/#setting-up-automate-as-an-oauth-provider-for-builder)
+* [Chef Automate (ALPHA)](https://automate.chef.io/docs/configuration/#alpha-setting-up-automate-as-an-oauth-provider-for-habitat-builder)
 * [Azure Active Directory](https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-protocols-oauth-code)
 * [GitHub](https://developer.github.com/apps/building-oauth-apps/authorization-options-for-oauth-apps/)
 * [GitLab](https://docs.gitlab.com/ee/integration/oauth_provider.html)
@@ -521,7 +521,7 @@ hab pkg upload -u http://localhost -z <your auth token> --force <package hart fi
 
 Note: the --force option above is only available in versions of the `hab` client greater than 0.59.
 
-### on-prem-archive.sh Fails during `populate-depot` with `403` error during core package uploads 
+### on-prem-archive.sh Fails during `populate-depot` with `403` error during core package uploads
 
 When populating your on-prem depot with upstream core packages, you may run into an error that looks like this:
 
