@@ -31,7 +31,7 @@ execute_sql() {
   local sql="$1"
   local server="$2"
 
-  hab pkg exec core/postgresql psql -t -U hab -h 127.0.0.1 -p 5432 -c "$sql" "builder_$server"
+  ${HAB_CMD} pkg exec core/postgresql psql -t -U hab -h 127.0.0.1 -p 5432 -c "$sql" "builder_$server"
 }
 
 process_shards() {

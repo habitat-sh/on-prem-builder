@@ -212,9 +212,9 @@ resource "aws_instance" "builder" {
   provisioner "remote-exec" {
     inline = [
       "cd /home/${var.aws_image_user}/builder/scripts",
-      "chmod +x ./install-hab.sh ./hab-sup.service.sh ./provision.sh",
-      "sudo -E ./install-hab.sh",
-      "sudo -E ./hab-sup.service.sh",
+      "chmod +x ./install.sh ./sup.service.sh ./provision.sh",
+      "sudo -E ./install.sh",
+      "sudo -E ./sup.service.sh",
       "sudo -E ./provision.sh",
     ]
   }

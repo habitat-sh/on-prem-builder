@@ -11,12 +11,9 @@ else
   exit 1
 fi
 
-# Defaults
-BLDR_ORIGIN=${BLDR_ORIGIN:="habitat"}
-
 sudo () {
-    [[ $EUID = 0 ]] || set -- command sudo -E "$@"
-    "$@"
+  [[ $EUID = 0 ]] || set -- command sudo -E "$@"
+  "$@"
 }
 
 init_datastore() {
@@ -68,7 +65,7 @@ EOT
     FEATURES_ENABLED=""
     ARTIFACTORY_API_URL="http://localhost:8081"
     ARTIFACTORY_API_KEY="none"
-    ARTIFACTORY_REPO="habitat-builder-artifact-store"
+    ARTIFACTORY_REPO="builder-artifact-store"
   fi
   cat <<EOT > /hab/svc/builder-api/user.toml
 log_level="error,tokio_core=error,tokio_reactor=error,zmq=error,hyper=error"
@@ -150,23 +147,23 @@ EOT
 }
 
 start_api() {
-  sudo hab svc load "${BLDR_ORIGIN}/builder-api" --bind memcached:builder-memcached.default --bind datastore:builder-datastore.default --channel "${BLDR_CHANNEL}" --force
+  sudo ${HAB_CMD} svc load "${BLDR_ORIGIN}/builder-api" --bind memcached:builder-memcached.default --bind datastore:builder-datastore.default --channel "${BLDR_CHANNEL}" --force
 }
 
 start_api_proxy() {
-  sudo hab svc load "${BLDR_ORIGIN}/builder-api-proxy" --bind http:builder-api.default --channel "${BLDR_CHANNEL}" --force
+  sudo ${HAB_CMD} svc load "${BLDR_ORIGIN}/builder-api-proxy" --bind http:builder-api.default --channel "${BLDR_CHANNEL}" --force
 }
 
 start_datastore() {
-  sudo hab svc load "${BLDR_ORIGIN}/builder-datastore" --channel "${BLDR_CHANNEL}" --force
+  sudo ${HAB_CMD} svc load "${BLDR_ORIGIN}/builder-datastore" --channel "${BLDR_CHANNEL}" --force
 }
 
 start_minio() {
-  sudo hab svc load "${BLDR_ORIGIN}/builder-minio" --channel "${BLDR_CHANNEL}" --force
+  sudo ${HAB_CMD} svc load "${BLDR_ORIGIN}/builder-minio" --channel "${BLDR_CHANNEL}" --force
 }
 
 start_memcached() {
-  sudo hab svc load "${BLDR_ORIGIN}/builder-memcached" --channel "${BLDR_CHANNEL}" --force
+  sudo ${HAB_CMD} svc load "${BLDR_ORIGIN}/builder-memcached" --channel "${BLDR_CHANNEL}" --force
 }
 
 generate_bldr_keys() {
@@ -180,8 +177,8 @@ generate_bldr_keys() {
     echo "Generated new builder key: $KEY_NAME"
   fi
 
-  hab file upload "builder-api.default" "$(date +%s)" "/hab/cache/keys/${KEY_NAME}.pub"
-  hab file upload "builder-api.default" "$(date +%s)" "/hab/cache/keys/${KEY_NAME}.box.key"
+  ${HAB_CMD} file upload "builder-api.default" "$(date +%s)" "/hab/cache/keys/${KEY_NAME}.pub"
+  ${HAB_CMD} file upload "builder-api.default" "$(date +%s)" "/hab/cache/keys/${KEY_NAME}.box.key"
 }
 
 upload_ssl_certificate() {
@@ -192,8 +189,8 @@ upload_ssl_certificate() {
       echo "ERROR: Certificate file(s) not found!"
       exit 1
     fi
-    hab file upload "builder-api-proxy.default" "$(date +%s)" "../ssl-certificate.crt"
-    hab file upload "builder-api-proxy.default" "$(date +%s)" "../ssl-certificate.key"
+    ${HAB_CMD} file upload "builder-api-proxy.default" "$(date +%s)" "../ssl-certificate.crt"
+    ${HAB_CMD} file upload "builder-api-proxy.default" "$(date +%s)" "../ssl-certificate.key"
   fi
 }
 
