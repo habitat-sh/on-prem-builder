@@ -423,6 +423,20 @@ If you have outgoing access via a proxy, please ensure that HTTPS_PROXY is set c
 You also will need to have the following _inbound_ port open for your instance:
 * Port 80
 
+In the case that you have configured your proxy for the local session while installing but are still recieving connection refusal errors like the one below, you may want to configure your proxy with the /etc/environment file or similar.
+```
+-- Logs begin at Mon 2019-06-10 09:02:13 PDT. --
+Jun 10 09:35:15 <TargetMachine> hab[13161]: ∵ Missing package for core/hab-launcher
+Jun 10 09:35:15 <TargetMachine> hab[13161]: » Installing core/hab-launcher
+Jun 10 09:35:15 <TargetMachine> hab[13161]: ☁ Determining latest version of core/hab-launcher in the 'stable' channel
+Jun 10 09:35:15 <TargetMachine> hab[13161]: ✗✗✗
+Jun 10 09:35:15 <TargetMachine> hab[13161]: ✗✗✗ Connection refused (os error 111)
+Jun 10 09:35:15 <TargetMachine> hab[13161]: ✗✗✗
+Jun 10 09:35:15 <TargetMachine> systemd[1]: hab-sup.service: Main process exited, code=exited, status=1/FAILURE
+Jun 10 09:35:15 <TargetMachine> hab[13171]: Supervisor not started.
+Jun 10 09:35:15 <TargetMachine> systemd[1]: hab-sup.service: Unit entered failed state.
+Jun 10 09:35:15 <TargetMachine> systemd[1]: hab-sup.service: Failed with result 'exit-code'
+```
 Please work with your enterprise network admin to ensure the appropriate firewall rules are configured for network access.
 
 ### Authentication failure when logging in
