@@ -127,6 +127,7 @@ provider = "$OAUTH_PROVIDER"
 client_id = "$OAUTH_CLIENT_ID"
 authorize_url = "$OAUTH_AUTHORIZE_URL"
 redirect_url = "$OAUTH_REDIRECT_URL"
+signup_url = "$OAUTH_SIGNUP_URL"
 
 [nginx]
 max_body_size = "2048m"
