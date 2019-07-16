@@ -200,7 +200,7 @@ Please ensure that you have plenty of free drive space available, for hosting th
 
 *Important*: Please make sure you have created a `core` origin before starting this process.
 
-*Important*: Please make sure you have installed the 'b2sum' tool in your path - see https://github.com/dchest/b2sum.
+*Important*: Please make sure you have installed the 'b2sum' tool in your path https://blake2.net/#su
 
 It is possible to also use the 'on-prem-archive.sh' script to syncronize the on-premise builder using the public Builder site as an 'upstream'.
 

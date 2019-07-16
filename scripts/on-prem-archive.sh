@@ -49,17 +49,38 @@ exists() {
 }
 
 s3_cp() {
-  aws s3 cp --acl=public-read "${1}" "${2}" >&2
+  hab pkg exec core/aws-cli aws s3 cp --acl=public-read "${1}" "${2}" >&2
 }
 
-check_tools() {
+check_root(){
+  if [[ $EUID -ne 0 ]]; then
+   echo "This script must be run as root" 
+   exit 1
+  fi
+}
+
+install_tools() {
   for tool
   do
-    if ! exists "$tool"; then
-      echo "Please install $tool and run this script again."
-      exit 1
+    echo "Installing ${tool} from Habitat package."
+    if [[ "$tool" == "jq" ]]; then
+        HAB_AUTH_TOKEN="" hab pkg install core/jq-static
+    elif [[ "$tool" == "aws" ]]; then
+        HAB_AUTH_TOKEN="" hab pkg install core/aws-cli
+    elif [[ "$tool" == "b2sum" ]]; then
+        HAB_AUTH_TOKEN="" hab pkg install core/coreutils
+    elif [[ "$tool" == "xzcat" ]]; then
+        HAB_AUTH_TOKEN="" hab pkg install core/xz
+    else
+        HAB_AUTH_TOKEN="" hab pkg install core/"${tool}"
     fi
   done
+  
+  CURL_CMD="hab pkg exec core/curl curl"
+  JQ_CMD="hab pkg exec core/jq-static jq"
+  B2SUM_CMD="hab pkg exec core/coreutils b2sum"
+  GIT_CMD="hab pkg exec core/git git"
+  XZCAT_CMD="hab pkg exec core/xz xzcat"
 }
 
 check_vars() {
@@ -95,7 +116,7 @@ cleanup() {
 }
 
 download_latest_archive() {
-  curl -O "$s3_root_url/$marker"
+  ${CURL_CMD} -O "$s3_root_url/$marker"
 }
 
 trap cleanup EXIT
@@ -111,7 +132,7 @@ download_hart_if_missing() {
     return 1
   else
     echo "$status_line Downloading $slash_ident"
-    curl -s -S --retry 6 --retry-delay 10 -H "Accept: application/json" -o "$local_file" "$upstream_depot/v1/depot/pkgs/$slash_ident/download?target=$target"
+    ${CURL_CMD} -s -S --retry 6 --retry-delay 10 -H "Accept: application/json" -o "$local_file" "$upstream_depot/v1/depot/pkgs/$slash_ident/download?target=$target"
   fi
 }
 
@@ -121,9 +142,9 @@ latest_ident() {
   local latest_
   local raw_ident_
 
-  latest_=$(curl -s -H "Accept: application/json" "$upstream_depot/v1/depot/channels/core/stable/pkgs/$pkg_name_/latest?target=$target_")
+  latest_=$(${CURL_CMD} -s -H "Accept: application/json" "$upstream_depot/v1/depot/channels/core/stable/pkgs/$pkg_name_/latest?target=$target_")
   set +e
-  raw_ident_=$(echo "$latest_" | jq ".ident")
+  raw_ident_=$(echo "$latest_" | ${JQ_CMD} ".ident")
   retVal=$?
   if [ $retVal -ne 0 ]; then
     echo "-1"
@@ -182,15 +203,15 @@ populate_dirs() {
   mkdir -p "$tmp_dir/keys"
 
   # download keys first
-  keys=$(curl -s -H "Accept: application/json" "$upstream_depot/v1/depot/origins/core/keys" | jq ".[] | .location")
+  keys=$(${CURL_CMD} -s -H "Accept: application/json" "$upstream_depot/v1/depot/origins/core/keys" | ${JQ_CMD} ".[] | .location")
   for k in $keys
   do
     key=$(tr -d '"' <<< "$k")
     release=$(cut -d '/' -f 5 <<< "$key")
-    curl -s -H "Accept: application/json" -o "$tmp_dir/keys/$release.pub" "$upstream_depot/v1/depot$key"
+    ${CURL_CMD} -s -H "Accept: application/json" -o "$tmp_dir/keys/$release.pub" "$upstream_depot/v1/depot$key"
   done
 
-  git clone --depth 1 https://github.com/habitat-sh/core-plans.git "$core"
+  ${GIT_CMD} clone --depth 1 https://github.com/habitat-sh/core-plans.git "$core"
   cd "$core"
 
   # we want both the directory name and the file name here
@@ -198,7 +219,7 @@ populate_dirs() {
   populate_packages "$cp_dir_list"
 
   # let's also pull in any hab components that might have a hart file
-  git clone --depth 1 https://github.com/habitat-sh/habitat.git "$habitat"
+  ${GIT_CMD} clone --depth 1 https://github.com/habitat-sh/habitat.git "$habitat"
   cd "$habitat/components"
 
   hb_dir_list=$(find . \( \( -type f -a -name "plan.sh" \) -o \
@@ -218,6 +239,10 @@ read_base_plans() {
     first=( $line )
     base_plans+=(${first##*/})
   done < base-plans.txt
+}
+
+read_hab_plans() {
+    hab_plans=( "hab-sup" "hab-launcher")
 }
 
 upload_keys() {
@@ -245,10 +270,11 @@ declare -a packages
 
 case "${1:-}" in
   create-archive)
-    check_tools git curl jq xzcat
+    check_root
+    install_tools git curl jq xzcat
 
     if [ -z "${HAB_ON_PREM_BOOTSTRAP_NO_UPLOAD:-}" ]; then
-      check_tools aws
+      install_tools aws
       check_vars AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY
     fi
 
@@ -287,7 +313,7 @@ case "${1:-}" in
           continue
         fi
 
-        slash_ident=$(jq '"\(.origin)/\(.name)/\(.version)/\(.release)"' <<< "$raw_ident" | tr -d '"')
+        slash_ident=$(${JQ_CMD} '"\(.origin)/\(.name)/\(.version)/\(.release)"' <<< "$raw_ident" | tr -d '"')
 
         # check to see if we have this file before fetching it again
         local_file="$tmp_dir/harts/$(tr '/' '-' <<< "$slash_ident")-$target.hart"
@@ -298,7 +324,7 @@ case "${1:-}" in
           tail -n +6 "$local_file" | unxz > "$local_tar"
 
           if tar tf "$local_tar" --no-anchored TDEPS > /dev/null 2>&1; then
-            tdeps=$(tail -n +6 "$local_file" | xzcat | tar xfO - --no-anchored TDEPS)
+            tdeps=$(tail -n +6 "$local_file" | ${XZCAT_CMD} | tar xfO - --no-anchored TDEPS)
             dep_total=$(echo "$tdeps" | wc -l)
             dep_count="0"
 
@@ -338,10 +364,12 @@ case "${1:-}" in
     fi
 
     depot_url=$2
-    check_tools git curl jq b2sum
+    check_root
+    install_tools git curl jq b2sum
     check_vars HAB_AUTH_TOKEN
     populate_dirs
     read_base_plans
+    read_hab_plans
     upload_keys
 
     for p in "${packages[@]}"
@@ -352,7 +380,7 @@ case "${1:-}" in
       pkg_count=$((pkg_count+1))
 
       if [ "${3:-}" == "base-plans" ]; then
-        if ! [[ " ${base_plans[@]} " =~ " ${pkg_name} " ]]; then
+        if ! [[ " ${base_plans[@]} " =~ " ${pkg_name} " ]] &&  ! [[ " ${hab_plans[@]} " =~ " ${pkg_name} " ]]; then
           echo "[$pkg_count/$pkg_total] ${pkg_name} is not a base plan. Skipping."
           continue
         fi
@@ -384,16 +412,16 @@ case "${1:-}" in
           continue
         fi
 
-        slash_ident=$(jq '"\(.origin)/\(.name)/\(.version)/\(.release)"' <<< "$raw_ident" | tr -d '"')
+        slash_ident=$(${JQ_CMD} '"\(.origin)/\(.name)/\(.version)/\(.release)"' <<< "$raw_ident" | tr -d '"')
 
         # get the latest version in the local depot
         echo "[$pkg_count/$pkg_total] Checking local version of core/$pkg_name for $target"
-        latest_local=$(curl -s -H "Accept: application/json" "${depot_url}/v1/depot/channels/core/stable/pkgs/$pkg_name/latest?target=$target")
-        raw_ident_local=$(echo "$latest_local" | jq ".ident")
+        latest_local=$($CURL_CMD -s -H "Accept: application/json" "${depot_url}/v1/depot/channels/core/stable/pkgs/$pkg_name/latest?target=$target")
+        raw_ident_local=$(echo "$latest_local" | ${JQ_CMD} ".ident")
         if [ "$raw_ident_local" != "" ]; then
-          slash_ident_local=$(jq '"\(.origin)/\(.name)/\(.version)/\(.release)"' <<< "$raw_ident_local" | tr -d '"')
-          release=$(echo ${raw_ident} | jq -r '.release')
-          release_local=$(echo ${raw_ident_local} | jq -r '.release')
+          slash_ident_local=$(${JQ_CMD} '"\(.origin)/\(.name)/\(.version)/\(.release)"' <<< "$raw_ident_local" | tr -d '"')
+          release=$(echo ${raw_ident} | ${JQ_CMD} -r '.release')
+          release_local=$(echo ${raw_ident_local} | ${JQ_CMD} -r '.release')
 
           if (( "$release" <= "$release_local" )); then
             echo "[$pkg_count/$pkg_total] Upstream has an older or equal release timestamp. Skipping."
@@ -406,9 +434,9 @@ case "${1:-}" in
 
         if download_hart_if_missing "$local_file" "$slash_ident" "[$pkg_count/$pkg_total]" "$target"; then
           echo "[$pkg_count/$pkg_total] Uploading ${slash_ident} to local depot"
-          checksum=$(b2sum -s=32 ${local_file} | cut -d ' ' -f 4-)
-          curl -so /dev/null -H "Accept: application/json" -H "Content-Type: application/json" -H "Authorization: Bearer $HAB_AUTH_TOKEN" --data-binary "@$local_file" ${depot_url}/v1/depot/pkgs/$slash_ident\?checksum=$checksum
-          hab pkg promote --url ${depot_url} ${slash_ident} stable ${target} || true
+          checksum=$(${B2SUM_CMD} -l 256 ${local_file} | cut -d ' ' -f 1)
+          ${CURL_CMD} -sov /dev/null -H "Accept: application/json" -H "Authorization: Bearer $HAB_AUTH_TOKEN" --data-binary "@$local_file" ${depot_url}/v1/depot/pkgs/$slash_ident\?checksum=${checksum}&target=${target}
+          hab pkg promote --url ${depot_url} ${slash_ident} stable ${target} || true 
         fi
       done
     done
@@ -420,8 +448,8 @@ case "${1:-}" in
     fi
 
     depot_url=$2
-
-    check_tools curl
+    check_root
+    install_tools curl
     check_vars HAB_AUTH_TOKEN
 
     tmp_dir=$(mktemp -d)
