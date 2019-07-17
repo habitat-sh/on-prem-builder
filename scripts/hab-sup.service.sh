@@ -27,7 +27,7 @@ Description=Habitat Supervisor
 
 [Service]
 ExecStartPre=/bin/bash -c "/bin/systemctl set-environment SSL_CERT_FILE=${SSL_CERT_FILE}"
-ExecStart=/bin/hab run
+ExecStart=/bin/hab sup run
 ExecStop=/bin/hab sup term
 KillMode=process
 LimitNOFILE=65535
