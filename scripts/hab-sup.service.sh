@@ -39,6 +39,7 @@ EOT
 
 systemctl daemon-reload
 systemctl start hab-sup
+systemctl enable hab-sup
 
 # wait for the sup to come up before proceeding.
 until hab svc status > /dev/null 2>&1; do
