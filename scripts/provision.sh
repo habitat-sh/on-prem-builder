@@ -89,7 +89,6 @@ provider = "$OAUTH_PROVIDER"
 userinfo_url = "$OAUTH_USERINFO_URL"
 token_url = "$OAUTH_TOKEN_URL"
 redirect_url = "$OAUTH_REDIRECT_URL"
-signup_url = "$OAUTH_SIGNUP_URL"
 client_id = "$OAUTH_CLIENT_ID"
 client_secret = "$OAUTH_CLIENT_SECRET"
 
