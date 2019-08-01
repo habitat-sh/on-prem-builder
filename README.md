@@ -200,8 +200,6 @@ Please ensure that you have plenty of free drive space available, for hosting th
 
 *Important*: Please make sure you have created a `core` origin before starting this process.
 
-*Important*: Please make sure you have installed the 'b2sum' tool in your path https://blake2.net/#su
-
 It is possible to also use the 'on-prem-archive.sh' script to syncronize the on-premise builder using the public Builder site as an 'upstream'.
 
 This allows new stable core packages from the upstream to get created in the on-premise instance automatically.
@@ -210,7 +208,7 @@ If your on-premise instance will have continued outgoing Internet connectivity, 
 
 1. Export your Personal Access Token as `HAB_AUTH_TOKEN` to
    your environment (e.g, `export HAB_AUTH_TOKEN=<your token>`)
-1. `./scripts/on-prem-archive.sh sync-packages http://${APP_HOSTNAME_OR_IP} base-packages`, passing the
+1. `sudo -E ./scripts/on-prem-archive.sh sync-packages http://${APP_HOSTNAME_OR_IP} base-packages`, passing the
    root URL of your new depot as the last argument  (Replace `http` with `https` in the URL if SSL is enabled)
 
 The 'base-packages' parameter restricts the sync to a smaller subset of the core packages. If you wish to synchronize all core packages, omit the 'base-packages' parameter from the script. Note that it will take much longer for the synchronization of all packages. Generally, it will only take a few minutes for base packages to synchronize.
