@@ -117,7 +117,7 @@ ttl = 1
 password = "$PGPASSWORD"
 connection_timeout_sec = 5
 host = "$PG_HOST"
-port = "PG_PORT"
+port = "$PG_PORT"
 EOT
 
   mkdir -p /hab/svc/builder-api-proxy
