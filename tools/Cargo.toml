@@ -1,0 +1,18 @@
+[package]
+name = "on-prem-builder-tools"
+version = "0.1.0"
+authors = ["Mark Anderson <mark@chef.io>"]
+edition = "2018"
+
+[dependencies]
+clap = "*"
+serde = "*"
+serde_json = "*"
+reqwest = "*"
+
+log = "*"
+env_logger = "*"
+
+[dependencies.habitat_core]
+git = "https://github.com/habitat-sh/habitat.git"
+
