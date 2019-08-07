@@ -9,6 +9,8 @@ clap = "*"
 serde = "*"
 serde_json = "*"
 reqwest = "*"
+rusoto_core = "*"
+rusoto_s3 = "*"
 
 log = "*"
 env_logger = "*"

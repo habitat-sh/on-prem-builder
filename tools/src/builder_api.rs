@@ -1,12 +1,12 @@
 //
 //
 //extern crate serde_derive;
-use serde_json::{Result, Value};
+use serde_json::{Value};
 
 extern crate reqwest;
-//use reqwest::Error;
 
 use crate::hab_core::package::{PackageIdent};
+use crate::error::{Error,Result};
 
 
 // TODO: PackageTarget is default linux x64 I think; we should figure out how to do others
@@ -24,19 +24,33 @@ use crate::hab_core::package::{PackageIdent};
 // components/builder-api/src/server/resources/channels.rs
 // "/depot/channels/{origin}/{channel}/pkgs/{pkg}/latest?target=x86_64-windows",
 
-pub fn fetch_package_details(root: &str, package_to_fetch: &PackageIdent) -> Result< serde_json::Value >  {
+pub fn fetch_json(url: &str) -> Result< serde_json::Value > {
+    println!("Fetching from URL {}", url);
+    let mut response = match reqwest::get(url) {
+        Ok(r) =>
+            r,
+        Err(e) => {
+            println!("Requesting url {:?} got {:?}", url, e);
+            return Err(Error::HttpClient(e))
+        }
+    };
+
+    println!("Response: {:?}", response);
+    
+    // THIS CAN FAIL; (our list doesn't work all the way through for either windows or linux
+    let json : Value = response.json().unwrap();
+    return Ok(json)
+}
+
+pub fn fetch_package_details(root: &str, package_to_fetch: &PackageIdent) -> Result< Vec<PackageIdent> >  {
     // E.g. 'https://bldr.habitat.sh/v1/depot/pkgs/core/7zip/latest?target=x86_64-linux'
     //       https://bldr.habitat.sh/v1/depot/channels/core/stable/pkgs/7zip/latest?target=x86_64-linux' | j
     let request_url = format!("{root}/channels/{origin}/stable/pkgs/{name}/latest?target={target}",
                               root = root,
                               origin = package_to_fetch.origin,
                               name = package_to_fetch.name,
-                              target = "x86_64-linux"); // "x86_64-linux"
-    println!("Fetching from URL {}", request_url);
-    let mut response = reqwest::get(&request_url).unwrap();
-
-    // THIS CAN FAIL; (our list doesn't work all the way through for either windows or linux
-    let json : Value = response.json().unwrap();
+                              target = "x86_64-windows"); // "x86_64-linux"
+    let json : Value = fetch_json(&request_url).unwrap();
     
     println!("Response: {:?}", json);
     
@@ -45,5 +59,5 @@ pub fn fetch_package_details(root: &str, package_to_fetch: &PackageIdent) -> Res
     let tdeps : Vec<PackageIdent> = serde_json::from_value(json["tdeps"].to_owned()).unwrap();
    
     println!("TDEPS: {:?}", tdeps);
-    Ok(serde_json::Value::Null)
+    Ok(tdeps)
 }

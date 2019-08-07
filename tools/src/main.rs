@@ -4,19 +4,21 @@ const S3_ROOT_URL_DEFAULT: &str = "https://s3-us-west-2.amazonaws.com";
 const LATEST: &str = "LATEST.tar.gz";
 const BLDR_DEFAULT: &str = "https://bldr.habitat.sh/v1/depot";
 
-mod package_util;
-mod builder_api;
-mod fetch_expand_cmd;
+extern crate env_logger;
+extern crate rusoto_core;
+extern crate rusoto_s3;
 
 use std::process;
-//use clap::{Arg, ArgMatches, App, SubCommand};
 use clap::{App};
 
-//#[macro_use] extern crate log;
-extern crate env_logger;
 //use log::Level;
 
 use habitat_core as hab_core;
+
+mod builder_api;
+mod error;
+mod fetch_expand_cmd;
+
 
 fn main() {
     env_logger::init();
@@ -33,5 +35,3 @@ fn main() {
     };
     process::exit(result)
 }
-
-
