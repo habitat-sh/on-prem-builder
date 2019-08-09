@@ -14,12 +14,12 @@ use crate::builder_api;
 //                                 PackageTarget,
 //                                 PackageIdent},
 //                       ChannelIdent};
-use crate::hab_core::package::PackageIdent;
+use crate::hab_core::package::{PackageIdent, PackageTarget};
 
 pub const NAME: &str = "fetch-from-file";
 pub const FILE_ARG: &str = "file";
 
-
+// TODO add targets option
 pub fn make_subcommand<'c>() -> App<'c,'c> {
     let c = SubCommand::with_name(NAME)
         .about("Takes a list of packages and expands their transitive deps, and fetches all packages needed to support them")
@@ -35,9 +35,19 @@ pub fn run(matches: &ArgMatches) -> i32 {
     let filename = matches.value_of(FILE_ARG).unwrap();
 
     let packages = read_file(filename).unwrap();
+
+    let mut fetch_list = Vec::<(PackageIdent,PackageTarget)>::new();
     
     for pkg in &packages {
-        builder_api::fetch_package_details(crate::BLDR_DEFAULT, pkg);
+        for target in PackageTarget::supported_targets() {
+            let  expanded_package = builder_api::fetch_package_details(crate::BLDR_DEFAULT, pkg, target);
+            match expanded_package {
+                Ok(mut p) =>
+                    fetch_list.append(&mut p),
+                Err(_e) =>
+                    println!("Unable to resolve package {} for target {}", pkg, target)
+            }
+        }
     }
     0
 }
@@ -58,5 +68,4 @@ pub fn read_file(filename: &str) -> Result<Vec<PackageIdent>, ()> {
 pub fn expand_line(line: String) -> PackageIdent {
     PackageIdent::from_str(line.trim()).unwrap()
 }
-
 
