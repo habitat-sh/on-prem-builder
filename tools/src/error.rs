@@ -1,19 +1,14 @@
 // adapted from https://github.com/habitat-sh/builder/blob/master/components/builder-api/src/server/error.rs
 // and https://github.com/habitat-sh/habitat/blob/master/components/core/src/error.rs
 
-use std::{error,
-          fmt,
-          fs,
-          io,
-          result,
-          string};
+use std::{error, fmt, fs, io, result, string};
 
 use reqwest;
 use rusoto_core::RusotoError;
 use rusoto_s3;
 use serde_json;
 
-use crate::{hab_core};
+use crate::hab_core;
 
 #[derive(Debug)]
 pub enum Error {
@@ -81,21 +76,31 @@ impl error::Error for Error {
 // From handlers - these make application level error handling cleaner
 
 impl From<hab_core::Error> for Error {
-    fn from(err: hab_core::Error) -> Error { Error::HabitatCore(err) }
+    fn from(err: hab_core::Error) -> Error {
+        Error::HabitatCore(err)
+    }
 }
 
 impl From<io::IntoInnerError<io::BufWriter<fs::File>>> for Error {
-    fn from(err: io::IntoInnerError<io::BufWriter<fs::File>>) -> Error { Error::InnerError(err) }
+    fn from(err: io::IntoInnerError<io::BufWriter<fs::File>>) -> Error {
+        Error::InnerError(err)
+    }
 }
 
 impl From<io::Error> for Error {
-    fn from(err: io::Error) -> Self { Error::IO(err) }
+    fn from(err: io::Error) -> Self {
+        Error::IO(err)
+    }
 }
 
 impl From<serde_json::Error> for Error {
-    fn from(err: serde_json::Error) -> Error { Error::SerdeJson(err) }
+    fn from(err: serde_json::Error) -> Error {
+        Error::SerdeJson(err)
+    }
 }
 
 impl From<string::FromUtf8Error> for Error {
-    fn from(err: string::FromUtf8Error) -> Error { Error::Utf8(err) }
+    fn from(err: string::FromUtf8Error) -> Error {
+        Error::Utf8(err)
+    }
 }
