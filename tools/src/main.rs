@@ -3,6 +3,9 @@ const BUCKET_DEFAULT: &str = "habitat-on-prem-builder-bootstrap";
 const S3_ROOT_URL_DEFAULT: &str = "https://s3-us-west-2.amazonaws.com";
 const LATEST: &str = "LATEST.tar.gz";
 const BLDR_DEFAULT: &str = "https://bldr.habitat.sh/v1/depot";
+const PRODUCT: &str = "hab";
+const VERSION: &str = "1.0";
+
 
 extern crate env_logger;
 extern crate rusoto_core;
@@ -14,6 +17,7 @@ use clap::{App};
 //use log::Level;
 
 use habitat_core as hab_core;
+use habitat_api_client as hab_api_client;
 
 mod builder_api;
 mod error;

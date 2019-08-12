@@ -17,4 +17,6 @@ env_logger = "*"
 
 [dependencies.habitat_core]
 git = "https://github.com/habitat-sh/habitat.git"
+[dependencies.habitat_api_client]
+git = "https://github.com/habitat-sh/habitat.git"
 

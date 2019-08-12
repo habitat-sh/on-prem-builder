@@ -74,7 +74,7 @@ pub fn fetch_package_details(root: &str, package_to_fetch: &PackageIdent, target
     let mut full_deps : Vec<(PackageIdent,PackageTarget)> = tdeps.iter().map(|package| (package.to_owned(), target.to_owned())).collect();
     full_deps.push((expanded_package, target.to_owned()));
     
-    // println!("full_deps: {:?}", full_deps);
+    println!("full_deps: {:?}", full_deps);
     Ok(full_deps)
 }
 
