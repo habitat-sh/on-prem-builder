@@ -42,11 +42,17 @@ pub fn make_subcommand<'c>() -> App<'c,'c> {
 
 fn process_target_option(matches: &ArgMatches) -> Vec<PackageTarget>  {
     let mut target_list = Vec::<(PackageTarget)>::new();
-
-    // else
-    for target in PackageTarget::supported_targets() {
-        target_list.push(*target)
-    }
+    if true {
+        let build_target = "x86_64-windows";
+        let target = PackageTarget::from_str(build_target).expect(&format!(
+            "provided value of {} could not be parsed as a PackageTarget",
+            build_target));
+        target_list.push(target)        
+    } else {
+        for target in PackageTarget::supported_targets() {
+            target_list.push(*target)
+        }
+   }
     return target_list
 }
 
@@ -71,7 +77,7 @@ pub fn run(matches: &ArgMatches) -> i32 {
         }
    }
 
-    fetch_packages(crate::BLDR_DEFAULT, fetch_list, Path::new("hab-cache"));
+    fetch_packages(crate::BLDR_BASE, fetch_list, Path::new("hab-cache"));
     
     0
 }
@@ -100,7 +106,9 @@ pub fn fetch_packages(base_url: &str, fetch_list:  Vec<(PackageIdent,PackageTarg
 
     for i in &fetch_list {
         let (package, target) = i;
-        client.fetch_package((&package, *target), None, dst_path, None);
+        println!("Fetching {} for {}", package, target);
+        let archive = client.fetch_package((&package, *target), None, dst_path, None).unwrap();
+        println!("Archive {:?}", archive)
     }
     Ok(())
 }
