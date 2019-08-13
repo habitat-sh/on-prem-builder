@@ -135,11 +135,16 @@ pub fn fetch_packages(
     .unwrap();
 
     for p in fetch_list {
-        println!("Fetching {} for {}", p.ident, p.target);
-        let archive = client
-            .fetch_package((&p.ident, p.target), None, dst_path, None)
-            .unwrap();
-        println!("Archive {:?}", archive)
+        let target_path = dst_path.join(p.archive_name()?);
+        if target_path.exists() {
+            println!("Skipping {} for {}, already present in cache", p.ident, p.target)
+        } else {
+            println!("Fetching {} for {}", p.ident, p.target);
+            let archive = client
+                .fetch_package((&p.ident, p.target), None, dst_path, None)
+                .unwrap();
+            println!("Archive {:?}", archive)
+        }
     }
     Ok(())
 }

@@ -34,6 +34,11 @@ impl PackageIdentTarget {
     //
     //    pub fn ident(&self) -> PackageIdent { &self.ident }
     //    pub fn target(&self) -> PackageTarget { &self.target }
+
+    /// Generates the name of the hab package (hart) file.
+    pub fn archive_name(&self) -> Result<String> {
+        self.ident.archive_name_with_target(self.target).map_err(|e| Error::HabitatCore(e))
+    }
 }
 
 // It would be nice if Ident and Target implemented Ord, PartialOrd and PartialEq
