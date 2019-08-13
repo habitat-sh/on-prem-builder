@@ -21,6 +21,7 @@ use habitat_core as hab_core;
 mod builder_api;
 mod error;
 mod fetch_expand_cmd;
+mod package_spec;
 
 fn main() {
     env_logger::init();

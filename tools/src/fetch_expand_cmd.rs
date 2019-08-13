@@ -1,9 +1,7 @@
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
-use std::{path::Path,
-          str::FromStr
-};
+use std::{path::Path, str::FromStr};
 
 //use log::{info, warn};
 use clap::{App, Arg, ArgMatches, SubCommand};
@@ -20,7 +18,7 @@ use crate::error::{Error, Result};
 use crate::hab_api_client::{self, BoxedClient, Client, Error::APIError};
 use crate::hab_core::package::{PackageIdent, PackageTarget};
 
-use crate::builder_api::PackageIdentTarget;
+use crate::package_spec::PackageIdentTarget;
 
 pub const NAME: &str = "fetch-from-file";
 pub const FILE_ARG: &str = "file";
@@ -81,12 +79,16 @@ pub fn run(matches: &ArgMatches) -> i32 {
     }
 
     let len_with_dup = fetch_list.len();
-    
-    fetch_list.sort();
-    fetch_list.dedup();        
 
-    println!("Found {} packages to fetch ({} before dedup)", fetch_list.len(), len_with_dup);
-    
+    fetch_list.sort();
+    fetch_list.dedup();
+
+    println!(
+        "Found {} packages to fetch ({} before dedup)",
+        fetch_list.len(),
+        len_with_dup
+    );
+
     fetch_packages(crate::BLDR_BASE, fetch_list, Path::new("hab-cache"));
 
     0
