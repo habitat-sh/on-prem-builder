@@ -76,7 +76,7 @@ pub fn fetch_package_details(
         .collect();
     full_deps.push(PackageIdentTarget::new(expanded_package, target.to_owned()));
 
-    println!("full_deps: {:?}", full_deps);
+//    println!("full_deps: {:?}", full_deps);
     Ok(full_deps)
 }
 

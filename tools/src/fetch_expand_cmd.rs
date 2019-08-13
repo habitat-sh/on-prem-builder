@@ -1,7 +1,9 @@
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
-use std::{path::Path, str::FromStr};
+use std::{path::Path,
+          str::FromStr
+};
 
 //use log::{info, warn};
 use clap::{App, Arg, ArgMatches, SubCommand};
@@ -9,51 +11,57 @@ use clap::{App, Arg, ArgMatches, SubCommand};
 use crate::builder_api;
 use crate::error::{Error, Result};
 
-// use crate::hab_core::{package::{self,
-//                                 Identifiable,
-//                                 PackageArchive,
-//                                 PackageTarget,
-//                                 PackageIdent},
-//                       ChannelIdent};
 use crate::hab_api_client::{self, BoxedClient, Client, Error::APIError};
-use crate::hab_core::package::{PackageIdent, PackageTarget};
+use crate::hab_core::package::{PackageIdent,
+                               PackageTarget::{
+                                   self                                   
+                               }
+};
 
 use crate::package_spec::PackageIdentTarget;
 
 pub const NAME: &str = "fetch-from-file";
 pub const FILE_ARG: &str = "file";
+pub const TARGET_ARG: &str = "target";
 
 pub fn make_subcommand<'c>() -> App<'c, 'c> {
     // This blows up with lifetime issues; TODO
     //    let target_help = format!("Target platform to fetch for (one of: {} all)",
     //                              supported_target_descriptor());
     let target_help = "Target platform to fetch for (one of:  x86_64-linux )";
-
+   
     let c = SubCommand::with_name(NAME)
         .about("Takes a list of packages and expands their transitive deps, and fetches all packages needed to support them")
         .arg(Arg::with_name(FILE_ARG)
              .help("File containing the package list")
              .index(1)
              )
-        .arg(Arg::with_name("target")
+        .arg(Arg::with_name(TARGET_ARG)
+             .short("t")
+             .long("target")
+             .takes_value(true)
+             .multiple(true)
              .help(target_help));
     c
 }
 
-fn process_target_option(_matches: &ArgMatches) -> Vec<PackageTarget> {
-    // TODO Actually parse this option
+fn process_target_option(matches: &ArgMatches) -> Vec<PackageTarget> {
     let mut target_list = Vec::<(PackageTarget)>::new();
-    if true {
-        let build_target = "x86_64-windows";
-        let target = PackageTarget::from_str(build_target).expect(&format!(
-            "provided value of {} could not be parsed as a PackageTarget",
-            build_target
-        ));
-        target_list.push(target)
-    } else {
-        for target in PackageTarget::supported_targets() {
-            target_list.push(*target)
-        }
+
+    match matches.values_of(TARGET_ARG) {
+        Some(targets) =>
+        {
+            for target_str in targets {
+                let target = PackageTarget::from_str(target_str).expect(&format!(
+                    "provided value of {} could not be parsed as a PackageTarget",
+                    target_str));
+                target_list.push(target)
+            }
+        },
+        None =>
+            for target in PackageTarget::supported_targets() {
+                target_list.push(*target)
+            }
     }
     return target_list;
 }
@@ -95,8 +103,6 @@ pub fn run(matches: &ArgMatches) -> i32 {
 }
 
 pub fn read_file(filename: &str) -> Result<Vec<PackageIdent>> {
-    println!("Opening file {}", filename);
-
     let file = File::open(filename).unwrap(); // This is a likely user error; we should be more graceful
     let buf_reader = BufReader::new(file);
     let packages: Vec<PackageIdent> = buf_reader
@@ -138,7 +144,7 @@ pub fn fetch_packages(
     Ok(())
 }
 
-fn supported_target_descriptor() -> String {
+fn supported_target_descriptors() -> String {
     let strings: Vec<&str> = PackageTarget::supported_targets()
         .map(|t| t.as_ref())
         .collect();
