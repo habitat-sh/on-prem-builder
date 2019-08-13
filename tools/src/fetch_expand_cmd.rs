@@ -1,8 +1,9 @@
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
-use std::path::Path;
-use std::str::FromStr;
+use std::{path::Path,
+          str::FromStr
+};
 
 //use log::{info, warn};
 use clap::{App, Arg, ArgMatches, SubCommand};
@@ -19,11 +20,13 @@ use crate::error::{Error, Result};
 use crate::hab_api_client::{self, BoxedClient, Client, Error::APIError};
 use crate::hab_core::package::{PackageIdent, PackageTarget};
 
+use crate::builder_api::PackageIdentTarget;
+
 pub const NAME: &str = "fetch-from-file";
 pub const FILE_ARG: &str = "file";
 
 pub fn make_subcommand<'c>() -> App<'c, 'c> {
-    // This blows up with lifetime issues; TODOge
+    // This blows up with lifetime issues; TODO
     //    let target_help = format!("Target platform to fetch for (one of: {} all)",
     //                              supported_target_descriptor());
     let target_help = "Target platform to fetch for (one of:  x86_64-linux )";
@@ -39,7 +42,8 @@ pub fn make_subcommand<'c>() -> App<'c, 'c> {
     c
 }
 
-fn process_target_option(matches: &ArgMatches) -> Vec<PackageTarget> {
+fn process_target_option(_matches: &ArgMatches) -> Vec<PackageTarget> {
+    // TODO Actually parse this option
     let mut target_list = Vec::<(PackageTarget)>::new();
     if true {
         let build_target = "x86_64-windows";
@@ -63,7 +67,7 @@ pub fn run(matches: &ArgMatches) -> i32 {
 
     let packages = read_file(filename).unwrap();
 
-    let mut fetch_list = Vec::<(PackageIdent, PackageTarget)>::new();
+    let mut fetch_list = Vec::<PackageIdentTarget>::new();
 
     for pkg in &packages {
         for target in &target_list {
@@ -76,6 +80,13 @@ pub fn run(matches: &ArgMatches) -> i32 {
         }
     }
 
+    let len_with_dup = fetch_list.len();
+    
+    fetch_list.sort();
+    fetch_list.dedup();        
+
+    println!("Found {} packages to fetch ({} before dedup)", fetch_list.len(), len_with_dup);
+    
     fetch_packages(crate::BLDR_BASE, fetch_list, Path::new("hab-cache"));
 
     0
@@ -103,7 +114,7 @@ pub fn expand_line(line: String) -> PackageIdent {
 
 pub fn fetch_packages(
     base_url: &str,
-    fetch_list: Vec<(PackageIdent, PackageTarget)>,
+    fetch_list: Vec<PackageIdentTarget>,
     dst_path: &std::path::Path,
 ) -> Result<()> {
     let client = Client::new(
@@ -114,11 +125,10 @@ pub fn fetch_packages(
     )
     .unwrap();
 
-    for i in &fetch_list {
-        let (package, target) = i;
-        println!("Fetching {} for {}", package, target);
+    for p in fetch_list {
+        println!("Fetching {} for {}", p.ident, p.target);
         let archive = client
-            .fetch_package((&package, *target), None, dst_path, None)
+            .fetch_package((&p.ident, p.target), None, dst_path, None)
             .unwrap();
         println!("Archive {:?}", archive)
     }

@@ -1,6 +1,11 @@
-//
-//
-//extern crate serde_derive;
+
+
+use std::{ops::Deref,
+          cmp::{Ordering,
+                Ord,
+                PartialOrd}
+          };
+
 use serde_json::Value;
 
 extern crate reqwest;
@@ -8,8 +13,56 @@ extern crate reqwest;
 use crate::error::{Error, Result};
 use crate::hab_core::package::{PackageIdent, PackageTarget};
 
-// TODO: PackageTarget is default linux x64 I think; we should figure out how to do others
-// see PackageTarget::ACTIVE_PACKAGE_TARGET
+
+//
+// This really belongs in hab_core::package; we really can't correctly specify a package with PackageIdent alone.
+// The name is terrible, but haven't come up with a better one.
+//
+#[derive(Debug, Clone, Eq, Hash, PartialEq)] // Copy needs PackageIdent::Copy
+pub struct PackageIdentTarget {
+    // Ideally these would not be pub, but the accessors seem to hit issues with split borrows
+    pub ident: PackageIdent,
+    pub target: PackageTarget    
+}
+
+impl PackageIdentTarget {
+    pub fn new(ident: PackageIdent, target: PackageTarget) -> Self {
+        PackageIdentTarget {
+            ident,
+            target
+        }
+    }
+
+    // These would be cool, except that they don't work
+    //  println!("Fetching {} for {}", p.ident(), p.target()); hits
+    //  E0308 or other borrow related errors, probably because they
+    //  are opaque and the checker uses the lifetime of the whole
+    //  struct and doesn't treat them as disjoint entities.
+
+    //  https://doc.rust-lang.org/nomicon/borrow-splitting.html
+    //
+    //    pub fn ident(&self) -> PackageIdent { &self.ident }
+    //    pub fn target(&self) -> PackageTarget { &self.target }
+
+}
+
+// It would be nice if Ident and Target implemented Ord, PartialOrd and PartialEq
+impl Ord for PackageIdentTarget {
+    fn cmp(&self, other: &Self) -> Ordering {
+        let ord = self.ident.by_parts_cmp(&other.ident);
+        match ord {
+            Ordering::Equal => self.target.deref().cmp(&other.target.deref()),
+            _ => ord
+        }       
+    }
+}
+
+impl PartialOrd for PackageIdentTarget {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
 
 // What I want is an API that for a set of targets gives latest in
 // channel.  Simplest approach is write a call that takes target list,
@@ -50,7 +103,7 @@ pub fn fetch_package_details(
     root: &str,
     package_to_fetch: &PackageIdent,
     target: &PackageTarget,
-) -> Result<Vec<(PackageIdent, PackageTarget)>> {
+) -> Result<Vec<PackageIdentTarget>> {
     // E.g. 'https://bldr.habitat.sh/v1/depot/pkgs/core/7zip/latest?target=x86_64-linux'
     //       https://bldr.habitat.sh/v1/depot/channels/core/stable/pkgs/7zip/latest?target=x86_64-linux' | j
     let request_url = format!(
@@ -74,11 +127,11 @@ pub fn fetch_package_details(
     // For more information about this error, try `rustc --explain E0507`.
     let tdeps: Vec<PackageIdent> = serde_json::from_value(json["tdeps"].to_owned()).unwrap();
 
-    let mut full_deps: Vec<(PackageIdent, PackageTarget)> = tdeps
+    let mut full_deps: Vec<PackageIdentTarget> = tdeps
         .iter()
-        .map(|package| (package.to_owned(), target.to_owned()))
+        .map(|package| PackageIdentTarget::new(package.to_owned(), target.to_owned()))
         .collect();
-    full_deps.push((expanded_package, target.to_owned()));
+    full_deps.push(PackageIdentTarget::new(expanded_package, target.to_owned()));
 
     println!("full_deps: {:?}", full_deps);
     Ok(full_deps)
