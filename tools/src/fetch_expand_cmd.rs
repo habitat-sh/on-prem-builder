@@ -119,6 +119,7 @@ pub fn fetch_packages(
     fetch_list: Vec<PackageIdentTarget>,
     dst_path: &std::path::Path,
 ) -> Result<()> {
+    // TODO Only fetch things that we don't already have
     let client = Client::new(
         base_url,
         crate::PRODUCT,
