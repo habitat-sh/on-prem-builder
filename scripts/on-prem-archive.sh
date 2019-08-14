@@ -192,6 +192,7 @@ populate_dirs() {
   upstream_depot="https://bldr.habitat.sh"
   core="$core_tmp/core-plans"
   habitat="$core_tmp/habitat"
+  win_svc="$core_tmp/windows-service"
   bootstrap_file="on-prem-bootstrap-$(date +%Y%m%d%H%M%S).tar.gz"
   tar_file="/tmp/$bootstrap_file"
   tmp_dir=$(mktemp -d)
@@ -218,7 +219,14 @@ populate_dirs() {
   cp_dir_list=$(find . -type f -name "plan.*" -printf "%h~%f\\n" | sort -u)
   populate_packages "$cp_dir_list"
 
-  # let's also pull in any hab components that might have a hart file
+  # We should also pull in the windows-service component
+  ${GIT_CMD} clone --depth 1 https://github.com/habitat-sh/windows-service.git "$win_svc"
+  cd "$win_svc"
+
+  win_dir_list=$(find . -type f -name "plan.ps1" -printf "%h~%f\\n" | sort -u)
+  populate_packages "$win_dir_list"
+
+ # # let's also pull in any hab components that might have a hart file
   ${GIT_CMD} clone --depth 1 https://github.com/habitat-sh/habitat.git "$habitat"
   cd "$habitat/components"
 
@@ -242,7 +250,7 @@ read_base_plans() {
 }
 
 read_hab_plans() {
-    hab_plans=( "hab-sup" "hab-launcher")
+    hab_plans=( "hab-sup" "hab-launcher" "windows-service" )
 }
 
 upload_keys() {
