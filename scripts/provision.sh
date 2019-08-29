@@ -94,10 +94,6 @@ redirect_url = "$OAUTH_REDIRECT_URL"
 client_id = "$OAUTH_CLIENT_ID"
 client_secret = "$OAUTH_CLIENT_SECRET"
 
-[segment]
-url = "https://api.segment.io"
-write_key = "$ANALYTICS_WRITE_KEY"
-
 [s3]
 backend = "minio"
 key_id = "$MINIO_ACCESS_KEY"
