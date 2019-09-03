@@ -102,7 +102,7 @@ For more information, please refer to the developer documentation of these servi
 
 Further information on the OAuth endpoints can also be found [here](https://tools.ietf.org/html/rfc6749#page-21).
 
-*Note*: When setting Chef Automate as your OAuth provider, you will need to add your Automate instance's TLS certificate (found at the `load_balancer.v1.sys.frontend_tls` entry in your Chef Automate `config.toml` file), to your Builder instance's list of accepted certs. Currently, this can be done by modifying the `core/cacert` package and appending the cert to the cert.pem file at the following location: `$(hab pkg path core/cacerts)/ssl/cert.pem`.
+*Note*: When setting Chef Automate as your OAuth provider, you will need to add your Automate instance's TLS certificate (found at the `load_balancer.v1.sys.frontend_tls` entry in your Chef Automate `config.toml` file), to your Builder instance's list of accepted certs. This can be done by copying the certifcate to the `\hab\cache\ssl` folder on the Builder instance (supported by the latest version of the on-prem Builder), or alternatively by modifying the `core/cacert` package and appending the cert to the cert.pem file at the following location: `$(hab pkg path core/cacerts)/ssl/cert.pem`.
 
 ### Preparing your filesystem (Optional)
 
@@ -132,7 +132,7 @@ sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/privat
 
 *Important*: Make sure that the certificate files are named exactly `ssl-certificate.key` and `ssl-certificate.crt`. If you have procured the certificate from a different source, rename them to the prescribed filenames, and ensure that they are located in the same folder as the `install.sh` script. They will get uploaded to the Habitat supervisor during the install.
 
-*Important*: If you get authentication failures with a self-signed cert, you may need to either update the cert package that the habitat services are using (in the `/etc/systemd/system/hab-sup.service` file), or modify the hab `core/cacerts` package (in the `/hab/pkgs/core/cacerts/...` folder) to add your self-signed cert chain to the `cert.pem` file. Restart the hab services with `systemctl restart hab-sup` after updating the cert file.
+*Important*: If you get authentication failures with a self-signed cert, you may need to either update the cert package that the habitat services are using (in the `/etc/systemd/system/hab-sup.service` file), or modify the hab `core/cacerts` package (in the `/hab/pkgs/core/cacerts/...` folder) to add your self-signed cert chain to the `cert.pem` file. Restart the hab services with `systemctl restart hab-sup` after updating the cert file. The latest version of the on-prem Builder services will also look for certificates in the `/hab/cache/ssl` directory - you may copy any self-signed certificates to that directory if needed.
 
 ## Setup
 
