@@ -1,48 +1,20 @@
-# Install Chef Habitat Builder On-Premises
+# Chef Habitat Builder on-prem with Chef Automate
 
-The Habitat 0.85.0 release simplifies custom certificate management. Habitat now looks for custom certificates in its `~/.hab/cache/ssl` directory (or `/hab/cache/ssl` if running as root). You can copy over Multiple certificates--for example, a self-signed certificate and a custom certificate authority certificate--to the cache directory and they are automatically available for use by the Habitat client.
-
-## System Requirements
-
-The following are minimum requirements for the Chef Habitat On-Prem Builder:
-
-* Linux OS system with 64-bit architecture with kernel 2.6.32 or later
-* `systemd` process manager
-* CPU / RAM for trial deployments: minimum 2 CPU/4 GB RAM (corresponding to AWS T3.medium or better) or better
-* CPU / RAM for production deployments: minimum 16 CPU/32 GB RAM (corresponding to AWS M4.4xlarge) or better
-* Disk space for trial deployments: Minimum 2GB free disk space the baseline installation with only the packages required to run the Builder Services
-* Disk space for production deployments: Minimum 5GB+ of disk space for the full installation including the latest versions of core packages
-* Services should be deployed single-node - scale out is not yet supported
-* Outbound network (HTTPS) connectivity to WAN is required for the initial installation
-* Inbound network connectivity from LAN (HTTP/HTTPS) is required for internal clients to access the Builder
-* SSL Certificate
-* Oauth 2
-* Port 80 or 443
-
-## Authentication
-
-Chef Habitat Builder on-prem supports Oauth authentication for:
-
-* [Chef Automate v2 (ALPHA)](https://automate.chef.io/docs/configuration/#alpha-setting-up-automate-as-an-oauth-provider-for-habitat-builder)
-* [Azure Active Directory](https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-protocols-oauth-code)
-* [GitHub](https://developer.github.com/apps/building-oauth-apps/authorization-options-for-oauth-apps/)
-* [GitLab](https://docs.gitlab.com/ee/integration/oauth_provider.html)
-* [Okta](https://developer.okta.com/authentication-guide/implementing-authentication/auth-code)
-* [Atlassian BitBucket](https://confluence.atlassian.com/bitbucket/oauth-on-bitbucket-cloud-238027431.html)
+The Chef Habitat 0.85.0 release simplifies custom certificate management, making authentication with Chef Automate easier. Install Builder on-prem and authenticate with Automate in five steps. This is possible because Habitat now looks for custom certificates in its `~/.hab/cache/ssl` directory (or `/hab/cache/ssl` when running as root). Copying self-signed and custom certificates to the cache directory automatically makes them available to the Habitat client.
 
 ## Chef Habitat On-Prem + Chef Automate
 
-Configuring Chef Habitat On-Prem to use Chef Automate's Authentication takes five steps:
+Configuring Chef Habitat on-prem to use Chef Automate's Authentication takes five steps:
 
 1. Patch the Chef Automate `automate-credentials.toml` to recognize Chef Habitat
-1. Set up Builder On-Prem's `bldr.env` to use Chef Automate's OAuth
+1. Set up Chef Habitat Builder on-prem's `bldr.env` to use Chef Automate's authentication
 1. Copy the any custom certificate `.crt` and `.key` files to the same location as the `./install.sh` script.
-1. Install Chef Habitat Builder On-Prem
+1. Install Chef Habitat Builder on-prem
 1. Copy Automate's certificate to the `/hab/cache/ssl` directory
 
 ### Step One: Patch Chef Automate's Configuration
 
-For example, to authenticate with Chef Automate, create a patch with the Chef Automate command line:
+To authenticate with Chef Automate, create a patch with the Chef Automate command line:
 
 1. From the command line, access Chef Automate, for example:
 
@@ -97,7 +69,6 @@ For example, to authenticate with Chef Automate, create a patch with the Chef Au
     ssh <builder hostname>
     #or
     ssh <ipaddress>
-    ```i
 
 1. From Builder host command line, install Chef Habitat Builder on-prem package:
 
@@ -238,12 +209,12 @@ This `bldr.env` example shows an on-prem SSL-enabled Habitat Builder authenticat
 
 ### Step Three: Put the Certs with the Install Script
 
-Copy the any custom certificate `.crt` and `.key` files to the same location as the `./install.sh` script.
+If necessary, rename the custom certificates cert file as `ssl-certificate.crt` and the key file as `ssl-certificate.key`. Habitat recognizes only these names and will not recognize any other names. Copy the `ssl-certificate.crt` and `ssl-certificate.key` files to the same directory as the `./install.sh` script.
 
 1. Locate the SSL certificate and key pair.
 1. Copy the key pair to the same directory as the install script, which is `/on-prem-builder`, if the repository was not renamed.
 1. Make the keys accessible to Habitat during the installation.
-1. If you're testing this workflow, make your own key pair and copy them to `/on-prem-builder`. This example uses a Vagrant VM:
+1. If you're testing this workflow, make your own key pair and copy them to `/on-prem-builder`.
 
     ```bash
     sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/ssl-certificate.key -out /etc/ssl/certs/ssl-certificate.crt %>
@@ -315,54 +286,7 @@ Copy the any custom certificate `.crt` and `.key` files to the same location as 
 
 1. Login at `https://chef-builder.test`
 
-## Troubleshooting
-
-### Memory Filesystem Storage
-
-Preparing your filesystem (Optional)
-
-Since substantial storage may be required for holding packages, please ensure you have an appropriate amount of free space on your filesystem.
-
-The package artifacts will be stored in your Minio instance by default, typically at the following location: `/hab/svc/builder-minio/data`
-
-If you need to add additional storage, it is recommended that you create a mount at `/hab` and point it to your external storage. This is not required if you already have sufficient free space.
-
-*Note*: If you would prefer to Artifactory instead of Minio for the object storage, please see the [Artifactory](#using-artifactory-as-the-object-store-(alpha)) section below.
-
-### Network access / proxy configuration
-
-1. Check that you have outgoing connectivity:
-
-    ```bash
-    ping raw.githubusercontent.com`
-    ping bldr.habitat.sh`
-    ```
-
-1. Confirm that HTTPS_PROXY is set correctly in your environment.
-
-    ```bash
-    http_proxy="http://PROXY_SERVER:PORT"
-    https_proxy="https://PROXY_SERVER:PORT"
-    ```
-
-1. Confirm that _inbound_ port **80** is open if SSL is disabled or port **443** if SSL is enabled.
-
-### Finding origin keys
-
-On Linux OS:
-
-    ```bash
-    # Linux/MacOS
-    ls -la /hab/cache/keys
-    ls -la $HOME/.hab/cache.keys
-    ```
-
-On Windows:
-
-    ```PS
-    # Windows (Powershell 5+)
-    ls C:\hab\cache\keys
-    ```
+   ```
 
 ## Errors
 
@@ -389,55 +313,3 @@ Restart the Chef Habitat services:
     sudo systemctl restart hab-sup
     ```
 
-### Connection refused (os error 111)
-
-If the proxy was configured for the local session during installation, but you are still seeing connection refusal errors, you may want to configure your proxy with the `/etc/environment` file or something similar. Work with your enterprise network admin to ensure the appropriate firewall rules are configured for network access.
-
-  ```output
-  -- Logs begin at Mon 2019-06-10 09:02:13 PDT. --
-  Jun 10 09:35:15 <TargetMachine> hab[13161]: ∵ Missing package for core/hab-launcher
-  Jun 10 09:35:15 <TargetMachine> hab[13161]: » Installing core/hab-launcher
-  Jun 10 09:35:15 <TargetMachine> hab[13161]: ☁ Determining latest version of core/hab-launcher in the 'stable' channel
-  Jun 10 09:35:15 <TargetMachine> hab[13161]: ✗✗✗
-  Jun 10 09:35:15 <TargetMachine> hab[13161]: ✗✗✗ Connection refused (os error 111)
-  Jun 10 09:35:15 <TargetMachine> hab[13161]: ✗✗✗
-  Jun 10 09:35:15 <TargetMachine> systemd[1]: hab-sup.service: Main process exited, code=exited, status=1/FAILURE
-  Jun 10 09:35:15 <TargetMachine> hab[13171]: Supervisor not started.
-  Jun 10 09:35:15 <TargetMachine> systemd[1]: hab-sup.service: Unit entered failed state.
-  Jun 10 09:35:15 <TargetMachine> systemd[1]: hab-sup.service: Failed with result 'exit-code'
-  ```
-
-## Logging
-
-## Logging Levels
-
-The recognized values for logging are: `error`, `warn`, `info`, `debug`, and `trace`.
-For a more detailed explanation of logging in Chef Habitat, see the [Supervisor Log Configuration Reference](https://www.habitat.sh/docs/reference/#supervisor-log-configuration-reference) and the [Supervisor Log Key](https://www.habitat.sh/docs/reference/#supervisor-log-key) documentation.
-
-### Basic Logging
-
-To turn on and examine the services debug logging in your Habitat installation:
-
-1. Edit the `sudo /hab/svc/builder-api/user.toml` file
-1. On the first line, change the log_level from **error** to **debug**
-
-  ```tomlß
-  log_level="debug,tokio_core=error,tokio_reactor=error,zmq=error,hyper=error"
-  RUST_LOG=debug RUST_BACKTRACE=1
-  jobsrv_enabled = false
-  ```
-
-1. Save and close the file
-1. Restart Habitat with `sudo systemctl restart hab-sup` to restart the habitat.
-1. Use `journalctl -fu hab-sup` to view the logs.
-1. Reset `/hab/svc/builder-api/user.toml` file to the default `log_level=error` and restart the services with `sudo systemctl restart hab-sup` to stop debug-level logging.
-
-### RUST_LOG
-
-Use **RUST_LOG=debug RUST_BACKTRACE=1** to see a command's debug and backtrace.
-
-  ```bash
-	# Linux/MacOS
-  # replace "hab sup run" with your command
-	RUST_LOG=debug RUST_BACKTRACE=1 hab sup run
-  ```
