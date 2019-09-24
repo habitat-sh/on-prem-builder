@@ -174,7 +174,7 @@ At that point you should be able to log in using your configured OAuth provider.
 
 Once you are logged in, you should be able to create an origin by clicking on the 'Create Origin' button.
 
-**NOTE** _You will need to at least create a `core` origin for an initial set of base packages (see section below). Go ahead and create a new origin now, and type in `core` as the origin name. It's important to do this prior to populating your Chef Habitat Builder on-prem  with the `core` upstream packages, or else the upload will fail._
+**NOTE** _You will need to at least create a `core` origin for an initial set of base packages (see section below). Go ahead and create a new origin now, and type in `core` as the origin name. It's important to do this prior to populating your Chef Habitat Builder on-prem with the `core` upstream packages, or else the upload will fail._
 
 ### Generate a Personal Access Token
 
@@ -188,10 +188,8 @@ Click on your Gravatar icon on the top right corner of the Chef Habitat Builder 
 
 The freshly installed Chef Habitat Builder on-prem does not contain any packages. In order to bootstrap a set of stable `core` origin packages (refer to the [core-plans repo](https://github.com/habitat-sh/core-plans)), you can do the following:
 
-1. Export your Personal Access Token as `HAB_AUTH_TOKEN` to
-   your environment (e.g, `export HAB_AUTH_TOKEN=<your token>`)
-1. `sudo -E ./scripts/on-prem-archive.sh populate-depot http://${APP_HOSTNAME_OR_IP}`, passing the
-   root URL of your new Chef Habitat Builder on-prem as the last argument  (Replace `http` with `https` in the URL if SSL is enabled)
+1. Export your Personal Access Token as `HAB_AUTH_TOKEN` to your environment (e.g, `export HAB_AUTH_TOKEN=<your token>`)
+1. `sudo -E ./scripts/on-prem-archive.sh populate-depot http://${APP_HOSTNAME_OR_IP}`, passing the root URL of your new Chef Habitat Builder on-prem as the last argument (Replace `http` with `https` in the URL if SSL is enabled)
 
 This is quite a lengthy process, so be patient. It will download a *large* (~ 13GB currently) archive of the latest stable core plans, and then install them to your Chef Habitat Builder on-prem.
 
@@ -207,8 +205,7 @@ This allows new stable core packages from the upstream to get created in the Che
 
 If your Chef Habitat Builder on-prem instance will have continued outgoing internet connectivity, you may wish to periodically run the script to check for updates.
 
-1. Export your Personal Access Token as `HAB_AUTH_TOKEN` to
-   your environment (e.g, `export HAB_AUTH_TOKEN=<your token>`)
+1. Export your Personal Access Token as `HAB_AUTH_TOKEN` to your environment (e.g, `export HAB_AUTH_TOKEN=<your token>`)
 1. `sudo -E ./scripts/on-prem-archive.sh sync-packages http://${APP_HOSTNAME_OR_IP} base-packages`, passing the root URL of your new Chef Habitat Builder on-prem as the last argument. Replace `http` with `https` in the URL if SSL is enabled.
 
 The 'base-packages' parameter restricts the sync to a smaller subset of the core packages. If you wish to synchronize all core packages, omit the 'base-packages' parameter from the script. Note that it will take much longer for the synchronization of all packages. Generally, it will only take a few minutes for base packages to synchronize.
@@ -224,7 +221,7 @@ Configuring a user's workstation to point to the Chef Habitat Builder on-prem sh
 The following environment variables should be configured as needed:
 
 1. `HAB_BLDR_URL` - this is the main (and most important) configuration. It should point to the instance of Chef Habitat Builder on-prem that you have set up.
-2. `HAB_AUTH_TOKEN` - this is the user's auth token that will be needed for private packages (if any), or for operations requiring privileges, for example, package uploads.  The user will need to create their auth token and set/use it appropriately.
+2. `HAB_AUTH_TOKEN` - this is the user's auth token that will be needed for private packages (if any), or for operations requiring privileges, for example, package uploads. The user will need to create their auth token and set/use it appropriately.
 3. `SSL_CERT_FILE` - if the Chef Habitat Builder on-prem is configured with SSL and uses a self-signed or other certificate that is not in the trusted chain, then this environment variable can be used on the user's workstation to point the `hab` client to the correct certificate to use when connecting to Chef Habitat Builder on-prem.
 
 ## Upgrading
@@ -297,8 +294,8 @@ If you see this error message in the supervisor logs, that may indicate that you
 For example, add the following to the end of your `/etc/security/limits.conf` file, and restart your system.
 
 ```
-*    soft    nofile 65535
-*    hard    nofile 65535
+* soft nofile 65535
+* hard nofile 65535
 ```
 
 ### Error "Text file busy"
@@ -373,7 +370,7 @@ When populating your Chef Habitat Builder on-prem with upstream core packages, y
 Uploading hart files.
 
 [1/958] Uploading ./core-img-0.5.4-20190201011741-x86_64-linux.hart to the depot at https://your.awesome.depot
-    75 B / 75 B | [=======================================================================================================================================================================================================================] 100.00 % 384 B/s
+  75 B / 75 B | [=========================================] 100.00 % 384 B/s
 ✗✗✗
 ✗✗✗ [403 Forbidden]
 ✗✗✗
