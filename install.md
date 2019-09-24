@@ -98,16 +98,15 @@ To authenticate with Chef Automate, create a patch with the Chef Automate comman
 
 1. Edit `bldr.env`:
 
-      * The `APP_SSL_ENABLED` configuration must correspond with the type of hypertext transfer protocol named in `APP_URL`.
+      * Match the `SSL` with the `URL`. The `APP_SSL_ENABLED` configuration coordinates  with the type of hypertext transfer protocol named in `APP_URL`.
 
-        * To disable SSL, use `APP_SSL_ENABLED=false` and the `APP_URL` starts with `http`.
-        * To enable SSL, use `APP_SSL_ENABLED=true` and the `APP_URL` starts with `https`.
+        * To disable SSL, use `APP_SSL_ENABLED=false` and a `APP_URL` beginning with `http`.
+        * To enable SSL, use `APP_SSL_ENABLED=true` and a `APP_URL` beginning with `https`.
 
       * Always be closing. Close the Builder addresses provided in `APP_URL` and `OAUTH_REDIRECT_URL` with a forward slash, `/`.
 
         * `https://chef-builder.test` will NOT work.
         * `https://chef-builder.test/` will work.
-
 
   This `bldr.env` example shows an on-prem SSL-enabled Habitat Builder authenticating using Chef Automate's OAuth.
   `APP_SSL_ENABLED=true` and the `APP_URL` starts with `https`.
