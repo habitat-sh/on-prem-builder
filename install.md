@@ -156,57 +156,6 @@ To authenticate with Chef Automate, create a patch with the Chef Automate comman
   export ANALYTICS_COMPANY_NAME=""
   ```
 
-This `bldr.env` example shows an on-prem SSL-enabled Habitat Builder authenticating using GitHub's OAuth.
-`APP_SSL_ENABLED=true` and the `APP_URL` starts with `https`.
-
-  ```bash
-  #!/bin/bash
-
-  # The endpoint, key and secret for your Minio instance (see README)
-  # Change these before the first install if needed
-  export MINIO_ENDPOINT=http://localhost:9000
-  export MINIO_BUCKET=habitat-builder-artifact-store.local
-  export MINIO_ACCESS_KEY=depot
-  export MINIO_SECRET_KEY=password
-
-  # APP settings
-  export APP_SSL_ENABLED=true
-  export APP_URL=https://chef-builder.test/
-
-  # Whether SSL is enabled for the on-prem depot
-  export APP_SSL_ENABLED=true
-
-  # The OAUTH_PROVIDER values GitHub
-  # See https://api.github.com/ for endpoints
-  export OAUTH_PROVIDER=github
-  export OAUTH_USERINFO_URL=https://github.com/users
-  export OAUTH_AUTHORIZE_URL=https://github.com/login/oauth/authorize
-  export OAUTH_TOKEN_URL=https://https://github.com/login/oauth/access_token
-  export OAUTH_SIGNUP_URL=https://github.com
-
-  # The OAUTH_REDIRECT_URL is the registered OAuth2 redirect
-  # IMPORTANT: If SSL is enabled, the redirect URL should be https
-  # IMPORTANT: don't forget the `/` at the end of the URL
-  export OAUTH_REDIRECT_URL=http://chef-builder.test/
-
-  # The OAUTH_CLIENT_ID is the registered GitHub ClientID
-  export OAUTH_CLIENT_ID=0123456789abcdef0123
-
-  # The OAUTH_CLIENT_SECRET is the registered GitHub client secret
-  export OAUTH_CLIENT_SECRET=0123456789abcdef0123456789abcdef01234567
-
-  # Modify these only if there is a specific need, otherwise leave as is
-  export BLDR_CHANNEL=on-prem-stable
-  export BLDR_ORIGIN=habitat
-  export HAB_BLDR_URL=https://bldr.habitat.sh
-
-  # Help us make Habitat better! Opt into analytics by changing the ANALYTICS_ENABLED
-  # setting below to true, then optionally provide your company name. (Analytics is
-  # disabled by default. See our privacy policy at https://www.habitat.sh/legal/privacy-policy/.)
-  export ANALYTICS_ENABLED=false
-  export ANALYTICS_COMPANY_NAME=""
-  ```
-
 ### Step Three: Put the Certs with the Install Script
 
 If necessary, rename the custom certificates cert file as `ssl-certificate.crt` and the key file as `ssl-certificate.key`. Habitat recognizes only these names and will not recognize any other names. Copy the `ssl-certificate.crt` and `ssl-certificate.key` files to the same directory as the `./install.sh` script.
@@ -278,15 +227,17 @@ If necessary, rename the custom certificates cert file as `ssl-certificate.crt` 
 1. Paste the Chef Automate certificate into your file, `/hab/cache/ssl/automate-cert.crt`
 1. Restart builder
 
-   ```bash
-   sudo systemctl restart hab-sup
-   ``` %>
+    ```bash
+    sudo systemctl restart hab-sup
+    ```
 
 ### You're Done!
 
-1. Login at `https://chef-builder.test`
+1. Login at
 
-   ```
+    ```bash
+    https://chef-builder.test
+    ```
 
 ## Errors
 
@@ -296,20 +247,19 @@ You were able to sign in to Chef Automate, but Chef Automate was unable to authe
 
 Open the `bldr.env` and verify that:
 
-* **APP_URL** ends with "\"
-* **OAUTH_REDIRECT_URL** ends with "\"
+* **APP_URL** ends with "/\"
+* **OAUTH_REDIRECT_URL** ends with "/\"
 * **OAUTH_CLIENT_ID** is complete and correct
 * **OAUTH_CLIENT_SECRET** is complete and correct
 
 Apply changes to the to apply changes to the `bldr.env`
 
-    ```bash
-    bash ./install.sh
-    ```
+```bash
+bash ./install.sh
+```
 
 Restart the Chef Habitat services:
 
-    ```bash
-    sudo systemctl restart hab-sup
-    ```
-
+```bash
+sudo systemctl restart hab-sup
+```
