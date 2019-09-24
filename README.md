@@ -121,13 +121,13 @@ By default, the Chef Habitat Builder on-prem will expose the web UI and API via 
 
 In order to prepare for this, you should procure a SSL certificate. If needed, you may use a self-signed certificate - however if you do so, you will need to install the certificate in the trusted chain on client machines (ones that will use the Chef Habitat Builder UI or APIs). You may use the `SSL_CERT_FILE` environment variable to also point to the certificate on client machines when invoking the `hab` client, for example:
 
-```
+```bash
 SSL_CERT_FILE=ssl-certificate.crt hab pkg search -u https://localhost <search term>
 ```
 
 Below is a sample command to generate a self-signed certificate with OpenSSL:
 
-```
+```bash
 sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/ssl-certificate.key -out /etc/ssl/certs/ssl-certificate.crt
 ```
 
@@ -145,7 +145,7 @@ sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/privat
 
 If everything goes well, you should see output similar to the following showing that the Chef Habitat Builder on-prem services are loaded:
 
-```
+```output
 hab-sup(MN): The habitat/builder-datastore service was successfully loaded
 hab-sup(MN): The habitat/builder-router service was successfully loaded
 hab-sup(MN): The habitat/builder-api service was successfully loaded
@@ -239,6 +239,7 @@ Once the services are uninstalled, you may re-install them by running `./install
 ### Network access / proxy configuration
 
 If the initial install fails, please check that you have outgoing connectivity, and that you can successfully ping the following:
+
 * `raw.githubusercontent.com`
 * `bldr.habitat.sh`
 
@@ -247,8 +248,9 @@ If you have outgoing access via a proxy, please ensure that HTTPS_PROXY is set c
 You also will need to have the following _inbound_ port open for your instance:
 * Port 80
 
-In the case that you have configured your proxy for the local session while installing but are still recieving connection refusal errors like the one below, you may want to configure your proxy with the /etc/environment file or similar.
-```
+In the case that you have configured your proxy for the local session while installing but are still receiving connection refusal errors like the one below, you may want to configure your proxy with the `/etc/environment` file or similar.
+
+```output
 -- Logs begin at Mon 2019-06-10 09:02:13 PDT. --
 Jun 10 09:35:15 <TargetMachine> hab[13161]: ∵ Missing package for core/hab-launcher
 Jun 10 09:35:15 <TargetMachine> hab[13161]: » Installing core/hab-launcher
@@ -293,7 +295,7 @@ If you see this error message in the supervisor logs, that may indicate that you
 
 For example, add the following to the end of your `/etc/security/limits.conf` file, and restart your system.
 
-```
+```text
 * soft nofile 65535
 * hard nofile 65535
 ```
@@ -307,7 +309,7 @@ If you get this, please re-try the install step again.
 
 You may see the following error when bootstrapping the core packages using the script above. If this happens, the bootstrap process will continue re-trying, and the upload will eventually succeed. Be patient and let the process continue until successful completion.
 
-```
+```output
 ✗✗✗
 ✗✗✗ Pooled stream disconnected
 ✗✗✗
@@ -366,7 +368,7 @@ Note: the --force option above is only available in versions of the `hab` client
 
 When populating your Chef Habitat Builder on-prem with upstream core packages, you may run into an error that looks like this:
 
-```
+```output
 Uploading hart files.
 
 [1/958] Uploading ./core-img-0.5.4-20190201011741-x86_64-linux.hart to the depot at https://your.awesome.depot
@@ -384,7 +386,7 @@ And repeats for every package. Check to make sure you've created the `core` orig
 
 The `builder-api-proxy` service will log (via Nginx) all access and errors to log files in your service directory. Since these files may get large, you may want to add a log rotation script. Below is a sample logrotate file that you can use as an example for your needs:
 
-```
+```bash
 /hab/svc/builder-api-proxy/logs/host.access.log
 /hab/svc/builder-api-proxy/logs/host.error.log
 {
