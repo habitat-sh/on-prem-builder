@@ -38,8 +38,8 @@ The following are minimum requirements for installation/deployment of the Chef H
 * OS should support `systemd` process manager
 * Deployment to bare-metal, VM or container image
 * CPU / RAM should be appropriate for the deployment purpose:
-  - For trial deployments: 2 CPU/4 GB RAM (corresponding to AWS c4.xlarge or better) or better
-  - For production deployments: 16 CPU/32 GB RAM (corresponding to AWS c4.4xlarge) or better
+  * For trial deployments: 2 CPU/4 GB RAM (corresponding to AWS c4.xlarge or better) or better
+  * For production deployments: 16 CPU/32 GB RAM (corresponding to AWS c4.4xlarge) or better
 * Significant free disk space (depends on package storage, which depends on the size of the applications you are building and storing here - plan conservatively. Around 2GB is required for the baseline installation with only the packages required to run the Chef Habitat Builder on-prem services, and another 5GB+ of disk space for the latest versions of core packages)
 * Services should be deployed single-node - scale out is not yet supported
 * Outbound network (HTTPS) connectivity to WAN is required for the _initial_ install
@@ -73,6 +73,7 @@ meets all the requirements.
 Note that the initial install will require _outgoing_ network connectivity.
 
 Your Chef Habitat Builder on-prem instance will need to have the following _inbound_ port open:
+
 * Port 80 (or 443 if you plan to enable SSL)
 
 You may need to work with your enterprise network admin to enable the appropriate firewall rules.
@@ -89,11 +90,13 @@ Refer to the steps that are specific to your OAuth provider to create and config
 1. Record the the Client Id and Client Secret. These will be used for the `OAUTH_CLIENT_ID` and `OAUTH_CLIENT_SECRET` environment variables in the section below.
 
 For the configuration below, you will also need to know following *fully qualified* end-points:
+
 * Authorization Endpoint (example: `https://github.com/login/oauth/authorize`)
 * Token Endpoint (example: `https://github.com/login/oauth/access_token`)
 * API Endpoint (example: `https://api.github.com`)
 
 For more information, please refer to the developer documentation of these services:
+
 * [Chef Automate (ALPHA)](https://automate.chef.io/docs/configuration/#alpha-setting-up-automate-as-an-oauth-provider-for-habitat-builder)
 * [Azure Active Directory](https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-protocols-oauth-code)
 * [GitHub](https://developer.github.com/apps/building-oauth-apps/authorization-options-for-oauth-apps/)
@@ -160,7 +163,7 @@ If things don't work as expected (eg, if all the services are not in the `up` st
 
 ## Minio Web UI
 
-The Chef Habitat Builder on-prem stores package artifacts in Minio (https://github.com/minio/minio). By default, the Minio instance will be available on port 9000 (or whatever port you specified in your `bldr.env`). Please confirm that the Minio UI is available, and that you can log in with the credentials that were specified in your `bldr.env` file. There should already be a bucket created in which to host the artifacts.
+The Chef Habitat Builder on-prem stores package artifacts in [Minio](https://github.com/minio/minio). By default, the Minio instance will be available on port 9000 (or whatever port you specified in your `bldr.env`). Please confirm that the Minio UI is available, and that you can log in with the credentials that were specified in your `bldr.env` file. There should already be a bucket created in which to host the artifacts.
 
 ## Chef Habitat Builder on-prem Web UI
 
@@ -227,6 +230,7 @@ The following environment variables should be configured as needed:
 ## Upgrading
 
 Currently, Chef Habitat Builder on-prem services are not set to auto-upgrade. When you wish to upgrade the services, there is a simple uninstall script you can use to stop and unload the services, and remove the services. In order to uninstall, you may do the following:
+
 1. `cd ${SRC_ROOT}`
 1. `sudo ./uninstall.sh`
 
@@ -246,6 +250,7 @@ If the initial install fails, please check that you have outgoing connectivity, 
 If you have outgoing access via a proxy, please ensure that HTTPS_PROXY is set correctly in your environment.
 
 You also will need to have the following _inbound_ port open for your instance:
+
 * Port 80
 
 In the case that you have configured your proxy for the local session while installing but are still receiving connection refusal errors like the one below, you may want to configure your proxy with the `/etc/environment` file or similar.
@@ -263,6 +268,7 @@ Jun 10 09:35:15 <TargetMachine> hab[13171]: Supervisor not started.
 Jun 10 09:35:15 <TargetMachine> systemd[1]: hab-sup.service: Unit entered failed state.
 Jun 10 09:35:15 <TargetMachine> systemd[1]: hab-sup.service: Failed with result 'exit-code'
 ```
+
 Please work with your enterprise network admin to ensure the appropriate firewall rules are configured for network access.
 
 ### Authentication failure when logging in
@@ -274,6 +280,7 @@ You can also turn on debug logging (section below) and check to see that the aut
 The OAuth Token and API endpoints must be reachable from the Chef Habitat Builder on-prem install point.
 
 *Important*: If you change any settings in your `bldr.env` file, you will need to do the following steps after making the changes:
+
 1. Re-run the install script (`./install.sh`)
 2. Restart the services (`sudo systemctl restart hab-sup`)
 
@@ -418,7 +425,5 @@ When you are done with debugging, you can set the logging back to the default se
 
 Copyright (c) 2018 Chef Software Inc. and/or applicable contributors
 
-Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
-
- http://www.apache.org/licenses/LICENSE-2.0
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0) at `http://www.apache.org/licenses/LICENSE-2.0)`
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
