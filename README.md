@@ -209,9 +209,9 @@ This allows new stable core packages from the upstream to get created in the Che
 If your Chef Habitat Builder on-prem instance will have continued outgoing internet connectivity, you may wish to periodically run the script to check for updates.
 
 1. Export your Personal Access Token as `HAB_AUTH_TOKEN` to your environment (e.g, `export HAB_AUTH_TOKEN=<your token>`)
-1. `sudo -E ./scripts/on-prem-archive.sh sync-packages http://${APP_HOSTNAME_OR_IP} base-packages`, passing the root URL of your new Chef Habitat Builder on-prem as the last argument. Replace `http` with `https` in the URL if SSL is enabled.
+1. `sudo -E ./scripts/on-prem-archive.sh sync-packages http://${APP_HOSTNAME_OR_IP} base-plans`, passing the root URL of your new Chef Habitat Builder on-prem as the last argument. Replace `http` with `https` in the URL if SSL is enabled.
 
-The 'base-packages' parameter restricts the sync to a smaller subset of the core packages. If you wish to synchronize all core packages, omit the 'base-packages' parameter from the script. Note that it will take much longer for the synchronization of all packages. Generally, it will only take a few minutes for base packages to synchronize.
+The 'base-plans' parameter restricts the sync to a smaller subset of the core packages. If you wish to synchronize all core packages, omit the 'base-plans' parameter from the script. Note that it will take much longer for the synchronization of all packages. Generally, it will only take a few minutes for base packages to synchronize.
 
 You can also run the sync-packages functionality to initially populate the local Chef Habitat Builder on-prem.
 
