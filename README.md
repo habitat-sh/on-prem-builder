@@ -38,9 +38,11 @@ The following are minimum requirements for installation/deployment of the Chef H
 * OS should support `systemd` process manager
 * Deployment to bare-metal, VM or container image
 * CPU / RAM should be appropriate for the deployment purpose:
-  * For trial deployments: 2 CPU/4 GB RAM (corresponding to AWS c4.xlarge or better) or better
-  * For production deployments: 16 CPU/32 GB RAM (corresponding to AWS c4.4xlarge) or better
-* Significant free disk space (depends on package storage, which depends on the size of the applications you are building and storing here - plan conservatively. Around 2GB is required for the baseline installation with only the packages required to run the Chef Habitat Builder on-prem services, and another 5GB+ of disk space for the latest versions of core packages)
+  * For trial deployments: 2 CPU/4 GB RAM
+  * For production deployments: 16 CPU/32 GB RAM
+* Significant free disk space. Storage needs will vary, depending primarily on the size of the applications built by Habitat. The baseline Chef Habitat Builder on-prem requires around 2GB to run the Chef Habitat Builder on-prem services and the latest versions of the core packages require another 7GB+ of disk space. However, each package update installs the new package version without deleting existing package versions. We recommend:
+  * For trial deployments: 20 GB disk space
+  * For production deployments: 100 GB disk space
 * Services should be deployed single-node - scale out is not yet supported
 * Outbound network (HTTPS) connectivity to WAN is required for the _initial_ install
 * Inbound network connectivity from LAN (HTTP/HTTPS) is required for internal clients to access the Chef Habitat Builder on-prem
