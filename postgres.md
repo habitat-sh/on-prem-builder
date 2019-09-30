@@ -7,7 +7,8 @@ August 17th 2018. If you re-install or upgrade to a newer version of the
 On-Premise Depot, you will be required to also merge your database shards into
 the `public` Postgres database schema. Please follow the steps below.
 
-### Pre-requisites
+### Shard Migration Pre-requisites
+
 1. The password to your Postgres database. By default, this is located at
    `/hab/svc/builder-datastore/config/pwfile`
 1. A fresh backup of the two databases present in the On-Premise Depot,
@@ -18,7 +19,8 @@ the `public` Postgres database schema. Please follow the steps below.
    PGPASSWORD=$(sudo cat /hab/svc/builder-datastore/config/pwfile) hab pkg exec core/postgresql pg_dump -h 127.0.0.1 -p 5432 -U hab builder_originsrv > builder-originsrv.sql
    ```
 
-### Migration
+### Shard Migration
+
 1. Uninstall existing services by running `sudo -E ./uninstall.sh`
 1. Install new services by running `./install.sh`
 1. If you check your logs at this point, you will likely see lines like this:
@@ -69,7 +71,8 @@ the database shard migration listed above. If upgrade to a newer version of the
 On-Premise Depot, you will be required to also merge databases into
 the `builder` Postgres database. Please follow the steps below.
 
-### Pre-requisites
+### Database Merge Pre-requisites
+
 1. The password to your Postgres database. By default, this is located at
    `/hab/svc/builder-datastore/config/pwfile`
 1. A fresh backup of the two databases present in the On-Premise Depot,
@@ -80,11 +83,14 @@ the `builder` Postgres database. Please follow the steps below.
    PGPASSWORD=$(sudo cat /hab/svc/builder-datastore/config/pwfile) hab pkg exec core/postgresql pg_dump -h 127.0.0.1 -p 5432 -U hab builder_originsrv > builder-originsrv.sql
    ```
 
-### Migration
+### Database Merge Migration
+
 1. With all services running your *current* versions, execute the following command from the root of the repo directory:
+
    ```shell
    PGPASSWORD=$(sudo cat /hab/svc/builder-datastore/config/pwfile) ./scripts/merge-databases.sh
    ```
+
    After confirming that you have fresh database backups, the script
    should run and create a new 'builder' database, and then migrate the data.
 1. At this point, all data is stored in the `builder` database. Both of the other
