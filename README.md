@@ -85,15 +85,15 @@ We currently support Chef Automate v2, Azure AD (OpenId Connect), GitHub, GitLab
 Refer to the steps that are specific to your OAuth provider to create and configure your OAuth application. The below steps illustrate setting up the OAuth application using Github as the identity provider:
 
 1. Create a new OAuth Application in your OAuth Provider - for example, [GitHub](https://github.com/settings/applications/new)
-1. Set the value of `Homepage URL` to `http://${APP_HOSTNAME_OR_IP}`, or `https://${APP_HOSTNAME_OR_IP}` if you plan to enable SSL.
-1. Set the value of `User authorization callback URL` to `http://${APP_HOSTNAME_OR_IP}/` (The trailing `/` is *important*). Specify `https` instead of `http` if you plan to enable SSL.
+1. Set the homepage url value of `APP_URL` to `http://${BUILDER_HOSTNAME_OR_IP}/`, or `https://${BUILDER_HOSTNAME_OR_IP}/` if you plan to enable SSL.
+1. Set the callback url value of `OAUTH_REDIRECT_URL` to `http://${BUILDER_HOSTNAME_OR_IP}/` (The trailing `/` is *important*). Specify `https` instead of `http` if you plan to enable SSL.
 1. Record the the Client Id and Client Secret. These will be used for the `OAUTH_CLIENT_ID` and `OAUTH_CLIENT_SECRET` environment variables in the section below.
 
 For the configuration below, you will also need to know following *fully qualified* end-points:
 
 * Authorization Endpoint (example: `https://github.com/login/oauth/authorize`)
 * Token Endpoint (example: `https://github.com/login/oauth/access_token`)
-* API Endpoint (example: `https://api.github.com`)
+* API Endpoint (example: `https://api.github.com/user`)
 
 For more information, please refer to the developer documentation of these services:
 
@@ -169,7 +169,7 @@ The Chef Habitat Builder on-prem stores package artifacts in [Minio](https://git
 
 Once the services are running successfully, the Chef Habitat Builder on-prem UI will become available at the configured hostname or IP address.
 
-Navigate to `http://${APP_HOSTNAME_OR_IP}/#/sign-in` to access the Chef Habitat Builder on-prem UI.
+Navigate to `http://${BUILDER_HOSTNAME_OR_IP}/#/sign-in` to access the Chef Habitat Builder on-prem UI.
 
 At that point you should be able to log in using your configured OAuth provider.
 
@@ -192,7 +192,7 @@ Click on your Gravatar icon on the top right corner of the Chef Habitat Builder 
 The freshly installed Chef Habitat Builder on-prem does not contain any packages. In order to bootstrap a set of stable `core` origin packages (refer to the [core-plans repo](https://github.com/habitat-sh/core-plans)), you can do the following:
 
 1. Export your Personal Access Token as `HAB_AUTH_TOKEN` to your environment (e.g, `export HAB_AUTH_TOKEN=<your token>`)
-1. `sudo -E ./scripts/on-prem-archive.sh populate-depot http://${APP_HOSTNAME_OR_IP}`, passing the root URL of your new Chef Habitat Builder on-prem as the last argument (Replace `http` with `https` in the URL if SSL is enabled)
+1. `sudo -E ./scripts/on-prem-archive.sh populate-depot http://${BUILDER_HOSTNAME_OR_IP}`, passing the root URL of your new Chef Habitat Builder on-prem as the last argument (Replace `http` with `https` in the URL if SSL is enabled)
 
 This is quite a lengthy process, so be patient. It will download a *large* (~ 13GB currently) archive of the latest stable core plans, and then install them to your Chef Habitat Builder on-prem.
 
@@ -209,7 +209,7 @@ This allows new stable core packages from the upstream to get created in the Che
 If your Chef Habitat Builder on-prem instance will have continued outgoing internet connectivity, you may wish to periodically run the script to check for updates.
 
 1. Export your Personal Access Token as `HAB_AUTH_TOKEN` to your environment (e.g, `export HAB_AUTH_TOKEN=<your token>`)
-1. `sudo -E ./scripts/on-prem-archive.sh sync-packages http://${APP_HOSTNAME_OR_IP} base-plans`, passing the root URL of your new Chef Habitat Builder on-prem as the last argument. Replace `http` with `https` in the URL if SSL is enabled.
+1. `sudo -E ./scripts/on-prem-archive.sh sync-packages http://${BUILDER_HOSTNAME_OR_IP} base-plans`, passing the root URL of your new Chef Habitat Builder on-prem as the last argument. Replace `http` with `https` in the URL if SSL is enabled.
 
 The 'base-plans' parameter restricts the sync to a smaller subset of the core packages. If you wish to synchronize all core packages, omit the 'base-plans' parameter from the script. Note that it will take much longer for the synchronization of all packages. Generally, it will only take a few minutes for base packages to synchronize.
 
