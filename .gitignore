@@ -2,6 +2,7 @@
 bldr.env
 .vagrant
 .secrets/**
+.vscode/settings.json
 !.secrets/.gitkeep
 results/
 .terraform/

@@ -4,11 +4,11 @@ On-prem-builder is currently only supported for single node deployment. This pro
 
 ## Support
 
-Support for automated provisioning for on-prem-builder is experimental. Use at your own risk. No support of any kind is guarenteed at this time.
+Support for automated provisioning for on-prem-builder is experimental. Use at your own risk. No support of any kind is guaranteed at this time.
 
 ## Usage
 
-Deploy using Terraform and store your state file in secure storage, like an S3 bucket. Use of a CI pipeline to execute is highly recommeneded.
+Deploy using Terraform and store your state file in secure storage, like an S3 bucket. Use of a CI pipeline to execute is highly recommended.
 
 1. Create a terraform.tfvars in the same directory as main.tf, and fill it out using the variables described in inputs.tf.
 1. `terraform init`
