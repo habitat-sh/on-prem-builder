@@ -104,7 +104,7 @@ For more information, please refer to the developer documentation of these servi
 * [Okta](https://developer.okta.com/authentication-guide/implementing-authentication/auth-code)
 * [BitBucket](https://confluence.atlassian.com/bitbucket/oauth-on-bitbucket-cloud-238027431.html)
 
-Further information on the OAuth endpoints, see the Internet Engineering Task Force (IETF) RFC 6749, [The OAuth 2.0 Authorization Framework](https://tools.ietf.org/html/rfc6749), page 21.
+For further information on OAuth endpoints, see the Internet Engineering Task Force (IETF) RFC 6749, [The OAuth 2.0 Authorization Framework](https://tools.ietf.org/html/rfc6749), page 21.
 
 *Note*: When setting Chef Automate as your OAuth provider, you will need to add your Automate instance's TLS certificate (found at the `load_balancer.v1.sys.frontend_tls` entry in your Chef Automate `config.toml` file), to your Chef Habitat Builder on-prem instance's list of accepted certs. This can be done by copying the certifcate to the `\hab\cache\ssl` folder on the Chef Habitat Builder on-prem instance (supported by the latest version of the Chef Habitat Builder on-prem), or alternatively by modifying the `core/cacert` package and appending the cert to the cert.pem file at the following location: `$(hab pkg path core/cacerts)/ssl/cert.pem`.
 
