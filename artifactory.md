@@ -24,6 +24,3 @@ sudo hab svc load core/artifactory
 ```
 This will spin up an Artifactory instance, and you can use the following to log in: http://localhost:8081/artifactory/webapp/#/home
 
-## Support
-
-You can also post any questions or issues on the [Habitat Forum](https://forums.habitat.sh/), on our [Slack channel](https://habitat-sh.slack.com), or file issues directly at the [Github repo](https://github.com/habitat-sh/on-prem-builder/issues).

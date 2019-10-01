@@ -10,7 +10,7 @@
 
 ## IMPORTANT NOTICE
 
-Please see the [Migrating Package Artifacts to Minio](minio-migrate.md) if your existing Chef Habitat Builder on-prem was installed *prior* to June 15th 2018. The package artifacts are now stored in a Minio instance, and running a migration script will be required in order to properly transition over to newer versions of Chef Habitat Builder on-prem.
+Please see the [Migrating Package Artifacts to Minio](minio-migration.md) if your existing Chef Habitat Builder on-prem was installed *prior* to June 15th 2018. The package artifacts are now stored in a Minio instance, and running a migration script will be required in order to properly transition over to newer versions of Chef Habitat Builder on-prem.
 
 Please see the [Merging database shards](postgres.md#merging-database-shards) section if
 your existing Chef Habitat Builder on-prem was installed *prior* to August 17th 2018. All
@@ -104,7 +104,7 @@ For more information, please refer to the developer documentation of these servi
 * [Okta](https://developer.okta.com/authentication-guide/implementing-authentication/auth-code)
 * [BitBucket](https://confluence.atlassian.com/bitbucket/oauth-on-bitbucket-cloud-238027431.html)
 
-Further information on the OAuth endpoints can also be found [here](https://tools.ietf.org/html/rfc6749#page-21).
+Further information on the OAuth endpoints, see the Internet Engineering Task Force (IETF) RFC 6749, [The OAuth 2.0 Authorization Framework](https://tools.ietf.org/html/rfc6749), page 21.
 
 *Note*: When setting Chef Automate as your OAuth provider, you will need to add your Automate instance's TLS certificate (found at the `load_balancer.v1.sys.frontend_tls` entry in your Chef Automate `config.toml` file), to your Chef Habitat Builder on-prem instance's list of accepted certs. This can be done by copying the certifcate to the `\hab\cache\ssl` folder on the Chef Habitat Builder on-prem instance (supported by the latest version of the Chef Habitat Builder on-prem), or alternatively by modifying the `core/cacert` package and appending the cert to the cert.pem file at the following location: `$(hab pkg path core/cacerts)/ssl/cert.pem`.
 
@@ -427,3 +427,6 @@ Copyright (c) 2018 Chef Software Inc. and/or applicable contributors
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0) at `http://www.apache.org/licenses/LICENSE-2.0)`
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+## Support
+
+You can also post any questions or issues on the [Habitat Forum](https://forums.habitat.sh/), on our [Slack channel](https://habitat-sh.slack.com), or file issues directly at the [Github repo](https://github.com/habitat-sh/on-prem-builder/issues).
