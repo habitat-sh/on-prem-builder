@@ -377,6 +377,16 @@ Restart the Chef Habitat services:
 sudo systemctl restart hab-sup
 ```
 
+### Self-signed cert files do not exist
+
+The latest version of the Chef Habitat Builder on-prem services looks certificates in the `/hab/cache/ssl` directory. Copy your self-signed certificates directory if they are missing. Follow the naming pattern `appname-cert.cert` or `appname-cert.pem`. Do not use `cert.pem`, which is reserved for the Chef Habitat system. Overwriting this file will cause Chef Habitat Builder to fail.
+
+Restart the Chef Habitat services:
+
+```bash
+sudo systemctl restart hab-sup
+```
+
 ### Error "sorry, too many clients already"
 
 If the hab services don't come up as expected, use `journalctl -fu hab-sup` to check the service logs (also see below for turning on Debug Logging).
