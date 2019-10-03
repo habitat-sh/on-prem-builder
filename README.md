@@ -355,14 +355,27 @@ Please work with your enterprise network admin to ensure the appropriate firewal
 
 If you are not able to log in, please double check the settings that you have configured your OAuth application with, as well as the URLs that you have specified in your `bldr.env` file.
 
-You can also turn on debug logging (section below) and check to see that the authenticate endpoint is getting called at the Chef Habitat Builder API backend, and whether there is any additional information in the logs that may be helpful.
+### Unable to retrieve OAuth token
 
-The OAuth Token and API endpoints must be reachable from the Chef Habitat Builder on-prem install point.
+You were able to sign in to the authentication provider, but unable authenticate with Chef Habitat's OAuth token.
 
-*Important*: If you change any settings in your `bldr.env` file, you will need to do the following steps after making the changes:
+Open the `bldr.env` and verify that:
+* **APP_URL** ends with "/\"
+* **OAUTH_REDIRECT_URL** ends with "/\"
+* **OAUTH_CLIENT_ID** is complete and correct
+* **OAUTH_CLIENT_SECRET** is complete and correct
 
-1. Re-run the install script (`./install.sh`)
-2. Restart the services (`sudo systemctl restart hab-sup`)
+Apply changes to the to apply changes to the `bldr.env` by running the install script
+
+```bash
+bash ./install.sh
+```
+
+Restart the Chef Habitat services:
+
+```bash
+sudo systemctl restart hab-sup
+```
 
 ### Error "sorry, too many clients already"
 
