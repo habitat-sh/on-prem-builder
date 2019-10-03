@@ -65,7 +65,7 @@ Once installed, the following functionality will be available to users:
 * Package builds using the `hab` client and Chef Habitat Studio
 * Ability to import core packages from the upstream Chef Habitat Builder
 
-The following Chef Habitat Builder on-prem functionality is *NOT* currently available:
+The following Chef Habitat Builder on-prem functionalities are *NOT* currently available:
 
 * Automated package builds using Chef Habitat Builder on-prem
 * Automated package exports using Chef Habitat Builder on-prem
@@ -112,8 +112,6 @@ For more information, please refer to the developer documentation of these servi
 
 For further information on OAuth endpoints, see the Internet Engineering Task Force (IETF) RFC 6749, [The OAuth 2.0 Authorization Framework](https://tools.ietf.org/html/rfc6749), page 21.
 
-*Note*: When setting Chef Automate as your OAuth provider, you will need to add your Automate instance's TLS certificate (found at the `load_balancer.v1.sys.frontend_tls` entry in your Chef Automate `config.toml` file), to your Chef Habitat Builder on-prem instance's list of accepted certs. This can be done by copying the certificate to the `\hab\cache\ssl` folder on the Chef Habitat Builder on-prem instance (supported by the latest version of the Chef Habitat Builder on-prem), or alternatively by modifying the `core/cacert` package and appending the cert to the cert.pem file at the following location: `$(hab pkg path core/cacerts)/ssl/cert.pem`.
-
 ### Preparing your filesystem (Optional)
 
 Since substantial storage may be required for holding packages, please ensure you have an appropriate amount of free space on your filesystem.
@@ -141,8 +139,6 @@ sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/privat
 ```
 
 *Important*: Make sure that the certificate files are named exactly `ssl-certificate.key` and `ssl-certificate.crt`. If you have procured the certificate from a different source, rename them to the prescribed filenames, and ensure that they are located in the same folder as the `install.sh` script. They will get uploaded to the Chef Habitat supervisor during the install.
-
-*Important*: If you get authentication failures with a self-signed cert, you may need to either update the cert package that the Chef Habitat on-prem services are using (in the `/etc/systemd/system/hab-sup.service` file), or modify the hab `core/cacerts` package (in the `/hab/pkgs/core/cacerts/...` folder) to add your self-signed cert chain to the `cert.pem` file. Restart the hab services with `systemctl restart hab-sup` after updating the cert file. The latest version of the Chef Habitat Builder on-prem services will also look for certificates in the `/hab/cache/ssl` directory - you may copy any self-signed certificates to that directory if needed.
 
 ## Setup
 
@@ -181,32 +177,41 @@ At that point you should be able to log in using your configured OAuth provider.
 
 ### Create an Origin
 
-Once you are logged in, you should be able to create an origin by clicking on the 'Create Origin' button.
+Create a `core` origin for an initial set of base packages. Uploads will fail unless you first populate your Chef Habitat Builder on-prem with the `core` upstream packages.
 
-**NOTE** _You will need to at least create a `core` origin for an initial set of base packages (see section below). Go ahead and create a new origin now, and type in `core` as the origin name. It's important to do this prior to populating your Chef Habitat Builder on-prem with the `core` upstream packages, or else the upload will fail._
+Once you are logged in to the Chef Habitat Builder on-prem UI, select the `New Origin` button and enter in `core` as the origin name.
 
 ### Generate a Personal Access Token
 
-In order to bootstrap a set of `core` package, as well as perform authenticated operations using the `hab` client, you will need to generate a Personal Access Token.
+Next, generate a Personal Access Token for bootstrapping the `core` packages, as well as for performing authenticated operations using the `hab` client.
 
-Click on your Gravatar icon on the top right corner of the Chef Habitat Builder on-prem web page, and then select Profile. This will take you to a page where you can generate your access token. Make sure to save it away securely.
+Select your Gravatar icon on the top right corner of the Chef Habitat Builder on-prem web page, and then select **Profile**. This will take you to a page where you can generate your access token. Make sure to save it securely.
 
 ## Bootstrap `core` packages
 
-*Important*: Please make sure you have created a `core` origin before starting this process.
+*Important*: Create a `core` origin before starting this process. The process will fail without first having a `core` origin.
 
-The freshly installed Chef Habitat Builder on-prem does not contain any packages. In order to bootstrap a set of stable `core` origin packages (refer to the [core-plans repo](https://github.com/habitat-sh/core-plans)), you can do the following:
+Chef Habitat Builder on-prem has no pre-installed packages. To bootstrap a set of stable `core` origin packages (refer to the [core-plans repo](https://github.com/habitat-sh/core-plans)), you can do the following:
 
-1. Export your Personal Access Token as `HAB_AUTH_TOKEN` to your environment (e.g, `export HAB_AUTH_TOKEN=<your token>`)
-1. `sudo -E ./scripts/on-prem-archive.sh populate-depot http://${BUILDER_HOSTNAME_OR_IP}`, passing the root URL of your new Chef Habitat Builder on-prem as the last argument (Replace `http` with `https` in the URL if SSL is enabled)
+1. Export your Personal Access Token as `HAB_AUTH_TOKEN` to your environment
 
-This is quite a lengthy process, so be patient. It will download a *large* (~ 13GB currently) archive of the latest stable core plans, and then install them to your Chef Habitat Builder on-prem.
+    ```bash
+    export HAB_AUTH_TOKEN=<your token>
+    ```
 
-Please ensure that you have plenty of free drive space available, for hosting the `core` packages as well as your own packages.
+1. Run the population script, passing the root URL of your new Chef Habitat Builder on-prem as the last argument (Replace `http` with `https` in the URL if SSL is enabled)
+
+    ```bash
+    sudo -E ./scripts/on-prem-archive.sh populate-depot http://${BUILDER_HOSTNAME_OR_IP}`
+    ```
+
+This is quite a lengthy process, so be patient. It will download a *large* (~ 14GB currently) archive of the latest stable core plans, and then install them to your Chef Habitat Builder on-prem.
+
+Please ensure that you have plenty of free disk space available for hosting the `core` packages as well as for managing your own packages. Updated packages install without deleting any existing packages, so plan disk space accordingly.
 
 ## Synchronizing 'core' packages from an upstream
 
-*Important*: Please make sure you have created a `core` origin before starting this process.
+*Important*: Create a `core` origin before starting this process. The process will fail without first having a `core` origin.
 
 It is possible to also use the 'on-prem-archive.sh' script to synchronize the Chef Habitat Builder on-prem using the public Chef Habitat Builder site as an 'upstream'.
 
