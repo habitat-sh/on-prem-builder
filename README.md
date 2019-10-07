@@ -379,7 +379,7 @@ sudo systemctl restart hab-sup
 
 ### Self-signed cert files do not exist
 
-The latest version of the Chef Habitat Builder on-prem services looks certificates in the `/hab/cache/ssl` directory. Copy your self-signed certificates directory if they are missing. Follow the naming pattern `appname-cert.cert` or `appname-cert.pem`. Do not use `cert.pem`, which is reserved for the Chef Habitat system. Overwriting this file will cause Chef Habitat Builder to fail.
+The latest version of the Chef Habitat Builder on-prem services looks certificates in the `/hab/cache/ssl` directory. Copy your self-signed certificates directory if they are missing. Follow the naming pattern `appname-cert.cert` or `appname-cert.pem`, for example `automate-cert.cert` or `automate-cert.pem`. Do not use `cert.pem`, which is reserved for the Chef Habitat system. Overwriting this file will cause Chef Habitat Builder to fail.
 
 Restart the Chef Habitat services:
 
