@@ -261,6 +261,8 @@ You also will need to have the following _inbound_ port open for your instance:
 
 In the case that you have configured your proxy for the local session while installing but are still receiving connection refusal errors like the one below, you may want to configure your proxy with the `/etc/environment` file or similar.
 
+IMPORTANT: During installation, if any values are found in the environment for `HTTP_PROXY`, `HTTPS_PROXY`, or `NO_PROXY`, they will be written into the hab-sup systemd service file.  If these values need to change, you can update `/etc/systemd/system/hab-sup.service`.
+
 ```output
 -- Logs begin at Mon 2019-06-10 09:02:13 PDT. --
 Jun 10 09:35:15 <TargetMachine> hab[13161]: ∵ Missing package for core/hab-launcher
