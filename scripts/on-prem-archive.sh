@@ -271,6 +271,18 @@ upload_keys() {
     done
 }
 
+  _pkg_ident_of_hart() {
+      declare full_path_to_hart="${1}"
+      local full_path_of_embedded_IDENT=$(tail -n +6 "${full_path_to_hart}" | xzcat | tar --include="*\/IDENT$" -tf -)
+      tail -n +6 "${full_path_to_hart}" | xzcat | tar -xOf - "${full_path_of_embedded_IDENT}"
+  }
+
+  _get_target_from_hart() {
+      declare full_path_to_hart="${1}"
+      local full_path_of_embedded_TARGET=$(tail -n +6 "${full_path_to_hart}"  | xzcat | tar --include="*\/TARGET$" -tf -)
+      tail -n +6 "${full_path_to_hart}" | xzcat | tar -xOf - "${full_path_of_embedded_TARGET}"
+  }
+
 bucket="${HAB_ON_PREM_BOOTSTRAP_BUCKET_NAME:-habitat-on-prem-builder-bootstrap}"
 s3_root_url="${HAB_ON_PREM_BOOTSTRAP_S3_ROOT_URL:-https://s3-us-west-2.amazonaws.com}/$bucket"
 marker="LATEST.tar.gz"
@@ -442,9 +454,15 @@ case "${1:-}" in
 
         if download_hart_if_missing "$local_file" "$slash_ident" "[$pkg_count/$pkg_total]" "$target"; then
           echo "[$pkg_count/$pkg_total] Uploading ${slash_ident} to local depot"
-          checksum=$(${B2SUM_CMD} -l 256 ${local_file} | cut -d ' ' -f 1)
-          ${CURL_CMD} -sov /dev/null -H "Accept: application/json" -H "Authorization: Bearer $HAB_AUTH_TOKEN" --data-binary "@$local_file" ${depot_url}/v1/depot/pkgs/$slash_ident\?checksum=${checksum}&target=${target}
-          hab pkg promote --url ${depot_url} ${slash_ident} stable ${target} || true 
+
+          # first, upload the package to 'unstable' channel
+          hab pkg upload "${local_file}" --url "${depot_url}" --channel unstable --auth "${HAB_AUTH_TOKEN}" 
+
+          # then, promote the package to 'stable'.  Why? 
+          # Because doing an all-in-one upload/promotion fails for many packages hab assumes 
+          # every package is linux x86_64-linux.  Windows and kernel2 packages fail to promote
+          # unless the $target is specified on promotion
+          hab pkg promote "${slash_ident}" 'stable' "${target}"
         fi
       done
     done
@@ -500,14 +518,8 @@ case "${1:-}" in
       hart_count=$((hart_count+1))
       echo
       echo "[$hart_count/$hart_total] Uploading $hart to the depot at $depot_url"
-
-      # Retry this operation up to 5 times before aborting
-      for _ in {1..5}
-      do
-        hab pkg upload --url "$depot_url" --channel stable "$hart" && break
-        echo "Upload failed. Sleeping 5 seconds and retrying."
-        sleep 5
-      done
+      hab pkg upload --url "$depot_url" --channel unstable "$hart" --auth "${HAB_AUTH_TOKEN}"
+      hab pkg promote "$(_pkg_ident_of_hart ${hart})" 'stable' "$(_target_of_hart ${hart})"
     done
 
     echo "Package uploads finished."
