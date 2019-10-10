@@ -64,15 +64,15 @@ install_tools() {
   do
     echo "Installing ${tool} from Habitat package."
     if [[ "$tool" == "jq" ]]; then
-        HAB_AUTH_TOKEN="" hab pkg install core/jq-static
+        HAB_AUTH_TOKEN="" hab pkg install --channel stable core/jq-static
     elif [[ "$tool" == "aws" ]]; then
-        HAB_AUTH_TOKEN="" hab pkg install core/aws-cli
+        HAB_AUTH_TOKEN="" hab pkg install --channel stable core/aws-cli
     elif [[ "$tool" == "b2sum" ]]; then
-        HAB_AUTH_TOKEN="" hab pkg install core/coreutils
+        HAB_AUTH_TOKEN="" hab pkg install --channel stable core/coreutils
     elif [[ "$tool" == "xzcat" ]]; then
-        HAB_AUTH_TOKEN="" hab pkg install core/xz
+        HAB_AUTH_TOKEN="" hab pkg install --channel stable core/xz
     else
-        HAB_AUTH_TOKEN="" hab pkg install core/"${tool}"
+        HAB_AUTH_TOKEN="" hab pkg install --channel stable core/"${tool}"
     fi
   done
   
