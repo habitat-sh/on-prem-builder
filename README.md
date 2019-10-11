@@ -177,7 +177,7 @@ At that point you should be able to log in using your configured OAuth provider.
 
 ### Create an Origin
 
-Create a `core` origin for an initial set of base packages. Uploads will fail unless you first populate your Chef Habitat Builder on-prem with the `core` upstream packages.
+Create a `core` origin for an initial set of base packages. Uploads will fail unless you first populate your Chef Habitat Builder on-prem with the upstream `core` upstream origin.
 
 Once you are logged in to the Chef Habitat Builder on-prem UI, select the `New Origin` button and enter in `core` as the origin name.
 
@@ -357,7 +357,7 @@ If you are not able to log in, please double check the settings that you have co
 
 ### Unable to retrieve OAuth token
 
-You were able to sign in to the authentication provider, but unable authenticate with Chef Habitat's OAuth token.
+You were able to sign in to the authentication provider, but unable to authenticate with Chef Habitat's OAuth token.
 
 Open the `bldr.env` and verify that:
 * **APP_URL** ends with "/\"
@@ -365,7 +365,7 @@ Open the `bldr.env` and verify that:
 * **OAUTH_CLIENT_ID** is complete and correct
 * **OAUTH_CLIENT_SECRET** is complete and correct
 
-Apply changes to the to apply changes to the `bldr.env` by running the install script
+Apply changes to the `bldr.env` by running the install script:
 
 ```bash
 bash ./install.sh
