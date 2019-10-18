@@ -140,6 +140,23 @@ sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/privat
 
 *Important*: Make sure that the certificate files are named exactly `ssl-certificate.key` and `ssl-certificate.crt`. If you have procured the certificate from a different source, rename them to the prescribed filenames, and ensure that they are located in the same folder as the `install.sh` script. They will get uploaded to the Chef Habitat supervisor during the install.
 
+## Airgapped Installation Prep Work
+
+In order to install the on-prem Chef Habitat Builder in an airgapped (no direct Internet access) environment, several preparatory steps must be taken:
+
+1. Download the Zip archive of [on-prem-builder](https://github.com/habitat-sh/on-prem-builder/archive/master.zip)
+1. Download the Chef Habitat CLI [tool](https://api.bintray.com/content/habitat/stable/linux/x86_64/hab-%24latest-x86_64-linux.tar.gz?bt_package=hab-x86_64-linux)
+1. Download the Habitat Builder service packages and their dependencies as documented [here](blah)
+1. Zip up all the above, transfer and unzip on the Linux system where Builder will be deployed
+1. From the Zip archive, install the `hab` binary somewhere in $PATH and ensure it has execute permissions
+`sudo chmod 755 /bin/hab`
+1. Import the public package signing keys from the Builder starter kit
+`for file in $(ls builder_pkgs/keys/*pub); do cat $file | sudo hab origin key import; done`
+1. Create a Habitat artifact cache directory and place the downloaded Habitat Builder service packages inside
+`sudo mkdir -p /hab/cache/artifacts`
+`sudo cp builder_pkgs/artifacts/*hart /hab/cache/artifacts`
+`sudo hab pkg install /hab/cache/artifacts/habitat-builder*hart`
+
 ## Setup
 
 1. Clone this repo (or unzip the archive you have downloaded from the Github release page) at the desired machine where you will stand up the Chef Habitat Builder on-prem
