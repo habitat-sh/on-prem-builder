@@ -140,22 +140,34 @@ sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/privat
 
 *Important*: Make sure that the certificate files are named exactly `ssl-certificate.key` and `ssl-certificate.crt`. If you have procured the certificate from a different source, rename them to the prescribed filenames, and ensure that they are located in the same folder as the `install.sh` script. They will get uploaded to the Chef Habitat supervisor during the install.
 
-## Airgapped Installation Prep Work
+### Starter Kits (Recommended)
 
-In order to install the on-prem Chef Habitat Builder in an airgapped (no direct Internet access) environment, several preparatory steps must be taken:
+### Airgapped installation prep work (Recommended if airgapped)
 
-1. Download the Zip archive of [on-prem-builder](https://github.com/habitat-sh/on-prem-builder/archive/master.zip)
-1. Download the Chef Habitat CLI [tool](https://api.bintray.com/content/habitat/stable/linux/x86_64/hab-%24latest-x86_64-linux.tar.gz?bt_package=hab-x86_64-linux)
-1. Download the Habitat Builder service packages and their dependencies as documented [here](blah)
+In order to install the on-prem Chef Habitat Builder in an airgapped (no direct Internet access) environment, the following steps are helpful:
+
+1. Download the Zip archive of [on-prem-builder](https://github.com/habitat-sh/on-prem-builder/archive/master.zip) repo
+1. Download the Chef Habitat [cli](https://api.bintray.com/content/habitat/stable/linux/x86_64/hab-%24latest-x86_64-linux.tar.gz?bt_package=hab-x86_64-linux) tool
+1. Create the Habitat Builder starter kit bundle and download it
+```bash
+git clone https://github.com/habitat-sh/on-prem-builder.git
+cd on-prem-builder
+hab pkg download --file starter_kits/builder --download-directory ${HOME}/builder_starter_kit`
+```
+1. Create any additional starter kit bundles as documented [here](https://..)
 1. Zip up all the above, transfer and unzip on the Linux system where Builder will be deployed
 1. From the Zip archive, install the `hab` binary somewhere in $PATH and ensure it has execute permissions
 `sudo chmod 755 /bin/hab`
-1. Import the public package signing keys from the Builder starter kit
-`for file in $(ls builder_pkgs/keys/*pub); do cat $file | sudo hab origin key import; done`
-1. Create a Habitat artifact cache directory and place the downloaded Habitat Builder service packages inside
-`sudo mkdir -p /hab/cache/artifacts`
-`sudo cp builder_pkgs/artifacts/*hart /hab/cache/artifacts`
-`sudo hab pkg install /hab/cache/artifacts/habitat-builder*hart`
+1. Import the public package signing keys from the downloaded Builder starter kit
+`for file in $(ls builder_starter_kit/keys/*pub); do cat $file | sudo hab origin key import; done`
+1. Create a Habitat artifact cache directory, place the Builder starter kit packages in that directory and pre-install the Builder Services
+```bash
+sudo mkdir -p /hab/cache/artifacts
+sudo mv builder_start_kit/artifacts/*hart /hab/cache/artifacts
+sudo hab pkg install /hab/cache/artifacts/habitat-builder*hart
+```
+1. Pre-install the core Habitat components
+`sudo hab pkg install /hab/cache/artifacts/core-hab-*hart`
 
 ## Setup
 
