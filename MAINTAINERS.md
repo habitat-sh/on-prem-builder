@@ -4,7 +4,7 @@ The On-Prem Builder project membership adheres to the [Chef OSS Practices](https
 
 Please review the Project Members section in the link above for details on how to become a contributor, reviewer, approver or project owner.
 
-+++
+---
 
 # Maintainers
 

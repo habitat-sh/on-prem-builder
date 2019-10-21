@@ -7,7 +7,7 @@
 - [**closed**] Add Windows packages to the on-prem bootstrap archive. [#51](https://github.com/habitat-sh/on-prem-builder/pull/51)
 - [**closed**] Add license, etc [#49](https://github.com/habitat-sh/on-prem-builder/pull/49)
 
-+++
+---
 
 ## v0.1.0 (01/06/2018)
 - [**closed**] Fix README title [#48](https://github.com/habitat-sh/on-prem-builder/pull/48)
