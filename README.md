@@ -140,11 +140,9 @@ sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/privat
 
 *Important*: Make sure that the certificate files are named exactly `ssl-certificate.key` and `ssl-certificate.crt`. If you have procured the certificate from a different source, rename them to the prescribed filenames, and ensure that they are located in the same folder as the `install.sh` script. They will get uploaded to the Chef Habitat supervisor during the install.
 
-### Starter Kits (Recommended)
+### Airgapped Installation (Recommended prep work, if airgapped)
 
-### Airgapped installation prep work (Recommended if airgapped)
-
-In order to install the on-prem Chef Habitat Builder in an airgapped (no direct Internet access) environment, the following steps are helpful:
+In order to install the on-prem Chef Habitat Builder in an airgapped (no direct Internet access) environment, the following preparatory steps are helpful:
 
 1. Download the Zip archive of [on-prem-builder](https://github.com/habitat-sh/on-prem-builder/archive/master.zip) repo
 1. Download the Chef Habitat [cli](https://api.bintray.com/content/habitat/stable/linux/x86_64/hab-%24latest-x86_64-linux.tar.gz?bt_package=hab-x86_64-linux) tool
@@ -152,22 +150,22 @@ In order to install the on-prem Chef Habitat Builder in an airgapped (no direct 
 ```bash
 git clone https://github.com/habitat-sh/on-prem-builder.git
 cd on-prem-builder
-hab pkg download --file starter_kits/builder --download-directory ${HOME}/builder_starter_kit`
+hab pkg download --target x86_64-linux --channel stable --file quickstart_lists/builder_x86_64-linux_stable --download-directory ${HOME}/builder_starter_kit`
 ```
-1. Create any additional starter kit bundles as documented [here](https://..)
+1. Create any additional starter kit bundles as documented in the [Bootstrap Builder](https://github.com/habitat-sh/on-prem-builder/tree/master#bootstrap-builder-with-habitat-packages) section of this README
 1. Zip up all the above, transfer and unzip on the Linux system where Builder will be deployed
-1. From the Zip archive, install the `hab` binary somewhere in $PATH and ensure it has execute permissions
+1. From the zip archive, install the `hab` binary somewhere in $PATH and ensure it has execute permissions
 `sudo chmod 755 /bin/hab`
 1. Import the public package signing keys from the downloaded Builder starter kit
 `for file in $(ls builder_starter_kit/keys/*pub); do cat $file | sudo hab origin key import; done`
-1. Create a Habitat artifact cache directory, place the Builder starter kit packages in that directory and pre-install the Builder Services
+1. Create a Habitat artifact cache directory, place the Builder starter kit .hart packages into that directory and then pre-install the Builder Services
 ```bash
 sudo mkdir -p /hab/cache/artifacts
 sudo mv builder_start_kit/artifacts/*hart /hab/cache/artifacts
 sudo hab pkg install /hab/cache/artifacts/habitat-builder*hart
 ```
-1. Pre-install the core Habitat components
-`sudo hab pkg install /hab/cache/artifacts/core-hab-*hart`
+1. Pre-install the Habitat Supervisor and its dependencies
+`sudo hab pkg install --binlink --force /hab/cache/artifacts/core-hab-*hart`
 
 ## Setup
 
@@ -180,12 +178,11 @@ sudo hab pkg install /hab/cache/artifacts/habitat-builder*hart
 If everything goes well, you should see output similar to the following showing that the Chef Habitat Builder on-prem services are loaded:
 
 ```output
-hab-sup(MN): The habitat/builder-datastore service was successfully loaded
-hab-sup(MN): The habitat/builder-router service was successfully loaded
-hab-sup(MN): The habitat/builder-api service was successfully loaded
-hab-sup(MN): The habitat/builder-api-proxy service was successfully loaded
-hab-sup(MN): The habitat/builder-originsrv service was successfully loaded
-hab-sup(MN): The habitat/builder-sessionsrv service was successfully loaded
+hab-sup(AG): The habitat/builder-datastore service was successfully loaded
+hab-sup(AG): The habitat/builder-minio service was successfully loaded
+hab-sup(AG): The habitat/builder-memcached service was successfully loaded
+hab-sup(AG): The habitat/builder-api service was successfully loaded
+hab-sup(AG): The habitat/builder-api-proxy service was successfully loaded
 ```
 
 Do a `hab svc status` to check the status of all the services. They may take a few seconds to all come up.
@@ -216,11 +213,21 @@ Next, generate a Personal Access Token for bootstrapping the `core` packages, as
 
 Select your Gravatar icon on the top right corner of the Chef Habitat Builder on-prem web page, and then select **Profile**. This will take you to a page where you can generate your access token. Make sure to save it securely.
 
-## Bootstrap `core` packages
+## Bootstrap Builder with Habitat Packages
 
 *Important*: Create a `core` origin before starting this process. The process will fail without first having a `core` origin.
 
-Chef Habitat Builder on-prem has no pre-installed packages. To bootstrap a set of stable `core` origin packages (refer to the [core-plans repo](https://github.com/habitat-sh/core-plans)), you can do the following:
+Chef Habitat Builder on-prem has no pre-installed package sets. You must populate your Builder instance by uploading packages.
+With Habitat *0.88.0*, two new commands were introduced to assist in bootstrapping an on-prem Builder instance with a set of stable packages:
+
+1. *hab pkg download*
+1. *hab pkg bulkupload*
+
+As you can see from the commands above, the package Bootstrap flow is comprised of two major tasks: a download from the public [SaaS Builder](https://bldr.habitat.sh) followed by a bulkupload to your on-prem Builder instance(s). Historically, we bootstraped on-prem-builders by downloading all the packages in 'core' for all targets. That amounted to ~15GB and was both too much and too little, in that many of the packages weren't needed, and for many patterns (effortless) other origins were needed.
+
+The [new bootstrap process flow](https://forums.habitat.sh/t/populating-chef-habitat-builder-on-prem/1228) allows you to easily customize your Bootstrap package set or use pre-populated [Starter Kit](https://github.com/habitat-sh/on-prem-builder/tree/master/quickstart_lists) files, which should amount to substantially less time and resource waste.
+
+The following section illustrates the steps required to bootstrap the on-prem Builder with the [Effortless Linux](https://github.com/habitat-sh/on-prem-builder/blob/master/quickstart_lists/effortless_x86_64-linux_stable) starter kit. Simply repeat the following download/bulkupload flow for the starter kits you think you will need to have in your on-prem Builder, or create your own custom starter kit file:
 
 1. Export your Personal Access Token as `HAB_AUTH_TOKEN` to your environment
 
