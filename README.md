@@ -229,9 +229,10 @@ With Habitat *0.88.0*, two new commands were introduced to assist in bootstrappi
 
 As you can see from the commands above, the package Bootstrap flow is comprised of two main phases: a download from the public [SaaS Builder](https://bldr.habitat.sh) followed by a bulkupload to your on-prem Builder instance(s). Historically, we bootstraped on-prem-builders by downloading all the packages in 'core' for all targets. That amounted to ~15GB and was both too much and too little, in that many of the packages weren't needed, and for many patterns (effortless) other origins were needed.
 
-The [new bootstrap process flow](https://forums.habitat.sh/t/populating-chef-habitat-builder-on-prem/1228) allows you to easily customize your Bootstrap package set or use pre-populated [Starter Kit](https://github.com/habitat-sh/on-prem-builder/tree/master/quickstart_lists) files, which should amount to substantially less time and resource waste.
+The [new bootstrap process flow](https://forums.habitat.sh/t/populating-chef-habitat-builder-on-prem/1228) allows you to easily customize your Bootstrap package set or use pre-populated [Starter Kit](https://github.com/habitat-sh/on-prem-builder/tree/master/quickstart_lists) files.
 
 The following section illustrates the steps required to bootstrap the on-prem Builder with the [Effortless Linux](https://github.com/habitat-sh/on-prem-builder/blob/master/quickstart_lists/effortless_x86_64-linux_stable) starter kit. Simply repeat the following download/bulkupload flow for the starter kits you think you will need to have in your on-prem Builder, or even create your own custom starter kit file:
+
 
 1. Phase 1: download
     ```bash
@@ -239,8 +240,11 @@ The following section illustrates the steps required to bootstrap the on-prem Bu
     cd on-prem-builder
     hab pkg download --target x86_64-linux --channel stable --file quickstart_lists/effortless_x86_64-linux_stable --download-directory builder_bootstrap
     ```
+
 1. Phase 2: bulkupload
-*Important*: Inspect the contents of the `builder_bootstrapi/artifacts` directory created from the download command above. For each of the origins (`core`, `effortless`, etc),  create a matching origin name if one doesn't exist already in the on-prem Builder UI before starting the bulkupload.
+
+     **Important**: Inspect the contents of the `builder_bootstrapi/artifacts` directory created from the download command above. For each of the origins (`core`, `effortless`, etc),  create a matching origin name if one doesn't exist already in the on-prem Builder UI before starting the bulkupload.
+
     ```bash
     export HAB_AUTH_TOKEN=<your _on-prem_ Builder instance token>
     hab pkg bulkupload --url https://your-builder.tld --channel stable builder_bootstrap/
