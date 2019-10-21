@@ -1,0 +1,22 @@
+.detail {
+  .detail-title {
+    font-weight: $bold;
+  }
+
+  .detail-body {
+    ol {
+      margin-left: rem-calc(4px);
+    }
+
+    ul {
+      @include reset-ul();
+
+      margin-left: 0px;
+      margin-bottom: 1rem;
+
+      li {
+        margin-bottom: rem-calc(4px);
+      }
+    }
+  }
+}

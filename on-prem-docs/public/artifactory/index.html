@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+<meta http-equiv="x-ua-compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Artifactory</title>
+<link rel="shortcut icon" type="image/png" href="/images/favicon.ico" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css" />
+
+  <link rel="stylesheet" href="/css/chef-sh.css" />
+</head>
+
+<body>
+  <div class="off-canvas-wrapper has-sidebar">
+    <div class="off-canvas-content" data-off-canvas-content>
+      <div class="cell small-12">
+        <nav id="utility-bar" class="utility-bar" data-toggler="active">
+  <div class="grid-container">
+    <div class="grid-x align-right">
+      <div class="cell medium-7 utility-bar-wrapper text-right">
+        <button type="button" class="utility-bar-button" data-toggle="utility-bar">
+          <span class="show-for-medium">Explore the <span class="chef-logo"><span class="sr-only">Chef</span></span> Automation Portfolio</span>
+          <span class="show-for-small-only">Chef Automation</span>
+          <span class="arrow"><span class="sr-only">Expand</span></span>
+        </button>
+        <div class="utility-bar-content text-left">
+          <div class="grid-x">
+            <div class="oss-projects grid-x" data-equalizer>
+              <div class="cell medium-4">
+                <a href="https://chef.sh">
+                  <div data-equalizer-watch><img src="/images/chef-logo.svg" alt="Chef" width="131" class="chef"></div>
+                  <p>Ensure configurations are applied consistently in every environment, at any scale.</p>
+                </a>
+              </div>
+              <div class="cell medium-4">
+                <a href="https://inspec.io">
+                  <div data-equalizer-watch><img src="/images/inspec-logo.svg" alt="Inspec" width="133" class="inspec"></div>
+                  <p>Automate the validation of compliance and security in any environment, on any platform.</p>
+                </a>
+              </div>
+              <div class="cell medium-4">
+                <a href="https://habitat.sh">
+                  <div data-equalizer-watch><img src="/images/habitat-logo.svg" alt="Habitat" width="111" class="habitat"></div>
+                  <p>Automate the process of building, deploying, and managing any application in any environment.</p>
+                </a>
+              </div>
+            </div>
+            <div class="automate cell small-12">
+              <div class="cell small-12">
+                <a href="https://automate.chef.io" class="with-arrow-button">
+                  <img src="/images/chef-automate-logo.svg" alt="Chef Automate" width="217" class="chef-automate">
+                  <p>Build, deploy, and manage faster, more efficiently, and with less risk with Chef Automate, the continuous automation platform.</p>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+      </div>
+      <div id="menu" class="cell small-12" data-sticky-container>
+        
+
+<nav data-sticky class="sticky" style="min-width:100%;" data-check-every="0" data-sticky-on="small" data-margin-top="0" data-top-anchor="utility-bar:bottom">
+  <header>
+    <div class="grid-container">
+      <div class="grid-x">
+        <div id="header-logo" class="cell large-3 small-11">
+          <a href="/"><img src="/images/chef-logo.svg" alt="Chef Habitat Builder on-prem documentation"></a>
+        </div>
+        <div id="header-toggle" data-responsive-toggle="header-menu" data-hide-for="large" class="cell small-1">
+          <div class="valign-small">
+            <button type="button" data-toggle="header-menu" aria-label="Menu"><i aria-hidden="true" class="fas fa-bars fa-lg"></i></button>
+          </div>
+        </div>
+        <div id="header-menu" class="cell large-9 small-12">
+          <ul class="vertical medium-horizontal menu">
+            
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </header>
+</nav>
+
+      </div>
+      <div id="main-content" class="cell small-12" data-sticky-container>
+        <div class="grid-container">
+          <div class="grid-x">
+            <div class="cell medium-3 col-sidebar">
+              
+
+
+<aside class="sticky" data-sticky data-anchor="main-content-col" data-margin-top="4" data-margin-bottom="2">
+  <nav id="sidebar-nav">
+    
+    
+    <div class="nav">
+      <ul class="vertical menu accordion-menu" data-accordion-menu>
+        
+      </ul>
+    </div>
+  </nav>
+</aside>
+
+            </div>
+            <div id="main-content-col" class="cell medium-9 col-content">
+              
+<h1>Artifactory</h1>
+<div class="prose">
+  
+
+<h1 id="using-artifactory-as-the-object-store-alpha">Using Artifactory as the object store (Alpha)</h1>
+
+<p>If you are interested in using an existing instance of Artifactory as your object store instead of Minio,
+we are providing this capability as an early preview/alpha for testing.</p>
+
+<p>To set this up, you will need to have the following:</p>
+
+<ul>
+<li>Know the URL to the Artifactory instance</li>
+<li>Know (or generate) an API key to authenticate to the instance</li>
+<li>Create a repo for the Habitat artifacts</li>
+</ul>
+
+<p>Once you have the above, modify the your <code>bldr.env</code> based on the same config in <code>bldr.env.sample</code> in order to enable Artifactory.</p>
+
+<p>Once you have <code>bldr.env</code> updated, you can do an install normally using the <code>install.sh</code> script.</p>
+
+<p>After logging into the Depot Web UI and creating your origins, you can try uploading some packages and check your Artifactory instance to ensure that they are present in the repo you specified.</p>
+
+<p>If you run into any issues, please see the Support section below.</p>
+
+<h2 id="running-a-local-artifactory">Running a local Artifactory</h2>
+
+<p>If you just want to do a quick test, you can also run a local Artifactory instance. In order to do that, you can do the following:</p>
+<div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo hab svc load core/artifactory</code></pre></div>
+<p>This will spin up an Artifactory instance, and you can use the following to log in: <a href="http://localhost:8081/artifactory/webapp/#/home">http://localhost:8081/artifactory/webapp/#/home</a></p>
+
+</div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="footer" class="cell small-12">
+        <div class="grid-x">
+          <div class="cell small-12">
+            <nav>
+              
+<footer>
+  <div class="grid-container">
+    <div class="grid-x align-middle">
+      <div class="cell small-12 large-3 logo"><a href="/"><img src="/images/chef-logo-light.svg" alt="Chef Habitat Builder on-prem documentation"></a></div>
+      <div class="cell small-12 large-9">
+        <ul class="menu vertical medium-horizontal">
+          <li><a href="https://www.chef.io/online-master-agreement/" target="_blank">Licensing</a></li>
+          <li><a href="https://www.chef.io/terms-of-service/" target="_blank">Terms &amp; Conditions</a></li>
+          <li><a href="https://www.chef.io/trademark-policy/" target="_blank">Trademark Policy</a></li>
+          <li><a href="https://www.chef.io/privacy-policy/" target="_blank">Privacy Policy</a></li>
+          <li><a href="https://www.chef.io/cookie-policy/" target="_blank">Cookie Policy</a></li>
+        </ul>
+        <p class="legal">&copy; 2008-2019 Chef Software, Inc. All Rights Reserved.</p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="/js/scripts-all.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
+  <script type="text/javascript">
+    docsearch({
+      apiKey: '3f16191e15b2b4a4b0823c9f856e2de2',
+      indexName: 'chef_sh',
+      inputSelector: '#doc-search',
+      debug: false 
+    });
+  </script>
+</body>
+</html>

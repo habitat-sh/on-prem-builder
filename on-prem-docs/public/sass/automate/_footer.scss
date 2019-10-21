@@ -1,0 +1,40 @@
+#footer {
+  background-color: $charcoal;
+  padding-top: 60px;
+	padding-bottom: 60px;
+
+	h5 {
+		color: $orange;
+		font-size: rem-calc(20px);
+		margin-bottom: rem-calc(10px);
+
+		@include breakpoint(large down){
+			font-size: rem-calc(16px);
+		}
+	}
+
+	ul {
+		@include reset-ul();
+		line-height: 1;
+		margin-bottom: rem-calc(25px);
+
+		li {
+			line-height: 1;
+			margin-bottom: rem-calc(15px);
+
+			@include breakpoint(large down){
+				margin-bottom: rem-calc(10px);
+			}
+
+			a {
+				color: $footer-text;
+				line-height: 1.375;
+
+				@include breakpoint(large down){
+					font-size: rem-calc(14px);
+					line-height: 1;
+				}
+			}
+		}
+	}
+}

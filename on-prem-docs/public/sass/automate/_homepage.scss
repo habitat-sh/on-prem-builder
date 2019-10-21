@@ -1,0 +1,40 @@
+#hero {
+  @include bg-cover();
+  background-image: url("/images/automate_hero@2x.jpg");
+
+  &.mini {
+    > .grid-container {
+      @include breakpoint(small) {
+        padding: rem-calc(10px 10px);
+      }
+
+      @include breakpoint(medium){
+        padding: rem-calc(15px 0);
+      }
+
+      @include breakpoint(large){
+        padding: rem-calc(30px 0);
+      }
+    }
+  }
+
+  > .grid-container {
+    @include breakpoint(small) {
+      padding: rem-calc(45px 10px);
+    }
+
+    @include breakpoint(medium){
+      padding: rem-calc(80px 0);
+    }
+
+    @include breakpoint(large){
+      padding: rem-calc(120px 0);
+    }
+  }
+
+  h1 {
+    text-shadow: 0 2px 4px rgba(66,66,66,1);
+  }
+}
+
+@import "homepage/hero_nav";

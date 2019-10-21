@@ -1,0 +1,341 @@
+nav {
+  $main-nav-z: 9990;
+  $menu-z: 9989;
+
+  // We need the main nav to sit atop just about everything else.
+  // Tooltips and things that need to float over the nav should
+  // use z-index greater than the value specified here.
+  &.sticky {
+    z-index: 9990;
+  }
+
+  &.is-stuck {
+    @include transition();
+
+    header {
+      border-bottom: 1px solid $sidebargray;
+      box-shadow: 0px 0px 10px rgba(0,0,0,0.25);
+      z-index: 2;
+
+      #header-logo {
+        img {
+          @include transition();
+          padding: 4px 0;
+          width: 90px;
+          margin-top: 2px;
+        }
+      }
+    }
+  }
+
+  header {
+    background-color: $white;
+
+    #header-logo {
+      img {
+        padding: 24px 0;
+        width: 121px;
+      }
+    }
+
+    #header-menu {
+      position: relative;
+
+      @include breakpoint(medium) {
+        position: static;
+      }
+
+      ul.menu {
+        li {
+          text-transform: uppercase;
+          position: relative;
+
+          @include breakpoint(medium) {
+            &::before {
+              @include transition();
+              content: "";
+              height: 8px;
+              background: $blue;
+              display: block;
+              position: absolute;
+              top: auto;
+              width: 0;
+              margin: 0;
+              padding: 0;
+              bottom: 25%;
+            }
+
+            &:hover {
+              &::before {
+                width: 100%;
+              }
+            }
+          }
+        }
+
+        a {
+          // Override Foundation Defaults to get the styling we want
+          background-color: $white !important;
+          padding: 8px 0;
+
+          color: $body-font-color;
+          font-weight: $regular;
+          font-size: 14px;
+
+          &:hover {
+            opacity: 1;
+            color: $body-font-color;
+          }
+        }
+      }
+
+      @include breakpoint(small only) {
+        padding-bottom: rem-calc(24);
+
+        ul.menu {
+          margin: 0;
+
+          li {
+            &.active {
+              a {
+                border-left: 3px solid $blue;
+              }
+            }
+          }
+
+          a {
+            border-left: 3px solid $white;
+          }
+        }
+      }
+
+      .menu-items {
+        @include transition();
+        left: 0;
+
+        @include breakpoint(medium) {
+          a {
+            i {
+              display: none;
+            }
+          }
+        }
+      }
+
+      .menu-content {
+        @include transition();
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: 100%;
+        background-color: #ebeef0;
+        opacity: 0;
+        font-size: 15px;
+        z-index: $menu-z;
+        width: 100%;
+        overflow: scroll;
+
+        h4 {
+          font-size: 20px;
+        }
+
+        .back {
+          text-transform: uppercase;
+          font-size: 12px;
+          border-bottom: 1px solid #ddd;
+        }
+
+        .item {
+          position: absolute;
+          top: 42px;
+        }
+
+        @include breakpoint(small only) {
+          width: calc(100% + 20px);
+          margin-left: -10px;
+          padding: 0 10px;
+          background-color: #ebeef0;
+
+          .grid-container {
+            padding-right: 0;
+            padding-left: 0;
+            max-width: 100%;
+            margin: 0 auto;
+          }
+        }
+
+        img.logo {
+          display: block;
+          margin-bottom: 16px;
+
+          &.automate {
+            height: 20px;
+          }
+
+          &.chef {
+            height: 44px;
+            margin-top: auto;
+          }
+
+          &.inspec {
+            height: 36px;
+          }
+
+          &.habitat {
+            height: 22px;
+          }
+        }
+
+        @include breakpoint(medium) {
+          right: 0;
+          left: 0;
+
+          .back {
+            display: none;
+          }
+
+          .grid-container {
+            position: relative;
+          }
+
+          .item {
+            @include transition();
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: auto;
+
+            &:not(.empty) {
+              padding: 20px 0;
+            }
+
+            img.logo {
+
+              &.chef {
+                height: 44px;
+                margin-top: -8px;
+              }
+
+              &.inspec {
+                margin-top: -10px;
+              }
+
+              &.habitat {
+                height: 22px;
+              }
+            }
+
+            .cell {
+              &:not(:first-child) {
+                padding-left: 24px;
+                border-left: 1px solid $white;
+              }
+            }
+          }
+        }
+
+        ul.links {
+          list-style-type: none;
+          margin-left: 0;
+
+          a {
+            font-weight: $bold;
+
+            &:before {
+              @include fa-icon;
+              @extend .fas;
+              content: fa-content($fa-var-angle-right);
+              margin-right: 5px;
+              font-size: 13px;
+              font-weight: $bold;
+              vertical-align: inherit;
+            }
+          }
+        }
+      }
+
+      @include breakpoint(medium) {
+        ul.menu {
+          height: 100%;
+          float: right;
+
+          li {
+            text-transform: uppercase;
+            margin-right: rem-calc(30px);
+
+            &:last-child {
+              margin-right: 0px;
+            }
+
+            &.active {
+              position: relative;
+
+              &:after {
+                content: "";
+                height: 3px;
+                width: 100%;
+                background-color: $blue;
+                position: absolute;
+                bottom: 0;
+                left: 0;
+              }
+            }
+
+            a {
+              // Override Foundation Defaults to get the styling we want
+              top: 50%;
+              position: relative;
+              transform: translateY(-50%);
+              padding: 0 !important;
+            }
+          }
+        }
+      }
+    }
+
+    #header-toggle {
+      text-align: right;
+
+      button {
+        cursor: pointer;
+      }
+    }
+  }
+
+  &.open {
+
+    header {
+      @include transition();
+      background-color: #ebeef0;
+
+      #header-menu > .menu-items > li > a {
+        @include transition(background-color);
+        background-color: #ebeef0 !important;
+      }
+    }
+
+    #header-menu {
+
+      .menu-items {
+        left: -100%;
+      }
+
+      .menu-content {
+        left: 0;
+        opacity: 1;
+      }
+
+      @include breakpoint(medium) {
+        left: auto;
+
+        .menu-items {
+          left: auto;
+        }
+
+        .menu-content {
+          left: auto;
+        }
+      }
+    }
+  }
+}
