@@ -272,7 +272,7 @@ upload_keys() {
 }
 
 bucket="${HAB_ON_PREM_BOOTSTRAP_BUCKET_NAME:-habitat-on-prem-builder-bootstrap}"
-s3_root_url="${HAB_ON_PREM_BOOTSTRAP_S3_ROOT_URL:-https://s3-us-west-2.amazonaws.com}/$bucket"
+s3_root_url="${HAB_ON_PREM_BOOTSTRAP_S3_ROOT_URL:-https://on-prem-archive.habitat.sh}"
 marker="LATEST.tar.gz"
 declare -a packages
 
