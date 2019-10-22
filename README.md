@@ -182,14 +182,15 @@ In order to install the on-prem Chef Habitat Builder in an airgapped (no direct 
 1. Import the public package signing keys from the downloaded Builder starter kit:
 
      ```bash
-     for file in $(ls ${DOWNLOAD_DIR}/builder_starter_kit/keys/*pub); do cat $file | sudo hab origin key import; done
+     export UNZIP_DIR=/some/base/unzip/directory
+     for file in $(ls ${UNZIP_DIR}/builder_starter_kit/keys/*pub); do cat $file | sudo hab origin key import; done
      ```
 
 1. Create a Habitat artifact cache directory, place the Builder starter kit .hart packages into that directory and then pre-install the Builder Services:
 
      ```bash
      sudo mkdir -p /hab/cache/artifacts
-     sudo mv ${DOWNLOAD_DIR}/builder_starter_kit/artifacts/*hart /hab/cache/artifacts
+     sudo mv ${UNZIP_DIR}/builder_starter_kit/artifacts/*hart /hab/cache/artifacts
      sudo hab pkg install /hab/cache/artifacts/habitat-builder*hart
      ```
 
