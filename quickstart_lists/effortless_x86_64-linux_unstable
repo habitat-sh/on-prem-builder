@@ -1,6 +1,1 @@
-# Download via:
-# hab pkg download --target=x86_64-linux --channel=unstable
-#
-# Packages for effortless infra on linux
-# This is broken into two parts, as the full set of effortless deps aren't in stable
 effortless/config-baseline

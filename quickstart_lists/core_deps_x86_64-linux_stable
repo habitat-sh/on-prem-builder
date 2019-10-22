@@ -1,9 +1,3 @@
-# Download via:
-# hab pkg download --target=x86_64-linux --channel=stable --file=THISFILE
-#
-# This is the packages listed as a tdep or build dep of another package in core for linux
-# Its intended as good starting point for building packages 
-#
 core/acbuild
 core/acl
 core/airlock

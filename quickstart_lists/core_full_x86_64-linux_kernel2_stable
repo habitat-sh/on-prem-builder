@@ -1,7 +1,3 @@
-# Download via:
-# hab pkg download --target=x86_64-linux-kernel2 --channel=stable --file=THISFILE
-#
-# This is the 'kitchen sink'; all packages for the linux-kernel2 architecture
 core/acl
 core/attr
 core/autoconf

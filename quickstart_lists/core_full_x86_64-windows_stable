@@ -1,9 +1,3 @@
-# Download via:
-# hab pkg download --target=x86_64-windows --channel=stable --file=THISFILE
-#
-# This is the 'kitchen sink'; all packages for the windows architecture
-# About 3.5 GB as of 2019-10-13
-#
 core/7zip
 core/asciinema
 core/aspnet-mvc1

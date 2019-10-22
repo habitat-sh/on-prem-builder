@@ -1,9 +1,3 @@
-# Download via:
-# hab pkg download --target=x86_64-linux --channel=stable --file=THISFILE
-#
-# Packages required to install on-prem-builder
-#
-#
 core/hab
 core/hab-sup
 core/hab-launcher
