@@ -120,7 +120,7 @@ The package artifacts will be stored in your Minio instance by default, typicall
 
 If you need to add additional storage, it is recommended that you create a mount at `/hab` and point it to your external storage. This is not required if you already have sufficient free space.
 
-*Note*: If you would prefer to Artifactory instead of Minio for the object storage, please see the [Artifactory](artifactory.md) documentation.
+*Note*: If you would prefer to use Artifactory instead of Minio for the object storage, please see the [Artifactory](artifactory.md) documentation.
 
 ### Procuring SSL certificate (Recommended)
 
@@ -145,38 +145,51 @@ sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/privat
 In order to install the on-prem Chef Habitat Builder in an airgapped (no direct Internet access) environment, the following preparatory steps are helpful:
 
 1. Download the [Zip archive](https://github.com/habitat-sh/on-prem-builder/archive/master.zip) of the on-prem-builder repo
+
     ```bash
     curl -LO https://github.com/habitat-sh/on-prem-builder/archive/master.zip
     ```
+
 1. Download the Chef Habitat [cli tool](https://api.bintray.com/content/habitat/stable/linux/x86_64/hab-%24latest-x86_64-linux.tar.gz?bt_package=hab-x86_64-linux)
+
     ```bash
     curl -Lo hab.tar.gz https://api.bintray.com/content/habitat/stable/linux/x86_64/hab-%24latest-x86_64-linux.tar.gz?bt_package=hab-x86_64-linux
     ```
+
 1. Create the Habitat Builder starter kit bundle and download it
+
      ```bash
      git clone https://github.com/habitat-sh/on-prem-builder.git
      export DOWNLOAD_DIR=/some/base/download/directory
      cd on-prem-builder
      hab pkg download --target x86_64-linux --channel stable --file quickstart_lists/builder_x86_64-linux_stable --download-directory ${DOWNLOAD_DIR}/builder_starter_kit
      ```
+
 1. Create any additional starter kit Builder bootstrap bundles as documented in the [Bootstrap Builder](https://github.com/habitat-sh/on-prem-builder/tree/master#bootstrap-builder-with-habitat-packages) section of this README. You can specify `--download-directory ${DOWNLOAD_DIR}/builder_bootstrap` argument to the download command in order to consolidate all bootstrap packages in a single directory
 1. Zip up all the above, transfer and unzip on the Linux system where Builder will be deployed
-1. From the zip archive, install the `hab` binary somewhere in $PATH and ensure it has execute permissions
+1. From the zip archive, install the `hab` binary somewhere in $PATH and ensure it has execute permissions:
+
      ```bash
      sudo chmod 755 /usr/bin/hab
      sudo hab # read the license and accept if in agreement, as the root user
      ```
-1. Import the public package signing keys from the downloaded Builder starter kit
+
+1. Import the public package signing keys from the downloaded Builder starter kit:
+
      ```bash
      for file in $(ls ${DOWNLOAD_DIR}/builder_starter_kit/keys/*pub); do cat $file | sudo hab origin key import; done
      ```
-1. Create a Habitat artifact cache directory, place the Builder starter kit .hart packages into that directory and then pre-install the Builder Services
+
+1. Create a Habitat artifact cache directory, place the Builder starter kit .hart packages into that directory and then pre-install the Builder Services:
+
      ```bash
      sudo mkdir -p /hab/cache/artifacts
      sudo mv ${DOWNLOAD_DIR}/builder_starter_kit/artifacts/*hart /hab/cache/artifacts
      sudo hab pkg install /hab/cache/artifacts/habitat-builder*hart
      ```
-1. Pre-install the Habitat Supervisor and its dependencies
+
+1. Pre-install the Habitat Supervisor and its dependencies:
+
      ```bash
      sudo hab pkg install --binlink --force /hab/cache/artifacts/core-hab-*hart
      ```
@@ -242,8 +255,8 @@ The [new bootstrap process flow](https://forums.habitat.sh/t/populating-chef-hab
 
 The following section illustrates the steps required to bootstrap the on-prem Builder with the [Effortless Linux](https://github.com/habitat-sh/on-prem-builder/blob/master/quickstart_lists/effortless_x86_64-linux_stable) starter kit. Simply repeat the following download/bulkupload flow for the starter kits you think you will need to have in your on-prem Builder, or even create your own custom starter kit file:
 
-
 1. Phase 1: download
+
     ```bash
     export HAB_AUTH_TOKEN=<your_public_Builder_instance_token>
     cd on-prem-builder
@@ -337,16 +350,16 @@ Backing up Builder's PostgreSQL database is the same as for any PostgreSQL datab
         `hab svc stop habitat/builder-api`
 1. Switch to user `hab`
         `sudo su - hab`
-1. Find your Postgres password 
+1. Find your Postgres password
         `sudo cat /hab/svc/builder-api/config/config.toml`
-1. Export as envvar 
+1. Export as envvar
         `export PGPASSWORD=<pw>`
-1. Run pgdump 
+1. Run pgdump
         `/hab/pkgs/core/postgresql/<version>/<release>/bin/pg_dump --file=builder.dump --format=custom --host=<ip_of_pg_host> --dbname=builder`
-1. Start the api and verify 
+1. Start the api and verify
         `sudo hab svc start habitat/builder-api`
 
-Once the backup finishes,  your will find it as the `builder.dump` file on your filesystem. Move and store this file according to your local policies. We recommend storing it remotely--either physically or virtually--so it will be useable in a worst-case scenario. For most, storing the dump file in an AWS bucket or Azure storage is enough, but you should follow the same strategy for all database backups. 
+Once the backup finishes,  your will find it as the `builder.dump` file on your filesystem. Move and store this file according to your local policies. We recommend storing it remotely--either physically or virtually--so it will be useable in a worst-case scenario. For most, storing the dump file in an AWS bucket or Azure storage is enough, but you should follow the same strategy for all database backups.
 
 #### Database Restore
 
@@ -366,16 +379,18 @@ Restoring a `builder` database is exactly like restoring any other database--whi
         `/hab/pkgs/core/postgresql/<version>/<release>/bin/pg_restore --host=<url_of_pg_host> --dbname=builder builder.dump`
 1. Start the on-prem Builder services
 
-        * In some cases your version of Postgres might not have a createdb binary in which case you'll want to connect to database to run the create db command
+    > note: In some cases your version of Postgres might not have a createdb binary in which case you'll want to connect to database to run the create db command.
 
-Just like that your database data should be restored and ready for new transactions!
+Just like that, your database data should be restored and ready for new transactions!
 
 #### Artifact Backups
+
 The process of artifact backups is quite a bit more environmentally subjective than Postgres if only because we support more than one artifact storage backend. For the sake of these docs we will focus on Minio backups.
 
 Backing up Minio is also a bit subjective but more or less amounts to a filesystem backup. Because Minio stores its files on the filesystem  (unless you're using a non-standard configuration) any filesystem backup strategy you want to use should be fine whether thats disk snapshotting of some kind or data  mirroring, and rsync. Minio however also has the [minio client](https://docs.min.io/docs/minio-client-quickstart-guide.html) which provides a whole boatload of useful features and specifically allows the user to mirror a bucket to an alternative location on the filesystem or even a remote S3 bucket! Ideally you should _never_ directly/manually manipulate the files within Minio's buckets while it could be performing IO. Which means you should _always_ use the Minio client mentioned above to manipulate Minio data.
 
 A simple backup strategy might look like this:
+
 1. Shut down the API to ensure no active transactions are occuring. (Optional but preferred)
         `hab svc stop habitat/builder-api`
 1. Mirror Minio data to an AWS S3 bucket. **
@@ -383,14 +398,9 @@ A simple backup strategy might look like this:
 ** Another option here is to mirror to a different part of the filesystem, perhaps one that's NFS mounted or the like and then snapshotting it:
         `mc mirror <local/minio/object/dir> <new/local/path>
 
-
 As mentioned before since this operation could be dramatically different for different environments Minio backup cannot be 100% prescriptive. But This should give you some ideas to explore.
 
 What's more, in the case that you're using Artifactory as the artifact store we would highly recommend reading [Artifactory's thoughts on back-ups](https://jfrog.com/whitepaper/best-practices-for-artifactory-backups-and-disaster-recovery/)
-
-## Support
-
-You can also post any questions or issues on the [Habitat Forum](https://forums.habitat.sh/), on our [Slack channel](https://habitat-sh.slack.com), or file issues directly at the [Github repo](https://github.com/habitat-sh/on-prem-builder/issues).
 
 ## Troubleshooting
 
@@ -434,6 +444,7 @@ If you are not able to log in, please double check the settings that you have co
 You were able to sign in to the authentication provider, but unable to authenticate with Chef Habitat's OAuth token.
 
 Open the `bldr.env` and verify that:
+
 * **APP_URL** ends with "/\"
 * **OAUTH_REDIRECT_URL** ends with "/\"
 * **OAUTH_CLIENT_ID** is complete and correct
@@ -604,6 +615,7 @@ Copyright (c) 2018 Chef Software Inc. and/or applicable contributors
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0) at `http://www.apache.org/licenses/LICENSE-2.0)`
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+
 ## Support
 
 You can also post any questions or issues on the [Habitat Forum](https://forums.habitat.sh/), on our [Slack channel](https://habitat-sh.slack.com), or file issues directly at the [Github repo](https://github.com/habitat-sh/on-prem-builder/issues).
