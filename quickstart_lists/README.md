@@ -1,15 +1,25 @@
-This directory contains 'starter lists' of packages for bootstrapping and syncing on-prem-builders.
+# Habitat seed lists
 
-Background: Historically we bootstraped on-prem-builders by downloading all the packages in 'core'
+
+Historically we bootstraped on-prem-builders by downloading all the packages in 'core'
 for all targets. That amounted to about 15GB, and was both too much and too little, in that many of
 the packages weren't needed, and for many patterns (effortless) other origins were needed.
 
-The basic naming pattern is TASK\_ARCH\_CHANNEL. This due to a limitation of the input file
+With the creation of the `hab pkg download` command a different approach is possible; you can start
+with a list of seed packages, and download them along with their transitive dependencies. Of course,
+the question now becomes 'what do I use for the seed'.
+
+This directory contains 'seed lists' of packages for bootstrapping and syncing on-prem-builders, for
+a number of different scenarios. 
+
+The basic file naming pattern is TASK\_ARCH\_CHANNEL. This due to a limitation of the input file
 format. The simple newline separated list of package idents doesn't allow for specification of
 channel or target architecture inline, so we're using a file naming convention to represent that
 information.
 
-The current tasks are
+# Scenarios
+
+The current scenarios are:
 * builder (setting up an on prem builder)
 * core_deps (a reduced starter set from core with common build time deps)
 * core_full (everything for a particular architecture)
@@ -20,7 +30,33 @@ from stable and once from unstable will be required.
 
 For example, to	get the	complete effortless infrastructure for linux,
 ```
-hab pkg download --download-directory download_pkgs --channel=unstable --target x86_64-linux  --file  quickstart_lists/effortless_x86_64-windows_unstab\
-le
-hab pkg download --download-directory download_pkgs --channel=stable --target x86_64-linux  --file  quickstart_lists/effortless_x86_64-windows_stable
+hab pkg download --download-directory download_pkgs --channel=unstable --target x86\_64-linux  --file  quickstart_lists/effortless_x86_64-linux_unstable
+hab pkg download --download-directory download_pkgs --channel=stable --target x86\_64-linux  --file  quickstart_lists/effortless_x86_64-linux_stable
 ```
+
+Current scenarios include:
+
+## effortless (effortless_ARCH_CHANNEL)
+
+These should provide all required packages for the various effortless patterns. They're broken out
+by architecture, and both stable and unstable are required for a complete effortless infrastructure.
+
+## Core full (core_full_ARCH_CHANNEL)
+
+These lists provide nearly all of the packages in core, broken down by architecture. Downloading
+these lists replicates the old process of downloading all of core, and is expensive in both download
+time and space. However, if you just want one of the architectures these do save substaintial
+amounts of space. The linux set expands to about 12 GB, while the windows and linux-kernel2 are
+about 3.5GB and 1GB respectively.
+
+## Core deps (core_deps_ARCH_CHANNEL)
+
+These are the packages listed as a tdep or build dep of another package in core for the architecture in
+It is intended as good starting point for building packages. 
+
+## builder (core_deps_x86_64-linux_stable)
+
+This should be just enough packages to get builder installed on your system. Currently builder only
+supports the x86_64-linux platform.
+
+
