@@ -145,34 +145,46 @@ sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/privat
 In order to install the on-prem Chef Habitat Builder in an airgapped (no direct Internet access) environment, the following preparatory steps are helpful:
 
 1. Download the [Zip archive](https://github.com/habitat-sh/on-prem-builder/archive/master.zip) of the on-prem-builder repo
+
+    ```bash
+    curl -LO https://github.com/habitat-sh/on-prem-builder/archive/master.zip
+    ```
+
 1. Download the Chef Habitat [cli tool](https://api.bintray.com/content/habitat/stable/linux/x86_64/hab-%24latest-x86_64-linux.tar.gz?bt_package=hab-x86_64-linux)
+
+    ```bash
+    curl -Lo hab.tar.gz https://api.bintray.com/content/habitat/stable/linux/x86_64/hab-%24latest-x86_64-linux.tar.gz?bt_package=hab-x86_64-linux
+    ```
+
 1. Create the Habitat Builder starter kit bundle and download it
 
      ```bash
      git clone https://github.com/habitat-sh/on-prem-builder.git
+     export DOWNLOAD_DIR=/some/base/download/directory
      cd on-prem-builder
-     hab pkg download --target x86_64-linux --channel stable --file quickstart_lists/builder_x86_64-linux_stable --download-directory ${HOME}/builder_starter_kit`
+     hab pkg download --target x86_64-linux --channel stable --file quickstart_lists/builder_x86_64-linux_stable --download-directory ${DOWNLOAD_DIR}/builder_starter_kit
      ```
 
-1. Create any additional starter kit Builder bootstrap bundles as documented in the [Bootstrap Builder](https://github.com/habitat-sh/on-prem-builder/tree/master#bootstrap-builder-with-habitat-packages) section of this README. You can specify `--download-directory ${HOME}/builder_bootstrap` argument to the download command in order to consolidate all bootstrap packages in a single directory
+1. Create any additional starter kit Builder bootstrap bundles as documented in the [Bootstrap Builder](https://github.com/habitat-sh/on-prem-builder/tree/master#bootstrap-builder-with-habitat-packages) section of this README. You can specify `--download-directory ${DOWNLOAD_DIR}/builder_bootstrap` argument to the download command in order to consolidate all bootstrap packages in a single directory
 1. Zip up all the above, transfer and unzip on the Linux system where Builder will be deployed
 1. From the zip archive, install the `hab` binary somewhere in $PATH and ensure it has execute permissions:
 
      ```bash
-     sudo chmod 755 /bin/hab
+     sudo chmod 755 /usr/bin/hab
+     sudo hab # read the license and accept if in agreement, as the root user
      ```
 
 1. Import the public package signing keys from the downloaded Builder starter kit:
 
      ```bash
-     for file in $(ls builder_starter_kit/keys/*pub); do cat $file | sudo hab origin key import; done
+     for file in $(ls ${DOWNLOAD_DIR}/builder_starter_kit/keys/*pub); do cat $file | sudo hab origin key import; done
      ```
 
 1. Create a Habitat artifact cache directory, place the Builder starter kit .hart packages into that directory and then pre-install the Builder Services:
 
      ```bash
      sudo mkdir -p /hab/cache/artifacts
-     sudo mv builder_start_kit/artifacts/*hart /hab/cache/artifacts
+     sudo mv ${DOWNLOAD_DIR}/builder_starter_kit/artifacts/*hart /hab/cache/artifacts
      sudo hab pkg install /hab/cache/artifacts/habitat-builder*hart
      ```
 
@@ -189,6 +201,7 @@ In order to install the on-prem Chef Habitat Builder in an airgapped (no direct 
 1. `cp bldr.env.sample bldr.env`
 1. Edit `bldr.env` with a text editor and replace the values appropriately. Consider helping us to improve Chef Habitat as well by changing the `ANALYTICS_ENABLED` setting to `true` and providing an optional company name.
 1. `./install.sh`
+1. `sudo systemctl restart hab-sup`
 
 If everything goes well, you should see output similar to the following showing that the Chef Habitat Builder on-prem services are loaded:
 
