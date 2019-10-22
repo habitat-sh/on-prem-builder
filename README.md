@@ -140,9 +140,11 @@ sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/privat
 
 *Important*: Make sure that the certificate files are named exactly `ssl-certificate.key` and `ssl-certificate.crt`. If you have procured the certificate from a different source, rename them to the prescribed filenames, and ensure that they are located in the same folder as the `install.sh` script. They will get uploaded to the Chef Habitat supervisor during the install.
 
-### Airgapped Installation (Recommended prep work, if airgapped)
+### Preparing for an Airgapped Installation (Recommended if applicable)
 
-In order to install the on-prem Chef Habitat Builder in an airgapped (no direct Internet access) environment, the following preparatory steps are helpful:
+In order to install the on-prem Chef Habitat Builder in an airgapped (no direct Internet access) environment, the following preparatory steps are helpful.
+
+> Note: Unless otherwise noted, the tasks are intended to be completed on a Non-Airgapped environment with Internet connectivity
 
 1. Download the [Zip archive](https://github.com/habitat-sh/on-prem-builder/archive/master.zip) of the on-prem-builder repo
 
@@ -166,7 +168,10 @@ In order to install the on-prem Chef Habitat Builder in an airgapped (no direct 
      ```
 
 1. Create any additional starter kit Builder bootstrap bundles as documented in the [Bootstrap Builder](https://github.com/habitat-sh/on-prem-builder/tree/master#bootstrap-builder-with-habitat-packages) section of this README. You can specify `--download-directory ${DOWNLOAD_DIR}/builder_bootstrap` argument to the download command in order to consolidate all bootstrap packages in a single directory
-1. Zip up all the above, transfer and unzip on the Linux system where Builder will be deployed
+1. Zip up all the above content, transfer and unzip on the Linux system where Builder will be deployed in the Airgapped environment
+
+> Note: The following tasks are intended to be completed on the Airgapped system where Builder will be deployed, in advance of the installation
+
 1. From the zip archive, install the `hab` binary somewhere in $PATH and ensure it has execute permissions:
 
      ```bash
@@ -196,10 +201,13 @@ In order to install the on-prem Chef Habitat Builder in an airgapped (no direct 
 
 ## Setup
 
-1. Clone this repo (or unzip the archive you have downloaded from the Github release page) at the desired machine where you will stand up the Chef Habitat Builder on-prem
+1. Clone this repo (or unzip the zip archive you previously downloaded from the Github release page) at the desired machine where you will stand up the Chef Habitat Builder on-prem
 1. `cd ${SRC_ROOT}`
 1. `cp bldr.env.sample bldr.env`
 1. Edit `bldr.env` with a text editor and replace the values appropriately. Consider helping us to improve Chef Habitat as well by changing the `ANALYTICS_ENABLED` setting to `true` and providing an optional company name.
+
+## Installation
+
 1. `./install.sh`
 1. `sudo systemctl restart hab-sup`
 
@@ -379,7 +387,7 @@ Restoring a `builder` database is exactly like restoring any other database--whi
         `/hab/pkgs/core/postgresql/<version>/<release>/bin/pg_restore --host=<url_of_pg_host> --dbname=builder builder.dump`
 1. Start the on-prem Builder services
 
-    > note: In some cases your version of Postgres might not have a createdb binary in which case you'll want to connect to database to run the create db command.
+    > Note: In some cases your version of Postgres might not have a createdb binary in which case you'll want to connect to database to run the create db command.
 
 Just like that, your database data should be restored and ready for new transactions!
 
