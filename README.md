@@ -167,7 +167,7 @@ In order to install the on-prem Chef Habitat Builder in an airgapped (no direct 
      hab pkg download --target x86_64-linux --channel stable --file quickstart_lists/builder_x86_64-linux_stable --download-directory ${DOWNLOAD_DIR}/builder_starter_kit
      ```
 
-1. Create any additional starter kit Builder bootstrap bundles as documented in the [Bootstrap Builder](https://github.com/habitat-sh/on-prem-builder/tree/master#bootstrap-builder-with-habitat-packages) section of this README. You can specify `--download-directory ${DOWNLOAD_DIR}/builder_bootstrap` argument to the download command in order to consolidate all bootstrap packages in a single directory
+1. Create any additional starter kit Builder bootstrap bundles as documented in the [Bootstrap Builder](https://github.com/habitat-sh/on-prem-builder/blob/master/README.md#bootstrap-builder-with-habitat-packages-new) section of this README. You can specify `--download-directory ${DOWNLOAD_DIR}/builder_bootstrap` argument to the download command in order to consolidate all bootstrap packages in a single directory
 1. Zip up all the above content, transfer and unzip on the Linux system where Builder will be deployed in the Airgapped environment
 
 > Note: The following tasks are intended to be completed on the Airgapped system where Builder will be deployed, in advance of the installation
