@@ -16,7 +16,13 @@ pygmentsCodefences = true
 name = "Getting started"
 weight = 10
 identifier = "getting-started"
-url = "/docs/getting-started"
+url = "/getting-started"
+
+[[menu.docs]]
+name = "Automate + Builder"
+weight = 50
+identifier = "builder-automate"
+url = "/docs/builder-automate"
 
 [[menu.docs]]
 name = "builder.toml"
