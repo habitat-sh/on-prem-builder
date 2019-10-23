@@ -140,9 +140,9 @@ sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/privat
 
 *Important*: Make sure that the certificate files are named exactly `ssl-certificate.key` and `ssl-certificate.crt`. If you have procured the certificate from a different source, rename them to the prescribed filenames, and ensure that they are located in the same folder as the `install.sh` script. They will get uploaded to the Chef Habitat supervisor during the install.
 
-### Preparing for an Airgapped Installation (Recommended if applicable)
+### Prerequisite Tasks for an Airgapped Installation (Required if applicable)
 
-In order to install the on-prem Chef Habitat Builder in an airgapped (no direct Internet access) environment, the following preparatory steps are helpful.
+In order to install the on-prem Chef Habitat Builder in an airgapped (no direct Internet access) environment, the following preparatory steps are required.
 
 > Note: Unless otherwise noted, the tasks are intended to be completed on a Non-Airgapped environment with Internet connectivity
 
@@ -170,7 +170,7 @@ In order to install the on-prem Chef Habitat Builder in an airgapped (no direct 
 1. Create any additional package bundles to upload to Builder from package seed lists as documented in the [Bootstrap Builder](https://github.com/habitat-sh/on-prem-builder/blob/master/README.md#bootstrap-builder-with-habitat-packages-new) section of this README. You can specify `--download-directory ${DOWNLOAD_DIR}/builder_bootstrap` argument to the download command in order to consolidate all bootstrap packages in a single directory
 1. Zip up all the above content, transfer and unzip on the Linux system where Builder will be deployed in the Airgapped environment
 
-> Note: The following tasks are intended to be completed on the Airgapped system where Builder will be deployed, in advance of the installation
+> Note: The following tasks are intended to be completed on the Airgapped system where Builder will be deployed, in advance of the [Installation](https://github.com/habitat-sh/on-prem-builder/blob/master/README.md#Installation).
 
 1. From the zip archive, install the `hab` binary somewhere in $PATH and ensure it has execute permissions:
 
@@ -208,6 +208,8 @@ In order to install the on-prem Chef Habitat Builder in an airgapped (no direct 
 1. Edit `bldr.env` with a text editor and replace the values appropriately. Consider helping us to improve Chef Habitat as well by changing the `ANALYTICS_ENABLED` setting to `true` and providing an optional company name.
 
 ## Installation
+
+> Note: If the on-prem Builder system is in an Airgapped (non-Internet connected) environment, you must first complete the [prerequisite](https://github.com/habitat-sh/on-prem-builder/blob/master/README.md#prerequisite-tasks-for-an-airgapped-installation-required-if-applicable) tasks detailed earlier.
 
 1. `./install.sh`
 1. `sudo systemctl restart hab-sup`
@@ -258,7 +260,7 @@ With Habitat *0.88.0*, two new commands were introduced to assist in bootstrappi
 1. *hab pkg download*
 1. *hab pkg bulkupload*
 
-As you can see from the commands above, the package Bootstrap flow is comprised of two main phases: a download from the public [SaaS Builder](https://bldr.habitat.sh) followed by a bulkupload to your on-prem Builder instance(s). Historically, we bootstraped on-prem-builders by downloading all the packages in 'core' for all targets. That amounted to ~15GB and was both too much and too little, in that many of the packages weren't needed, and for many patterns (effortless) other origins were needed.
+As you can see from the commands above, the package Bootstrap flow is comprised of two main phases: a download from the public [SaaS Builder](https://bldr.habitat.sh) followed by a bulkupload to your on-prem Builder instance(s). Historically, we bootstrapped on-prem-builders by downloading all the packages in 'core' for all targets. That amounted to ~15GB and was both too much and too little, in that many of the packages weren't needed, and for many patterns (effortless) other origins were needed.
 
 The [new bootstrap process flow](https://forums.habitat.sh/t/populating-chef-habitat-builder-on-prem/1228) allows you to easily customize your Bootstrap package set or use pre-populated [Package Seed Lists](https://github.com/habitat-sh/on-prem-builder/blob/master/package_seed_lists/README.md) files.
 
@@ -306,7 +308,9 @@ This is quite a lengthy process, so be patient. It will download a *large* (~ 14
 
 Please ensure that you have plenty of free disk space available for hosting the `core` packages as well as for managing your own packages. Updated packages install without deleting any existing packages, so plan disk space accordingly.
 
-## Synchronizing 'core' packages from an upstream
+## Synchronizing 'core' packages from an upstream (**Deprecated**)
+
+*Important*: This methodology is now deprecated in favor of the download/bulkupload flow described above.
 
 *Important*: Create a `core` origin before starting this process. The process will fail without first having a `core` origin.
 
