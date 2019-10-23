@@ -9,14 +9,15 @@ With the creation of the `hab pkg download` command a different approach is poss
 with a list of seed packages, and download them along with their transitive dependencies. Of course,
 the question now becomes 'what do I use for the seed'.
 
-This directory contains 'seed lists' of packages for bootstrapping and syncing on-prem-builders, for
-a number of different scenarios. 
+This directory contains sample 'seed lists' of packages for bootstrapping and syncing on-prem-builders, for
+a number of different scenarios.
 
-The basic file naming pattern is TASK\_ARCH\_CHANNEL. This due to a limitation of the input file
-format. The simple newline separated list of package idents doesn't allow for specification of
-channel or target architecture inline, so we're using a file naming convention to represent that
-information. We plan to improve on that experience, but for now keep
-it mind when building your own lists.
+The basic file naming pattern is TASK\_ARCH\_CHANNEL. The files are newline separated list of
+package identifiers. The contents are specific to a particular architecture and channel and the
+correct architecture and channel must be provided on the command line when running the `hab pkg
+download` command. The simple file format used doesn't allow for specification of channel or target
+architecture inline, so we're using a file naming convention to represent that information. We plan
+to improve on that experience, but for now keep it mind when building your own lists.
 
 # Scenarios
 
@@ -26,21 +27,21 @@ The current scenarios are:
 * core_full (everything for a particular architecture)
 * effortless (starter set for the effortless pattern)
 
-Each is	broken out by the architecture and channel required; to	complete some two downloads, once
+Each is broken out by the architecture and channel required; to complete some two downloads, once
 from stable and once from unstable will be required.
 
-For example, to	get the	complete Effortless infrastructure for Linux,
+For example, to get the complete Effortless infrastructure for Linux,
 ```
-hab pkg download --download-directory download_pkgs --channel=unstable --target x86\_64-linux  --file  quickstart_lists/effortless_x86_64-linux_unstable
-hab pkg download --download-directory download_pkgs --channel=stable --target x86\_64-linux  --file  quickstart_lists/effortless_x86_64-linux_stable
+hab pkg download --download-directory download_pkgs --channel=unstable --target x86\_64-linux  --file  package_seed_lists/effortless_x86_64-linux_unstable
+hab pkg download --download-directory download_pkgs --channel=stable --target x86\_64-linux  --file package_seed_lists/effortless_x86_64-linux_stable
 ```
 
 Current scenarios include:
 
 ## Effortless (effortless_ARCH_CHANNEL)
 
-These should provide all required packages for the various effortless patterns. They're broken out
-by architecture, and both stable and unstable are required for a complete effortless infrastructure.
+These should provide all required packages for the various Effortless patterns. They're broken out
+by architecture, and both stable and unstable are required for a complete Effortless infrastructure.
 
 See https://github.com/chef/effortless) for more details on the Effortless infrstructure pattern.
 
@@ -61,5 +62,3 @@ in It is intended as good starting point for building packages.
 
 This should be just enough packages to get builder installed on your system. Currently builder only
 supports the x86_64-linux platform.
-
-
