@@ -279,6 +279,8 @@ The following section illustrates the steps required to bootstrap the on-prem Bu
 
      **Important**: Inspect the contents of the `builder_bootstrap/artifacts` directory created from the download command above. For each of the origins (`core`, `effortless`, etc),  create the origin name if one doesn't exist already in the on-prem Builder UI before starting the bulkupload.
 
+    > Note: If your on-prem builder's SSL certificate was issued from an internal Public Key Infrastructure and not from a Publicly Trusted Certificate Authority, you will need to copy the SSL public key cert chain into `/hab/cache/ssl` locally on the system that is uploading packages to the on-prem Builder. This is described in more detail [here](https://blog.chef.io/chef-habitat-product-announcement-improved-tls-certificate-management/)
+
     ```bash
     export HAB_AUTH_TOKEN=<your_on-prem_Builder_instance_token>
     hab pkg bulkupload --url https://your-builder.tld --channel stable builder_bootstrap/
