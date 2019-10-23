@@ -158,7 +158,7 @@ In order to install the on-prem Chef Habitat Builder in an airgapped (no direct 
     curl -Lo hab.tar.gz https://api.bintray.com/content/habitat/stable/linux/x86_64/hab-%24latest-x86_64-linux.tar.gz?bt_package=hab-x86_64-linux
     ```
 
-1. Create the Habitat Builder package bundle from the package seed list and download it
+1. Create the Habitat Builder package bundle from the [Builder Seed List](https://github.com/habitat-sh/on-prem-builder/blob/master/package_seed_lists/builder_x86_64-linux_stable) package seed list and download it
 
      ```bash
      git clone https://github.com/habitat-sh/on-prem-builder.git
@@ -271,6 +271,7 @@ The following section illustrates the steps required to bootstrap the on-prem Bu
     cd on-prem-builder
     hab pkg download --target x86_64-linux --channel stable --file package_seed_lists/effortless_x86_64-linux_stable --download-directory builder_bootstrap
     ```
+    > Note: If the on-prem Builder is Airgapped, this phase must be completed on a system with Internet connectivity. The downloaded content will need to be zipped and then transferred to the Builder system for phase 2.
 
 1. Phase 2: bulkupload
 
