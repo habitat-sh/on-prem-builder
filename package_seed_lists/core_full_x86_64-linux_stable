@@ -239,7 +239,6 @@ core/hab-pkg-export-tar
 core/hab-pkg-mesosize
 core/hab-pkg-tarize
 core/hab-plan-build
-core/hab-spider
 core/hab-studio
 core/hab-sup
 core/hab-sup-static
@@ -636,7 +635,6 @@ core/tcl
 core/tcpdump
 core/telegraf
 core/terraform
-core/testapp
 core/texinfo
 core/tlog
 core/tmux
