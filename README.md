@@ -158,16 +158,16 @@ In order to install the on-prem Chef Habitat Builder in an airgapped (no direct 
     curl -Lo hab.tar.gz https://api.bintray.com/content/habitat/stable/linux/x86_64/hab-%24latest-x86_64-linux.tar.gz?bt_package=hab-x86_64-linux
     ```
 
-1. Create the Habitat Builder starter kit bundle and download it
+1. Create the Habitat Builder package bundle from the package seed list and download it
 
      ```bash
      git clone https://github.com/habitat-sh/on-prem-builder.git
      export DOWNLOAD_DIR=/some/base/download/directory
      cd on-prem-builder
-     hab pkg download --target x86_64-linux --channel stable --file quickstart_lists/builder_x86_64-linux_stable --download-directory ${DOWNLOAD_DIR}/builder_starter_kit
+     hab pkg download --target x86_64-linux --channel stable --file package_seed_lists/builder_x86_64-linux_stable --download-directory ${DOWNLOAD_DIR}/builder_packages
      ```
 
-1. Create any additional starter kit Builder bootstrap bundles as documented in the [Bootstrap Builder](https://github.com/habitat-sh/on-prem-builder/blob/master/README.md#bootstrap-builder-with-habitat-packages-new) section of this README. You can specify `--download-directory ${DOWNLOAD_DIR}/builder_bootstrap` argument to the download command in order to consolidate all bootstrap packages in a single directory
+1. Create any additional package bundles to upload to Builder from package seed lists as documented in the [Bootstrap Builder](https://github.com/habitat-sh/on-prem-builder/blob/master/README.md#bootstrap-builder-with-habitat-packages-new) section of this README. You can specify `--download-directory ${DOWNLOAD_DIR}/builder_bootstrap` argument to the download command in order to consolidate all bootstrap packages in a single directory
 1. Zip up all the above content, transfer and unzip on the Linux system where Builder will be deployed in the Airgapped environment
 
 > Note: The following tasks are intended to be completed on the Airgapped system where Builder will be deployed, in advance of the installation
@@ -179,18 +179,18 @@ In order to install the on-prem Chef Habitat Builder in an airgapped (no direct 
      sudo hab # read the license and accept if in agreement, as the root user
      ```
 
-1. Import the public package signing keys from the downloaded Builder starter kit:
+1. Import the public package signing keys from the downloaded Builder package bundle:
 
      ```bash
      export UNZIP_DIR=/some/base/unzip/directory
-     for file in $(ls ${UNZIP_DIR}/builder_starter_kit/keys/*pub); do cat $file | sudo hab origin key import; done
+     for file in $(ls ${UNZIP_DIR}/builder_packages/keys/*pub); do cat $file | sudo hab origin key import; done
      ```
 
-1. Create a Habitat artifact cache directory, place the Builder starter kit .hart packages into that directory and then pre-install the Builder Services:
+1. Create a Habitat artifact cache directory, place the Builder `*.hart` packages into that directory and then pre-install the Builder Services:
 
      ```bash
      sudo mkdir -p /hab/cache/artifacts
-     sudo mv ${UNZIP_DIR}/builder_starter_kit/artifacts/*hart /hab/cache/artifacts
+     sudo mv ${UNZIP_DIR}/builder_packages/artifacts/*hart /hab/cache/artifacts
      sudo hab pkg install /hab/cache/artifacts/habitat-builder*hart
      ```
 
@@ -260,16 +260,16 @@ With Habitat *0.88.0*, two new commands were introduced to assist in bootstrappi
 
 As you can see from the commands above, the package Bootstrap flow is comprised of two main phases: a download from the public [SaaS Builder](https://bldr.habitat.sh) followed by a bulkupload to your on-prem Builder instance(s). Historically, we bootstraped on-prem-builders by downloading all the packages in 'core' for all targets. That amounted to ~15GB and was both too much and too little, in that many of the packages weren't needed, and for many patterns (effortless) other origins were needed.
 
-The [new bootstrap process flow](https://forums.habitat.sh/t/populating-chef-habitat-builder-on-prem/1228) allows you to easily customize your Bootstrap package set or use pre-populated [Starter Kit](https://github.com/habitat-sh/on-prem-builder/tree/master/quickstart_lists) files.
+The [new bootstrap process flow](https://forums.habitat.sh/t/populating-chef-habitat-builder-on-prem/1228) allows you to easily customize your Bootstrap package set or use pre-populated [Package Seed Lists](https://github.com/habitat-sh/on-prem-builder/blob/master/package_seed_lists/README.md) files.
 
-The following section illustrates the steps required to bootstrap the on-prem Builder with the [Effortless Linux](https://github.com/habitat-sh/on-prem-builder/blob/master/quickstart_lists/effortless_x86_64-linux_stable) starter kit. Simply repeat the following download/bulkupload flow for the starter kits you think you will need to have in your on-prem Builder, or even create your own custom starter kit file:
+The following section illustrates the steps required to bootstrap the on-prem Builder with the [Effortless Linux](https://github.com/habitat-sh/on-prem-builder/blob/master/package_seed_lists/effortless_x86_64-linux_stable) package seed list. Simply repeat the following download/bulkupload flow for any other package seed lists you think you will need to have in your on-prem Builder, or even create your own custom package seed list file:
 
 1. Phase 1: download
 
     ```bash
     export HAB_AUTH_TOKEN=<your_public_Builder_instance_token>
     cd on-prem-builder
-    hab pkg download --target x86_64-linux --channel stable --file quickstart_lists/effortless_x86_64-linux_stable --download-directory builder_bootstrap
+    hab pkg download --target x86_64-linux --channel stable --file package_seed_lists/effortless_x86_64-linux_stable --download-directory builder_bootstrap
     ```
 
 1. Phase 2: bulkupload
