@@ -42,6 +42,8 @@ Current scenarios include:
 These should provide all required packages for the various effortless patterns. They're broken out
 by architecture, and both stable and unstable are required for a complete effortless infrastructure.
 
+See https://github.com/chef/effortless) for more details on the Effortless infrstructure pattern.
+
 ## Core full (core_full_ARCH_CHANNEL)
 
 These machine generated lists provide nearly all of the packages in core, broken down by
