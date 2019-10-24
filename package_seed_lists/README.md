@@ -1,14 +1,14 @@
 # Habitat seed lists
 
-Historically we bootstrapped on-prem-builders by downloading all the packages in 'core'
+Historically we bootstrapped on-prem Builders by downloading all the packages in 'core'
 for all targets. That amounted to about 15GB, and was both too much and too little, in that many of
 the packages weren't needed, and for many patterns (Effortless) other origins were needed.
 
-With the creation of the `hab pkg download` command a different approach is possible; you can start
+With the creation of the `hab pkg download` command, a different approach is possible; you can start
 with a list of seed packages, and download them along with their transitive dependencies. Of course,
 the question now becomes 'what do I use for the seed'.
 
-This directory contains sample 'seed lists' of packages for bootstrapping and syncing on-prem-builders, for
+This directory contains sample 'seed lists' of packages for bootstrapping and syncing on-prem Builder, for
 a number of different scenarios.
 
 The basic file naming pattern is TASK\_ARCH\_CHANNEL. The files are newline separated list of
@@ -21,7 +21,7 @@ to improve on that experience, but for now keep it mind when building your own l
 # Scenarios
 
 The current scenarios are:
-* builder (setting up an on-prem-builder)
+* builder (setting up an on-prem Builder)
 * core_deps (a reduced starter set from core with common build time deps)
 * core_full (everything for a particular architecture)
 * effortless (starter set for the effortless pattern)
@@ -42,20 +42,20 @@ Current scenarios include:
 These should provide all required packages for the various Effortless patterns. They're broken out
 by architecture, and both stable and unstable are required for a complete Effortless infrastructure.
 
-See https://github.com/chef/effortless) for more details on the Effortless infrstructure pattern.
+See https://github.com/chef/effortless for more details on the Effortless infrastructure pattern.
 
 ## Core full (core_full_ARCH_CHANNEL)
 
 These machine generated lists provide nearly all of the packages in core, broken down by
 architecture. Downloading these lists replicates the old process of downloading all of core, and is
-expensive in both download time and space. However, if you just want one of the architectures these
+expensive in both download time and space. However if you just want one of the architectures these
 do save substantial amounts of space. The Linux set expands to about 12 GB, while the Windows and
 Linux kernel2 are about 3.5GB and 1GB respectively.
 
 ## Core deps (core_deps_ARCH_CHANNEL)
 
-These are the packages listed as a tdep or build dep of another package in core for the architecture
-in It is intended as good starting point for building packages.
+These are the packages listed as a transitive dep or build dep of another package in core. It is
+intended as good starting point for building packages.
 
 ## Builder (builder_x86_64-linux_stable)
 
