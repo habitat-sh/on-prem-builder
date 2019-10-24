@@ -1,6 +1,5 @@
 # Habitat seed lists
 
-
 Historically we bootstrapped on-prem-builders by downloading all the packages in 'core'
 for all targets. That amounted to about 15GB, and was both too much and too little, in that many of
 the packages weren't needed, and for many patterns (Effortless) other origins were needed.
@@ -58,7 +57,7 @@ Linux kernel2 are about 3.5GB and 1GB respectively.
 These are the packages listed as a tdep or build dep of another package in core for the architecture
 in It is intended as good starting point for building packages.
 
-## builder (builder_x86_64-linux_stable)
+## Builder (builder_x86_64-linux_stable)
 
-This should be just enough packages to get builder installed on your system. Currently builder only
+This should be just enough packages to get Builder installed on your system. Currently Builder only
 supports the x86_64-linux platform.
