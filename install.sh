@@ -3,6 +3,7 @@
 umask 0022
 
 sudo () {
+    # the -E pulls in environment variables like HAB_LICENSE
     [[ $EUID = 0 ]] || set -- command sudo -E "$@"
     "$@"
 }
@@ -24,8 +25,7 @@ fi
 if [[ "$response" =~ ^([yY][eE][sS]|[yY])+$ ]]; then
     pushd scripts > /dev/null
     export HAB_LICENSE=accept
-    # use -E to pull in the HAB_LICENSE Env variable
-    sudo -E ./install-hab.sh
+    sudo ./install-hab.sh
     sudo ./hab-sup.service.sh
     sudo ./provision.sh
     popd > /dev/null
