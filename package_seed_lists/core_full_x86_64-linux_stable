@@ -615,7 +615,6 @@ core/shield-proxy
 core/snappy
 core/socat
 core/spark
-core/spring-petclinic
 core/sqitch
 core/sqitch_pg
 core/sqlite
