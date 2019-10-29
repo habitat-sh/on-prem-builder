@@ -40,9 +40,9 @@ For downloading and installing for other OS's or by other methods, see the [Hugo
 
 This site uses git submodules for the site theme. To access the theme, initialize your local configuration file and update to the most recent version of the theme with:
 
-```
-git submodule init && git submodule update
-```
+    ```shell
+    git submodule init && git submodule update
+    ```
 
 ### View the docs
 
@@ -51,10 +51,10 @@ Use `hugo server -D` to serve the docs with draft content
 
 ### Development
 
-1. From the `on-prem-docs` directory, run the following command to start the development server.
+1. From the `on-prem-docs` directory, run the following command to start the development server:
 
-    ```
-    $ make serve
+    ```shell
+    make serve
     ```
 
     When this is running, any changes you make to content in the `components/automate-chef-io` directory will be automatically compiled and updated the browser.
@@ -63,9 +63,9 @@ Use `hugo server -D` to serve the docs with draft content
 
 The site is built with [Hugo](https://gohugo.io/), a Go-based static site generator, and uses [Stencil](https://stenciljs.com/) for web components and [Sass](http://sass-lang.com/) for CSS. You'll probably want to familiarize yourself with the Hugo documentation, which covers templating, layouts, functions, etc., but there are helpers to assist you with doing some common things, like creating a new docs page:
 
-```shell
-hugo new docs/my-sweet-new-post.md
-```
+    ```shell
+    hugo new docs/my-sweet-new-post.md
+    ```
 
 Your new post will be created as a draft with enough [frontmatter](https://gohugo.io/content-management/front-matter/) to get you going. All content is authored in [Markdown](https://en.wikipedia.org/wiki/Markdown).
 
@@ -83,11 +83,11 @@ make serve
 
 Please try to keep all your documentation in the `docs` directory. Any new documents should automatically show up in the sidebar. If you need to control the ordering of the sidebar, you can add `weight` to the frontmatter of the documents.
 
-To add a new Markdown file, simply run the following command from the `on-prem-bulder\on-prem-docs` directory:
+To add a new Markdown file, simply run the following command from the `on-prem-builder\on-prem-docs` directory:
 
-```
-hugo new docs/<filename>.md
-```
+    ```shell
+    hugo new docs/<filename>.md
+    ```
 
 This will create the file in the `content/docs` directory and fill in the minimum necessary frontmatter automatically.
 
@@ -95,11 +95,11 @@ This will create the file in the `content/docs` directory and fill in the minimu
 
 Hugo allows us to nest our data directory structure as much as necessary. You can add as many folders as necessary under `components/automate-chef-io/data/docs`.
 
-```
-.
-├── data
-│   ├── docs
-│   │   ├── cli
-|   │   │   ├── command_one.yml
-|   │   │   └── command_two.yml
-```
+    ```output
+    .
+    ├── data
+    │   ├── docs
+    │   │   ├── cli
+    |   │   │   ├── command_one.yml
+    |   │   │   └── command_two.yml
+    ```
