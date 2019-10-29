@@ -3,6 +3,7 @@ languageCode = "en-us"
 title = "Chef Habitat Builder on-prem documentation"
 Paginate = 4
 theme = "chef"
+enableGitInfo = true
 
 # To develop against a local copy of the chef hugo theme, uncomment this line
 # and set the value to the parent directory of where you have checked out the
