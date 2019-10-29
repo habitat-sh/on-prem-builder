@@ -4,7 +4,7 @@ A new static website for Chef Habitat on-prem is based on [Hugo](https://gohugo.
 
 ## Getting Started
 
-### One Time Install for MacOS or Windows
+### Install Hugo for MacOS or Windows
 
 1. Disable smart quotes. OS X tries to use smartquotes by default when editing Hugo docs. You want smartquotes disabled regardless if you are writing code. Here's how [you can disable it](http://www.iclarified.com/38772/how-to-disable-curly-quotes-in-mac-os-x-mavericks).
 
@@ -35,6 +35,14 @@ If you're using Scoop on Windows:
     ```
 
 For downloading and installing for other OS's or by other methods, see the [Hugo installation documentation](https://gohugo.io/getting-started/installing/)
+
+### Setup Theme Submodules
+
+This site uses git submodules for the site theme. To access the theme, initialize your local configuration file and update to the most recent version of the theme with:
+
+```
+git submodule init && git submodule update
+```
 
 ### View the docs
 
