@@ -1,8 +1,7 @@
 +++
-title = "Artifactory"
+title= "Artifactory"
 description = "Use Artifactory as the Chef Habitat Builder on-prem artifact store"
 draft = false
-bref = ""
 toc = true
 +++
 

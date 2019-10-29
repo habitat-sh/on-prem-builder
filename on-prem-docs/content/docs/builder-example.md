@@ -2,7 +2,6 @@
 title = "builder.env"
 description = "The Chef Habitat Builder configuration file"
 draft = false
-bref = ""
 toc = true
 +++
 

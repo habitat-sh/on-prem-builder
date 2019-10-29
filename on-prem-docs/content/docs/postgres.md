@@ -2,7 +2,6 @@
 title = "Postgres Migration"
 description = "Updating your Postgres Installation"
 draft = false
-bref = ""
 toc = true
 +++
 

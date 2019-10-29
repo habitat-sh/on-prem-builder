@@ -2,7 +2,6 @@
 title = "Minio Migrations"
 description = "Updating your Minio Artifact store"
 draft = false
-bref = ""
 toc = true
 +++
 

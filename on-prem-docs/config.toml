@@ -16,7 +16,7 @@ pygmentsCodefences = true
 name = "Getting started"
 weight = 10
 identifier = "getting-started"
-url = "/getting-started"
+url = "/docs/getting-started"
 
 [[menu.docs]]
 name = "Automate + Builder"
