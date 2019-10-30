@@ -1,0 +1,50 @@
+baseURL = "http://example.org/"
+languageCode = "en-us"
+title = "Chef Habitat Builder on-prem documentation"
+Paginate = 4
+theme = "chef"
+enableGitInfo = true
+
+# To develop against a local copy of the chef hugo theme, uncomment this line
+# and set the value to the parent directory of where you have checked out the
+# chef-hugo-theme repository
+# themesDir = "../../../hugo-themes"
+
+pygmentsStyle = "emacs"
+pygmentsCodefences = true
+
+[[menu.docs]]
+name = "Getting started"
+weight = 10
+identifier = "getting-started"
+url = "/docs/getting-started"
+
+[[menu.docs]]
+name = "Automate + Builder"
+weight = 50
+identifier = "builder-automate"
+url = "/docs/builder-automate"
+
+[[menu.docs]]
+name = "builder.toml"
+weight = 40
+identifier = "builder-example"
+url = "/docs/builder-example"
+
+[[menu.docs]]
+name = "Postgres"
+weight = 50
+identifier = "postgres"
+url = "/docs/postgres"
+
+[[menu.docs]]
+name = "Minio"
+weight = 60
+identifier = "minio-migration"
+url = "/docs/minio-migration"
+
+[[menu.docs]]
+name = "Artifactory"
+weight = 70
+identifier = "artifactory"
+url = "/docs/artifactory"

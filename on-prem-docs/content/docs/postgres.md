@@ -1,4 +1,9 @@
-# Postgres Migration
++++
+title = "Postgres Migration"
+description = "Updating your Postgres Installation"
+draft = false
+toc = true
++++
 
 ## Merging Database Shards
 

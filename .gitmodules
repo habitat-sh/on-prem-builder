@@ -1,0 +1,6 @@
+[submodule "themes/chef"]
+	path = themes/chef
+	url = https://github.com/chef/chef-hugo-theme.git
+[submodule "on-prem-docs/themes/chef"]
+	path = on-prem-docs/themes/chef
+	url = https://github.com/chef/chef-hugo-theme.git

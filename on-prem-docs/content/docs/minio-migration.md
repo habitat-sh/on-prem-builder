@@ -1,4 +1,9 @@
-# Migrating Package Artifacts to Minio
++++
+title = "Minio Migrations"
+description = "Updating your Minio Artifact store"
+draft = false
+toc = true
++++
 
 This section is for installations of On-Premise Depot that were done *prior* to June 15, 2018. If you re-install or upgrade to a newer version of the On-Premise Depot, you will be required to also migrate your package artifacts to a local instance of Minio (the new object store we are using). Please follow the steps below.
 

@@ -1,4 +1,9 @@
-# Using Artifactory as the object store (Alpha)
++++
+title= "Artifactory"
+description = "Use Artifactory as the Chef Habitat Builder on-prem artifact store"
+draft = false
+toc = true
++++
 
 If you are interested in using an existing instance of Artifactory as your object store instead of Minio,
 we are providing this capability as an early preview/alpha for testing.
@@ -26,4 +31,3 @@ sudo hab svc load core/artifactory
 ```
 
 This will spin up an Artifactory instance, and you can use the following to log in: http://localhost:8081/artifactory/webapp/#/home
-
