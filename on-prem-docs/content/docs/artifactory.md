@@ -1,5 +1,5 @@
 +++
-title= "Artifactory"
+title= "Builder on-prem + Artifactory"
 description = "Use Artifactory as the Chef Habitat Builder on-prem artifact store"
 draft = false
 toc = true
@@ -31,3 +31,7 @@ sudo hab svc load core/artifactory
 ```
 
 This will spin up an Artifactory instance, and you can use the following to log in: http://localhost:8081/artifactory/webapp/#/home
+
+## Managing Builder Artifacts on Artifactory
+
+If you usie Artifactory for your Habitat Builder on-prem artifact store, we recommend reading about [Artifactory's best practices for disaster recovery](https://jfrog.com/whitepaper/best-practices-for-artifactory-backups-and-disaster-recovery/).
