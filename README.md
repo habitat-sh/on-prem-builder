@@ -44,8 +44,8 @@ The following are minimum requirements for installation/deployment of the Chef H
   * 2GB for the baseline Chef Habitat Builder on-prem services
   * 15GB+ for the latest Chef Habitat Builder core packages
   * 30GB+ for downloading and expanding the core package bootstrap in the volume containing the `/tmp` directory
-* We recommend:
-  * 20 GB disk space for trial deployments
+* Chef recommends:
+  * 50 GB disk space for trial deployments
   * 100 GB disk space for production deployments
 * Deploy services single-node - scale out is not yet supported
 * Outbound network (HTTPS) connectivity to WAN is required for the _initial_ install
