@@ -52,6 +52,7 @@ The following Chef Habitat Builder on-prem functionalities are *NOT* currently a
 * Automated package exports using Chef Habitat Builder on-prem
 
 ### Memory Filesystem Storage
+
 Preparing your filesystem (Optional)
 Since substantial storage may be required for holding packages, please ensure you have an appropriate amount of free space on your filesystem.
 The package artifacts will be stored in your Minio instance by default, typically at the following location: `/hab/svc/builder-minio/data`

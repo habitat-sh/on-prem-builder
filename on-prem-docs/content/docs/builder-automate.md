@@ -12,7 +12,7 @@ The Chef Habitat 0.85.0 release simplifies custom certificate management, making
 Configuring Chef Habitat on-prem to use Chef Automate's Authentication takes five steps:
 
 1. Patch the Chef Automate `automate-credentials.toml` to recognize Chef Habitat
-1. Set up Chef Habitat Builder on-prem's `bldr.env` to use Chef Automate's authentication
+1. Set up the Chef Habitat Builder on-prem `bldr.env` to use Chef Automate's authentication
 1. Copy the any custom certificate `.crt` and `.key` files to the same location as the `./install.sh` script.
 1. Install Chef Habitat Builder on-prem
 1. Copy Automate's certificate to the `/hab/cache/ssl` directory

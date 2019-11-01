@@ -38,6 +38,7 @@ The following section illustrates the steps required to bootstrap the on-prem Bu
     cd on-prem-builder
     hab pkg download --target x86_64-linux --channel stable --file package_seed_lists/effortless_x86_64-linux_stable --download-directory builder_bootstrap
     ```
+
     > Note: If the on-prem Builder is Airgapped, this phase must be completed on a system with Internet connectivity. The downloaded content will need to be zipped and then transferred to the Builder system for phase 2.
 
 1. Phase 2: bulkupload

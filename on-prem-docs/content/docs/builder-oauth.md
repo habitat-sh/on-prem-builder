@@ -38,7 +38,7 @@ For the configuration below, you will also need to know following *fully qualifi
 
 For more information, please refer to the developer documentation of these services:
 
-* [Azure Active Directory](https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-protocols-oauth-code)
+* [Azure Active Directory](https://docs.microsoft.com/azure/active-directory/develop/active-directory-protocols-oauth-code)
 * [GitHub](https://developer.github.com/apps/building-oauth-apps/authorization-options-for-oauth-apps/)
 * [GitLab](https://docs.gitlab.com/ee/integration/oauth_provider.html)
 * [Okta](https://developer.okta.com/authentication-guide/implementing-authentication/auth-code)

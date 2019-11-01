@@ -20,7 +20,7 @@ export MINIO_BUCKET=habitat-builder-artifact-store.local
 export MINIO_ACCESS_KEY=depot
 export MINIO_SECRET_KEY=password
 
-# If you'd like to use Arifactory instead of Minio, uncomment
+# If you'd like to use Artifactory instead of Minio, uncomment
 # and set the following variables appropriately.
 # IMPORTANT: See the README for more info
 # export ARTIFACTORY_ENABLED=true
@@ -85,7 +85,7 @@ export OAUTH_REDIRECT_URL=http://localhost/
 # The OAUTH_CLIENT_ID is the registered OAuth2 client id
 export OAUTH_CLIENT_ID=0123456789abcdef0123
 
-# The OAUTH_CLIENT_SECRET is the registerd OAuth2 client secret
+# The OAUTH_CLIENT_SECRET is the registered OAuth2 client secret
 export OAUTH_CLIENT_SECRET=0123456789abcdef0123456789abcdef01234567
 
 # Modify these only if there is a specific need, otherwise leave as is
