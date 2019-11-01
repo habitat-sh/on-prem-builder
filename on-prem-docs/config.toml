@@ -32,37 +32,37 @@ identifier = "builder-oauth"
 url = "/docs/builder-oauth"
 
 [[menu.docs]]
-name = "Packages"
-weight = 40
-identifier = "packages"
-url = "/docs/packages"
+name = "Bootstrap Core Packages"
+weight = 50
+identifier = "bootstrap-core"
+url = "/docs/bootstrap-core"
 
 [[menu.docs]]
 name = "Example builder.env"
-weight = 50
+weight = 60
 identifier = "builder-example"
 url = "/docs/builder-example"
 
 [[menu.docs]]
 name = "Postgres"
-weight = 60
+weight = 70
 identifier = "postgres"
 url = "/docs/postgres"
 
 [[menu.docs]]
 name = "Minio"
-weight = 70
+weight = 80
 identifier = "minio"
 url = "/docs/minio"
 
 [[menu.docs]]
 name = "Artifactory"
-weight = 80
+weight = 90
 identifier = "artifactory"
 url = "/docs/artifactory"
 
 [[menu.docs]]
 name = "Troubleshooting"
-weight = 90
+weight = 100
 identifier = "troubleshooting"
 url = "/docs/troubleshooting"

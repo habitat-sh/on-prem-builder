@@ -1,5 +1,5 @@
 +++
-title= "Builder + Auth"
+title= "Builder + OAuth"
 date= 2019-10-30T14:44:39-07:00
 draft= true
 toc= true
@@ -38,7 +38,6 @@ For the configuration below, you will also need to know following *fully qualifi
 
 For more information, please refer to the developer documentation of these services:
 
-* [Chef Automate (ALPHA)](https://automate.chef.io/docs/configuration/#alpha-setting-up-automate-as-an-oauth-provider-for-habitat-builder)
 * [Azure Active Directory](https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-protocols-oauth-code)
 * [GitHub](https://developer.github.com/apps/building-oauth-apps/authorization-options-for-oauth-apps/)
 * [GitLab](https://docs.gitlab.com/ee/integration/oauth_provider.html)
@@ -175,3 +174,6 @@ Navigate to `http://${BUILDER_HOSTNAME_OR_IP}/#/sign-in` to access the Chef Habi
 
 At that point you should be able to log in using your configured OAuth provider.
 
+## Next Steps
+
+[Bootstrap Core Origin](/docs/bootstrap-core)

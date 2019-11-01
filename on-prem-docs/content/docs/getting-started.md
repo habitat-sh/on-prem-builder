@@ -26,7 +26,7 @@ The following are minimum requirements for installation/deployment of the Chef H
   * 15GB+ for the latest Chef Habitat Builder core packages
   * 30GB+ for downloading and expanding the core package bootstrap in the volume containing the `/tmp` directory
 * We recommend:
-  * 20 GB disk space for trial deployments
+  * 50 GB disk space for trial deployments
   * 100 GB disk space for production deployments
 * Deploy services single-node - scale out is not yet supported
 * Outbound network (HTTPS) connectivity to WAN is required for the _initial_ install
@@ -50,6 +50,13 @@ The following Chef Habitat Builder on-prem functionalities are *NOT* currently a
 
 * Automated package builds using Chef Habitat Builder on-prem
 * Automated package exports using Chef Habitat Builder on-prem
+
+### Memory Filesystem Storage
+Preparing your filesystem (Optional)
+Since substantial storage may be required for holding packages, please ensure you have an appropriate amount of free space on your filesystem.
+The package artifacts will be stored in your Minio instance by default, typically at the following location: `/hab/svc/builder-minio/data`
+If you need to add additional storage, it is recommended that you create a mount at `/hab` and point it to your external storage. This is not required if you already have sufficient free space.
+*Note*: If you would prefer to Artifactory instead of Minio for the object storage, please see the [Artifactory](#using-artifactory-as-the-object-store-(alpha)) section below.
 
 ## Next Steps
 

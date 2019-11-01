@@ -1,17 +1,17 @@
 +++
-title= "Packages"
+title= "Bootstrap Core Packages"
 date= 2019-10-30T15:38:30-07:00
 draft= false
 toc= true
 +++
 
-## Create an Origin
+## Create the Core Origin
 
 Create a `core` origin for an initial set of base packages. Uploads will fail unless you first populate your Chef Habitat Builder on-prem with the upstream `core` upstream origin.
 
 Once you are logged in to the Chef Habitat Builder on-prem UI, select the `New Origin` button and enter in `core` as the origin name.
 
-### Generate a Personal Access Token
+## Generate a Personal Access Token
 
 Next, generate a Personal Access Token for bootstrapping the `core` packages, as well as for performing authenticated operations using the `hab` client.
 

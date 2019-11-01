@@ -59,3 +59,21 @@ The following Chef Habitat Builder on-prem functionalities are *NOT* currently a
 ## Documentation
 
 The documentation for Builder on-prem is located in the [on-prem-docs](on-prem-docs/README.md) directory. For your convenience, you can serve the documentation locally from that directory by installing the dependencies and running the `hugo serve` command.
+
+### Index
+
+*Installation*
+1. [Getting Started](on-prem-docs/content/docs/getting-started.md)
+2. [Builder + Automate](on-prem-docs/content/docs/builder-automate.md)
+    *OR*
+2. [Builder + OAuth Authentication](on-prem-docs/content/docs/builder-oauth.md) (AzureAD/Github/GitLab/Okta/BitBucket)
+4. [Bootstrap Core Packages](on-prem-docs/content/docs/bootstrap-core.md)
+
+*Reference*
+[Example builder.env](on-prem-docs/content/docs/builder-example.md)
+[Errors &Troubleshooting](on-prem-docs/content/docs/troubleshooting)
+
+*Managing Builder On-Prem*
+[Managing the Builder On-Prem Postgres Installation](on-prem-docs/content/docs/postgres.md)
+[Managing the Builder On-Prem Minio Installation](on-prem-docs/content/docs/minio.md)
+[Using Artifactory with Builder On-Prem](on-prem-docs/content/docs/artifactory.md)

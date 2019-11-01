@@ -7,6 +7,22 @@ toc= true
 
 ## Troubleshooting
 
+### Finding origin keys
+
+On Linux OS:
+
+    ```bash
+    # Linux/MacOS
+    ls -la /hab/cache/keys
+    ls -la $HOME/.hab/cache.keys
+    ```
+On Windows:
+
+    ```PS
+    # Windows (Powershell 5+)
+    ls C:\hab\cache\keys
+    ```
+
 ### Network access / proxy configuration
 
 If the initial install fails, please check that you have outgoing connectivity, and that you can successfully ping the following:
@@ -74,6 +90,38 @@ Restart the Chef Habitat services:
 ```bash
 sudo systemctl restart hab-sup
 ```
+## Errors
+
+### Unable to retrieve OAuth token
+You were able to sign in to Chef Automate, but Chef Automate was unable to authenticate Chef Habitat's OAuth token.
+Open the `bldr.env` and verify that:
+* **APP_URL** ends with "\"
+* **OAUTH_REDIRECT_URL** ends with "\"
+* **OAUTH_CLIENT_ID** is complete and correct
+* **OAUTH_CLIENT_SECRET** is complete and correct
+Apply changes to the to apply changes to the `bldr.env`
+    ```bash
+    bash ./install.sh
+    ```
+Restart the Chef Habitat services:
+    ```bash
+    sudo systemctl restart hab-sup
+    ```
+### Connection refused (os error 111)
+If the proxy was configured for the local session during installation, but you are still seeing connection refusal errors, you may want to configure your proxy with the `/etc/environment` file or something similar. Work with your enterprise network admin to ensure the appropriate firewall rules are configured for network access.
+  ```output
+  -- Logs begin at Mon 2019-06-10 09:02:13 PDT. --
+  Jun 10 09:35:15 <TargetMachine> hab[13161]: ∵ Missing package for core/hab-launcher
+  Jun 10 09:35:15 <TargetMachine> hab[13161]: » Installing core/hab-launcher
+  Jun 10 09:35:15 <TargetMachine> hab[13161]: ☁ Determining latest version of core/hab-launcher in the 'stable' channel
+  Jun 10 09:35:15 <TargetMachine> hab[13161]: ✗✗✗
+  Jun 10 09:35:15 <TargetMachine> hab[13161]: ✗✗✗ Connection refused (os error 111)
+  Jun 10 09:35:15 <TargetMachine> hab[13161]: ✗✗✗
+  Jun 10 09:35:15 <TargetMachine> systemd[1]: hab-sup.service: Main process exited, code=exited, status=1/FAILURE
+  Jun 10 09:35:15 <TargetMachine> hab[13171]: Supervisor not started.
+  Jun 10 09:35:15 <TargetMachine> systemd[1]: hab-sup.service: Unit entered failed state.
+  Jun 10 09:35:15 <TargetMachine> systemd[1]: hab-sup.service: Failed with result 'exit-code'
+  ```
 
 ### Error "sorry, too many clients already"
 
@@ -180,6 +228,46 @@ And repeats for every package. Check to make sure you've created the `core` orig
 
 ## Logs
 
+## Logging
+
+### Logging Levels
+
+The recognized values for logging are: `error`, `warn`, `info`, `debug`, and `trace`.
+For a more detailed explanation of logging in Chef Habitat, see the [Supervisor Log Configuration Reference](https://www.habitat.sh/docs/reference/#supervisor-log-configuration-reference) and the [Supervisor Log Key](https://www.habitat.sh/docs/reference/#supervisor-log-key) documentation.
+
+### Basic Logging
+
+To turn on and examine the services debug logging in your Habitat installation:
+
+1. Edit the `sudo /hab/svc/builder-api/user.toml` file
+1. On the first line, change the log_level from **error** to **debug**
+
+  ```toml
+  log_level="debug,tokio_core=error,tokio_reactor=error,zmq=error,hyper=error"
+  ```
+
+1. Save and close the file
+1. Restart Habitat with `sudo systemctl restart hab-sup` to restart the habitat.
+1. Use `journalctl -fu hab-sup` to view the logs.
+1. Reset `/hab/svc/builder-api/user.toml` file to the default `log_level=error` and restart the services with `sudo systemctl restart hab-sup` to restore error-level logging.
+
+### RUST_LOG
+
+1. Use **RUST_LOG=debug RUST_BACKTRACE=1** to see an individual command's debug and backtrace.
+
+  ```bash
+	# Linux/MacOS
+  # replace "hab sup run" with your command
+	RUST_LOG=debug RUST_BACKTRACE=1 hab sup run
+  ```
+
+1. Edit the `sudo /hab/svc/builder-api/user.toml` file
+1. On the second line, change:
+
+  ```toml
+  RUST_LOG=debug RUST_BACKTRACE=1
+  ```
+
 ### Log Rotation
 
 The `builder-api-proxy` service will log (via Nginx) all access and errors to log files in your service directory. Since these files may get large, you may want to add a log rotation script. Below is a sample logrotate file that you can use as an example for your needs:
@@ -199,18 +287,6 @@ The `builder-api-proxy` service will log (via Nginx) all access and errors to lo
         endscript
 }
 ```
-
-### Debug Logging
-
-If you want to turn on and examine the services debug logging, you can do so by doing the following on your install location:
-
-Edit the `/hab/svc/builder-api/user.toml` file and update the `log_level` entry to start with `debug`
-
-After making the edit, restart the hab services with `sudo systemctl restart hab-sup`, or just stop and start the builder-api service with `hab svc stop habitat/builder-api` and `hab svc start habitat/builder-api`.
-
-Once the logging is enabled, you can examine it via `journalctl -fu hab-sup`
-
-When you are done with debugging, you can set the logging back to the default setting by modifying the user.toml and restarting the services.
 
 ## License
 
