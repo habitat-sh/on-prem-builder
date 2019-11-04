@@ -48,7 +48,6 @@ core/iis-aspnet4
 core/iis-webserverrole
 core/innounp
 core/jq-static
-core/jre8
 core/lessmsi
 core/lgpo
 core/libarchive

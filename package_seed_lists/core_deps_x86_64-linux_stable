@@ -113,11 +113,9 @@ core/inputproto
 core/iproute2
 core/iptables
 core/jbigkit
-core/jdk8
 core/jemalloc
 core/jfrog-cli
 core/jq-static
-core/jre8
 core/jruby1
 core/json-c
 core/json-glib
