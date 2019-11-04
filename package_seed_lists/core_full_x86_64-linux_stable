@@ -272,7 +272,6 @@ core/iptables
 core/ipvsadm
 core/jbigkit
 core/jdk7
-core/jdk8
 core/jdk9
 core/jemalloc
 core/jenkins
@@ -283,7 +282,6 @@ core/jo
 core/journalbeat
 core/jq-static
 core/jre7
-core/jre8
 core/jre9
 core/jruby
 core/jruby1
