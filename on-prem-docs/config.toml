@@ -21,30 +21,48 @@ url = "/docs/getting-started"
 
 [[menu.docs]]
 name = "Automate + Builder"
-weight = 50
+weight = 20
 identifier = "builder-automate"
 url = "/docs/builder-automate"
 
 [[menu.docs]]
-name = "builder.toml"
-weight = 40
+name = "Automate + OAuth"
+weight = 30
+identifier = "builder-oauth"
+url = "/docs/builder-oauth"
+
+[[menu.docs]]
+name = "Bootstrap Core Packages"
+weight = 50
+identifier = "bootstrap-core"
+url = "/docs/bootstrap-core"
+
+[[menu.docs]]
+name = "Example builder.env"
+weight = 60
 identifier = "builder-example"
 url = "/docs/builder-example"
 
 [[menu.docs]]
 name = "Postgres"
-weight = 50
+weight = 70
 identifier = "postgres"
 url = "/docs/postgres"
 
 [[menu.docs]]
 name = "Minio"
-weight = 60
-identifier = "minio-migration"
-url = "/docs/minio-migration"
+weight = 80
+identifier = "minio"
+url = "/docs/minio"
 
 [[menu.docs]]
 name = "Artifactory"
-weight = 70
+weight = 90
 identifier = "artifactory"
 url = "/docs/artifactory"
+
+[[menu.docs]]
+name = "Troubleshooting"
+weight = 100
+identifier = "troubleshooting"
+url = "/docs/troubleshooting"

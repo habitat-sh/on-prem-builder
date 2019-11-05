@@ -1,6 +1,6 @@
-# Chef Habitat Builder on-prem  - Website
+# Chef Habitat Builder on-prem  - Documentation Website
 
-A new static website for Chef Habitat on-prem is based on [Hugo](https://gohugo.io), the Go-powered static site generator.
+The documentation site for Chef Habitat on-prem is based on [Hugo](https://gohugo.io), the Go-powered static site generator.
 
 ## Getting Started
 
@@ -64,20 +64,10 @@ Use `hugo server -D` to serve the docs with draft content
 The site is built with [Hugo](https://gohugo.io/), a Go-based static site generator, and uses [Stencil](https://stenciljs.com/) for web components and [Sass](http://sass-lang.com/) for CSS. You'll probably want to familiarize yourself with the Hugo documentation, which covers templating, layouts, functions, etc., but there are helpers to assist you with doing some common things, like creating a new docs page:
 
     ```shell
-    hugo new docs/my-sweet-new-post.md
+    hugo new docs/<filename>.md
     ```
 
 Your new post will be created as a draft with enough [frontmatter](https://gohugo.io/content-management/front-matter/) to get you going. All content is authored in [Markdown](https://en.wikipedia.org/wiki/Markdown).
-
-## Helpers
-
-make sync
-: Pull down the current chef hugo theme
-
-make serve
-: Start the live-reload development environment
-
-> If you get a `git clone` related failure when running these commands, you may not have your HTTPS GitHub credentials setup. These commands will clone down the hugo theme via HTTPS. [Read these docs](https://help.github.com/articles/which-remote-url-should-i-use/#cloning-with-https-urls-recommended) to learn why we use HTTPS over SSH, and how to setup your GitHub credentials.
 
 ## Markdown Content
 
