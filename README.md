@@ -70,11 +70,11 @@ The documentation for Builder on-prem is located in the [on-prem-docs](on-prem-d
 
 #### Reference
 
-[Example builder.env](on-prem-docs/content/docs/builder-example.md)
-[Errors &Troubleshooting](on-prem-docs/content/docs/troubleshooting.md)
+1. [Example builder.env](on-prem-docs/content/docs/builder-example.md)
+1. [Errors &Troubleshooting](on-prem-docs/content/docs/troubleshooting.md)
 
 #### Managing Builder On-Prem
 
-[Managing the Builder On-Prem Postgres Installation](on-prem-docs/content/docs/postgres.md)
-[Managing the Builder On-Prem Minio Installation](on-prem-docs/content/docs/minio.md)
-[Using Artifactory with Builder On-Prem](on-prem-docs/content/docs/artifactory.md)
+1. [Managing the Builder On-Prem Postgres Installation](on-prem-docs/content/docs/postgres.md)
+1. [Managing the Builder On-Prem Minio Installation](on-prem-docs/content/docs/minio.md)
+1. [Using Artifactory with Builder On-Prem](on-prem-docs/content/docs/artifactory.md)
