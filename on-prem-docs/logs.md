@@ -34,7 +34,7 @@ To turn on and examine the services debug logging in your Habitat installation:
     ```
 
 1. Edit the `sudo /hab/svc/builder-api/user.toml` file
-1. On the second line, change:
+1. On the second line, add:
 
     ```toml
     RUST_LOG=debug RUST_BACKTRACE=1
