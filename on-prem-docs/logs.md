@@ -30,7 +30,7 @@ To turn on and examine the services debug logging in your Habitat installation:
     ```bash
     # Linux/MacOS
     # replace "hab sup run" with your command
-    RUST_LOG=debug RUST_BACKTRACE=1 hab sup run
+    env RUST_LOG=debug RUST_BACKTRACE=1 hab sup run
     ```
 
 1. Edit the `sudo /hab/svc/builder-api/user.toml` file
