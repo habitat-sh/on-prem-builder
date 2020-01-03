@@ -19,7 +19,7 @@ To turn on and examine the services debug logging in your Habitat installation:
     ```
 
 1. Save and close the file
-1. Restart Habitat with `sudo systemctl restart hab-sup` to restart the habitat.
+1. Restart Habitat with `sudo systemctl restart hab-sup`.
 1. Use `journalctl -fu hab-sup` to view the logs.
 1. Reset `/hab/svc/builder-api/user.toml` file to the default `log_level=error` and restart the services with `sudo systemctl restart hab-sup` to restore error-level logging.
 
@@ -59,4 +59,3 @@ The `builder-api-proxy` service will log (via Nginx) all access and errors to lo
             endscript
     }
     ```
-
