@@ -1,6 +1,9 @@
-# Builder on-prem + Minio
-
-Managing your Minio artifact store.
++++
+title = "Builder on-prem + Minio"
+description = "Managing your Minio artifact store"
+draft = false
+toc = true
++++
 
 [MinIO](https://min.io/) is an open source object storage server. Chef Habitat Builder on-prem uses Minio to store habitat artifacts (.harts).
 

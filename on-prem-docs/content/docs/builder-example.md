@@ -1,6 +1,9 @@
-# builder.env
-
-An example Chef Habitat Builder configuration file.
++++
+title = "builder.env"
+description = "An example Chef Habitat Builder configuration file"
+draft = false
+toc = true
++++
 
 ```shell
 #!/bin/bash

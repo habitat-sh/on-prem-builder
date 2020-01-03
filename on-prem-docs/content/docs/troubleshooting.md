@@ -1,8 +1,11 @@
-# Troubleshooting
++++
+title= "Troubleshooting"
+date= 2019-10-30T14:55:30-07:00
+draft= false
+toc= true
++++
 
-## Common Problems
-
-This section covers several common problems that you might encounter and how to solve them.
+## Troubleshooting
 
 ### Finding origin keys
 
@@ -209,6 +212,75 @@ When populating your Chef Habitat Builder on-prem with upstream core packages, y
 
 And repeats for every package. Check to make sure you've created the `core` origin and then try again, if you haven't, then the upload will fail.
 
+## Logs
+
+## Logging
+
+### Logging Levels
+
+The recognized values for logging are: `error`, `warn`, `info`, `debug`, and `trace`.
+For a more detailed explanation of logging in Chef Habitat, see the [Supervisor Log Configuration Reference](https://www.habitat.sh/docs/reference/#supervisor-log-configuration-reference) and the [Supervisor Log Key](https://www.habitat.sh/docs/reference/#supervisor-log-key) documentation.
+
+### Basic Logging
+
+To turn on and examine the services debug logging in your Habitat installation:
+
+1. Edit the `sudo /hab/svc/builder-api/user.toml` file
+1. On the first line, change the log_level from **error** to **debug**
+
+    ```toml
+    log_level="debug,tokio_core=error,tokio_reactor=error,zmq=error,hyper=error"
+    ```
+
+1. Save and close the file
+1. Restart Habitat with `sudo systemctl restart hab-sup` to restart the habitat.
+1. Use `journalctl -fu hab-sup` to view the logs.
+1. Reset `/hab/svc/builder-api/user.toml` file to the default `log_level=error` and restart the services with `sudo systemctl restart hab-sup` to restore error-level logging.
+
+### RUST_LOG
+
+1. Use `RUST_LOG=debug RUST_BACKTRACE=1` to see an individual command's debug and backtrace.
+
+    ```bash
+    # Linux/MacOS
+    # replace "hab sup run" with your command
+    RUST_LOG=debug RUST_BACKTRACE=1 hab sup run
+    ```
+
+1. Edit the `sudo /hab/svc/builder-api/user.toml` file
+1. On the second line, change:
+
+    ```toml
+    RUST_LOG=debug RUST_BACKTRACE=1
+    ```
+
+### Log Rotation
+
+The `builder-api-proxy` service will log (via Nginx) all access and errors to log files in your service directory. Since these files may get large, you may want to add a log rotation script. Below is a sample logrotate file that you can use as an example for your needs:
+
+    ```bash
+    /hab/svc/builder-api-proxy/logs/host.access.log
+    /hab/svc/builder-api-proxy/logs/host.error.log
+    {
+            rotate 7
+            daily
+            missingok
+            notifempty
+            delaycompress
+            compress
+            postrotate
+                    /bin/kill -USR1 `cat /hab/svc/builder-api-proxy/var/pid 2>/dev/null` 2>/dev/null || true
+            endscript
+    }
+    ```
+
+## License
+
+Copyright (c) 2018 Chef Software Inc. and/or applicable contributors
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0) at `http://www.apache.org/licenses/LICENSE-2.0)`
+Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+
 ## Support
 
-You can post questions or issues on the [Habitat Forum](https://forums.habitat.sh/), on our [Slack channel](https://habitat-sh.slack.com), or file issues directly at the [Github repo](https://github.com/habitat-sh/on-prem-builder/issues).
+You can also post any questions or issues on the [Habitat Forum](https://forums.habitat.sh/), on our [Slack channel](https://habitat-sh.slack.com), or file issues directly at the [Github repo](https://github.com/habitat-sh/on-prem-builder/issues).

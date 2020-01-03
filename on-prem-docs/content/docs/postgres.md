@@ -1,6 +1,9 @@
-# Builder on-prem + Postgres
-
-Managing your Postgres Installation
++++
+title = "Builder on-prem + Postgres"
+description = "Managing your Postgres Installation"
+draft = false
+toc = true
++++
 
 ## Managing Builder On-Prem PostgreSQL Data
 
