@@ -1,9 +1,6 @@
-+++
-title= "Builder + OAuth"
-date= 2019-10-30T14:44:39-07:00
-draft= false
-toc= true
-+++
+# Builder + OAuth
+
+Authenticating Builder with OAuth services.
 
 ## Pre-Requisites
 
