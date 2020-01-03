@@ -1,9 +1,4 @@
-+++
-title= "Builder on-prem + Artifactory"
-description = "Use Artifactory as the Chef Habitat Builder on-prem artifact store"
-draft = false
-toc = true
-+++
+# "Builder on-prem + Artifactory
 
 If you are interested in using an existing instance of Artifactory as your object store instead of Minio,
 we are providing this capability as an early preview/alpha for testing.

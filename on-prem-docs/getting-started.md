@@ -1,9 +1,6 @@
-+++
-title = "Chef Habitat Builder on-prem"
-description = "Chef Habitat Builder overview and pre-requisites"
-draft = false
-toc = true
-+++
+# Chef Habitat Builder on-prem
+
+Chef Habitat Builder overview and pre-requisites
 
 This repository contains scripts to install Chef Habitat Builder on-prem services. These services (referred to as the Chef Habitat Builder on-prem) allow privately hosting Chef Habitat packages (and associated artifacts such as keys) on-premise. Chef Habitat clients (such as the `hab` cli, Supervisors and Studios) can be pointed to the Chef Habitat Builder on-prem and allow for development, execution and management without depending on the public Chef Habitat services.
 

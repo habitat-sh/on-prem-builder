@@ -1,9 +1,6 @@
-+++
-title = "Builder on-prem + Postgres"
-description = "Managing your Postgres Installation"
-draft = false
-toc = true
-+++
+# Builder on-prem + Postgres
+
+Managing your Postgres Installation
 
 ## Managing Builder On-Prem PostgreSQL Data
 

@@ -58,23 +58,25 @@ The following Chef Habitat Builder on-prem functionalities are *NOT* currently a
 
 ## Documentation
 
-The documentation for Builder on-prem is located in the [on-prem-docs](on-prem-docs/README.md) directory. For your convenience, you can serve the documentation locally from that directory by installing the dependencies and running the `hugo serve` command.
+The documentation for Builder on-prem is located in the [on-prem-docs](on-prem-docs/getting-started.md) directory.
 
 ### Index
 
 #### Installation
 
-1. [Getting Started](on-prem-docs/content/docs/getting-started.md)
-1. [Builder + Automate](on-prem-docs/content/docs/builder-automate.md) *OR* [Builder + OAuth Authentication](on-prem-docs/content/docs/builder-oauth.md) (AzureAD/Github/GitLab/Okta/BitBucket)
-1. [Bootstrap Core Packages](on-prem-docs/content/docs/bootstrap-core.md)
+1. [Getting Started](on-prem-docs/getting-started.md)
+1. [Builder + Automate](on-prem-docs/builder-automate.md) *OR* [Builder + OAuth Authentication](on-prem-docs/builder-oauth.md) (AzureAD/Github/GitLab/Okta/BitBucket)
+1. [Bootstrap Core Packages](on-prem-docs/bootstrap-core.md)
 
 #### Reference
 
-1. [Example builder.env](on-prem-docs/content/docs/builder-example.md)
-1. [Errors &Troubleshooting](on-prem-docs/content/docs/troubleshooting.md)
+1. [Example builder.env](on-prem-docs/builder-example.md)
+2. [Logging](on-prem-docs/logs.md)
+3. [License](on-prem-docs/license.md)
+4. [Troubleshooting](on-prem-docs/troubleshooting.md)
 
 #### Managing Builder On-Prem
 
-1. [Managing the Builder On-Prem Postgres Installation](on-prem-docs/content/docs/postgres.md)
-1. [Managing the Builder On-Prem Minio Installation](on-prem-docs/content/docs/minio.md)
-1. [Using Artifactory with Builder On-Prem](on-prem-docs/content/docs/artifactory.md)
+1. [Managing the Builder On-Prem Postgres Installation](on-prem-docs/postgres.md)
+1. [Managing the Builder On-Prem Minio Installation](on-prem-docs/minio.md)
+1. [Using Artifactory with Builder On-Prem](on-prem-docs/artifactory.md)
