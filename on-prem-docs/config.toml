@@ -1,9 +1,8 @@
-baseURL = "http://example.org/"
+baseURL = "https://habitat.on-prem.cov/"
 languageCode = "en-us"
 title = "Chef Habitat Builder on-prem documentation"
-Paginate = 4
+disableKinds = ["taxonomy", "taxonomyTerm"]
 theme = "chef"
-enableGitInfo = true
 
 # To develop against a local copy of the chef hugo theme, uncomment this line
 # and set the value to the parent directory of where you have checked out the
@@ -13,6 +12,12 @@ enableGitInfo = true
 pygmentsStyle = "emacs"
 pygmentsCodefences = true
 
+[markup]
+  [markup.tableOfContents]
+    endLevel = 3
+    ordered = false
+    startLevel = 2
+    
 [[menu.docs]]
 name = "Getting started"
 weight = 10
@@ -26,10 +31,10 @@ identifier = "builder-automate"
 url = "/docs/builder-automate"
 
 [[menu.docs]]
-name = "Automate + OAuth"
+name = "Builder + OAuth"
 weight = 30
-identifier = "builder-oauth"
-url = "/docs/builder-oauth"
+identifier = "auth"
+url = "/docs/auth/"
 
 [[menu.docs]]
 name = "Bootstrap Core Packages"

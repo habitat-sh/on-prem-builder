@@ -36,14 +36,6 @@ If you're using Scoop on Windows:
 
 For downloading and installing for other OS's or by other methods, see the [Hugo installation documentation](https://gohugo.io/getting-started/installing/)
 
-### Setup Theme Submodules
-
-This site uses git submodules for the site theme. To access the theme, initialize your local configuration file and update to the most recent version of the theme with:
-
-    ```shell
-    git submodule init && git submodule update
-    ```
-
 ### View the docs
 
 From the `on-prem-docs` directory, run `hugo server` to serve the docs.

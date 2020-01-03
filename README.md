@@ -65,7 +65,7 @@ The documentation for Builder on-prem is located in the [on-prem-docs](on-prem-d
 #### Installation
 
 1. [Getting Started](on-prem-docs/content/docs/getting-started.md)
-1. [Builder + Automate](on-prem-docs/content/docs/builder-automate.md) *OR* [Builder + OAuth Authentication](on-prem-docs/content/docs/builder-oauth.md) (AzureAD/Github/GitLab/Okta/BitBucket)
+1. [Builder + Automate](on-prem-docs/content/docs/builder-automate.md) *OR* [Builder + OAuth Authentication](on-prem-docs/content/docs/builder-auth.md) (AzureAD/Github/GitLab/Okta/BitBucket)
 1. [Bootstrap Core Packages](on-prem-docs/content/docs/bootstrap-core.md)
 
 #### Reference
