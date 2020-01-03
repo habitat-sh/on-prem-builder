@@ -58,7 +58,7 @@ The following Chef Habitat Builder on-prem functionalities are *NOT* currently a
 
 ## Documentation
 
-The documentation for Builder on-prem is located in the [on-prem-docs](on-prem-docs/README.md) directory. For your convenience, you can serve the documentation locally from that directory by installing the dependencies and running the `hugo serve` command.
+The documentation for Builder on-prem is located in the [on-prem-docs directory](on-prem-docs/README.MD). For your convenience, you can serve the documentation locally from that directory by installing the dependencies and running the `hugo serve` command.
 
 ### Index
 
