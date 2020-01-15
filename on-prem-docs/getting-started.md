@@ -58,5 +58,5 @@ If you need to add additional storage, it is recommended that you create a mount
 
 ## Next Steps
 
-* [Install Builder on-prem authenticating with Chef Automate](/docs/builder-automate/)
-* [Install Builder on-prem authenticating with another OAuth service](/docs/builder-oauth/)
+* [Install Builder on-prem authenticating with Chef Automate](./builder-automate.md)
+* [Install Builder on-prem authenticating with another OAuth service](./builder-oauth.md)
