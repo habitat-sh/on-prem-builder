@@ -107,7 +107,7 @@ api_key = "$ARTIFACTORY_API_KEY"
 repo = "$ARTIFACTORY_REPO"
 
 [memcache]
-ttl = 1
+ttl = 15
 
 [datastore]
 password = "$PGPASSWORD"
