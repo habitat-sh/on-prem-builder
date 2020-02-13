@@ -1,5 +1,7 @@
 chef/scaffolding-chef-infra
 chef/scaffolding-chef-inspec
+chef/chef-infra-client
+chef/inspec
 effortless/audit-baseline
 effortless/config-baseline
 stuartpreston/chef-client 
