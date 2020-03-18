@@ -102,13 +102,3 @@ The following environment variables should be configured as needed:
 2. `HAB_AUTH_TOKEN` - this is the user's auth token that will be needed for private packages (if any), or for operations requiring privileges, for example, package uploads. The user will need to create their auth token and set/use it appropriately.
 3. `SSL_CERT_FILE` - if the Chef Habitat Builder on-prem is configured with SSL and uses a self-signed or other certificate that is not in the trusted chain, then this environment variable can be used on the user's workstation to point the `hab` client to the correct certificate to use when connecting to Chef Habitat Builder on-prem.
 
-## Upgrading
-
-Currently, Chef Habitat Builder on-prem services are not set to auto-upgrade. When you wish to upgrade the services, there is a simple uninstall script you can use to stop and unload the services, and remove the services. In order to uninstall, you may do the following:
-
-1. `cd ${SRC_ROOT}`
-1. `sudo ./uninstall.sh`
-
-Once the services are uninstalled, you may re-install them by running `./install.sh` again.
-
-*IMPORTANT*: Running the uninstall script will *NOT* remove any user data, so you can freely uninstall and re-install the services.
