@@ -199,4 +199,4 @@ If necessary, rename the custom certificates cert file as `ssl-certificate.crt` 
 
 ## Next Steps
 
-[Bootstrap Core Origin](/docs/bootstrap-core)
+[Bootstrap Core Origin](./bootstrap-core.md)
