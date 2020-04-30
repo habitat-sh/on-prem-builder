@@ -6,9 +6,9 @@ Managing your Minio artifact store.
 
 ## Managing Builder On-Prem Artifacts
 
-The data that Builder stores is luckily fairly lightweight and thus the backup and DR strategy is pretty straightforward. On-Prem Builder has two types of data that should be backed up case of a disaster:
+The data that Builder stores is luckily fairly lightweight and thus the backup and DR or Warm Spare strategy is pretty straightforward. On-Prem Builder has two types of data that should be backed up case of a disaster:
 
-1. [PostgreSQL package and user metadata](/docs/postgres/)
+1. [PostgreSQL package and user metadata](./postgres.md#postgresql-data-backups)
 1. Minio habitat artifacts (.harts)
 
 Chef Habitat Builder on-prem supports only Minio artifact repositories.
@@ -32,7 +32,7 @@ A simple backup strategy might look like this:
 
 As mentioned before since this operation could be dramatically different for different environments Minio backup cannot be 100% prescriptive. But This should give you some ideas to explore.
 
-## Upgrading Minio (June 2018)
+## Migrating off of local filesystem into S3/Minio
 
 This section is for installations of On-Premise Depot that were done *prior* to June 15, 2018. If you re-install or upgrade to a newer version of the On-Premise Depot, you will be required to also migrate your package artifacts to a local instance of Minio (the new object store we are using). Please follow the steps below.
 
