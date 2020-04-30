@@ -13,7 +13,7 @@ The following architecture diagram depicts the data synchronization process that
 increase the availability of the Builder API and backend for Disaster Recovery and Warm Spare
 scenarios.
 
-![onprem architecture](images/builder_architecture.png)
+![onprem architecture](../images/builder_architecture.png)
 
 ## Synchronization Components
 
@@ -43,7 +43,7 @@ PostgreSQL, you can repopulate it by re-uploading the package with the --force f
 If using AWS RDS, you should be taking periodic snapshots of the RDS instance. For Disaster Recovery,
 you can choose to use a Multi-AZ RDS Deployment.
 
-For non-RDS deployments, backing up the Postgres data is detailed [here](on-prem-docs/postgres.md#postgresql-data-backups)
+For non-RDS deployments, backing up the Postgres data is detailed [here](./postgres.md#postgresql-data-backups)
 
 The backups should be periodically restored into the DR / Warm Spare via a scheduled automated process
 such as a crontab script. The restore can be run remotely from the same host that was used to create
@@ -57,7 +57,7 @@ Habitat Artifacts can exist in one of two locations:
 1. S3 bucket
 
 In the event that your backend is using Minio for Artifact storage/retrieval, it should be backed by
-highly available storage. Backing up Minio data is detailed [here](on-prem-docs/minio.md#managing-builder-on-prem-artifacts).
+highly available storage. Backing up Minio data is detailed [here](./minio.md#managing-builder-on-prem-artifacts).
 If choosing a Warm Spare deployment in the same availability zone/datacenter the filesystem is a network
 attached filesystem, it can be attached to the Warm Spare. For Disaster Recovery, the filesystem should be
 replicated to the alternate availability zone/datacenter.

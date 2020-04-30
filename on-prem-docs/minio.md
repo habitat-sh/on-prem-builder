@@ -8,7 +8,7 @@ Managing your Minio artifact store.
 
 The data that Builder stores is luckily fairly lightweight and thus the backup and DR or Warm Spare strategy is pretty straightforward. On-Prem Builder has two types of data that should be backed up case of a disaster:
 
-1. [PostgreSQL package and user metadata](on-prem-docs/postgres.md#postgresql-data-backups)
+1. [PostgreSQL package and user metadata](./postgres.md#postgresql-data-backups)
 1. Minio habitat artifacts (.harts)
 
 Chef Habitat Builder on-prem supports only Minio artifact repositories.
