@@ -58,15 +58,16 @@ Habitat Artifacts can exist in one of two locations:
 
 In the event that your backend is using Minio for Artifact storage/retrieval, it should be backed by
 highly available storage. Backing up Minio data is detailed [here](./minio.md#managing-builder-on-prem-artifacts).
-If choosing a Warm Spare deployment in the same availability zone/datacenter the filesystem is a network
-attached filesystem, it can be attached to the Warm Spare. For Disaster Recovery, the filesystem should be
-replicated to the alternate availability zone/datacenter.
+If choosing a Warm Spare deployment in the same availability zone/datacenter and the filesystem is
+a network attached filesystem, it can also be attached to the Warm Spare. However, make sure that
+only one Builder cluster is ever accepting live traffic when sharing the same filesystem. For Disaster
+Recovery, the filesystem should be replicated to the alternate availability zone/datacenter.
 
 If Artifacts are stored directly in an S3 bucket, the same bucket can be used for a Warm Spare in the
 same availability zone/datacenter. In the case of Disaster Recovery, the S3 bucket should be replicated
-to the alternate availability zone/datacenter. In the case of AWS S3, this replication is already built into the service.
+to the alternate availability zone/datacenter. In the case of AWS S3, this replication is already
+built into the service.
 
-In the case that you are not re-attaching the Minio filesytem to the Warm Spare, the backups should be
-periodically restored into the DR / Warm Spare via a scheduled automated process such as a crontab script.
-The restore can be run remotely from the same host that was used to create the backup. The Builder database
-is relatively small, likely only tens of megabytes.
+In the case that you are not re-attaching the Minio filesytem to the Warm Spare, the backups should
+be periodically restored into the DR / Warm Spare via a scheduled automated process such as a crontab
+script.
