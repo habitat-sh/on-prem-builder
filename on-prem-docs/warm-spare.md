@@ -13,9 +13,7 @@ The following architecture diagram depicts the data synchronization process that
 increase the availability of the Builder API and backend for Disaster Recovery and Warm Spare
 scenarios.
 
-
-ARCHITECTURE DIAGRAM
-
+![onprem architecture](images/builder_architecture.png)
 
 ## Synchronization Components
 
