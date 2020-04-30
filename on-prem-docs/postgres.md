@@ -7,7 +7,7 @@ Managing your Postgres Installation
 The data that Builder stores is luckily fairly lightweight and thus the backup and DR strategy is pretty straightforward. On-Prem Builder has two types of data that should be backed up case of a disaster:
 
 1. PostgreSQL package and user metadata
-1. [Minio habitat artifacts]/docs/minio/)
+1. [Minio habitat artifacts](on-prem-docs/minio.md#minio-artifact-backups)
 
 Ideally, you should coordinate the backup of the entire Builder on-prem cluster to happen together. However, the type of data that Builder stores (metadata and artifacts) permits some flexibility in the timing of your backup operations. In the worst case, if a package's metadata is missing from PostgreSQL, you can repopulate it by re-uploading the package with the `--force` flag, for example: `hab pkg upload <path to hartfile> -u <on-prem_url> --force`.
 
