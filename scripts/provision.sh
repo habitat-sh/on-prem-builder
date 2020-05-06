@@ -3,8 +3,10 @@
 set -eou pipefail
 
 if [ -f ../bldr.env ]; then
+# shellcheck disable=SC1091
   source ../bldr.env
 elif [ -f /vagrant/bldr.env ]; then
+# shellcheck disable=SC1091
   source /vagrant/bldr.env
 else
   echo "ERROR: bldr.env file is missing!"
@@ -32,13 +34,20 @@ EOT
 }
 
 configure() {
-  while [ ! -f /hab/svc/builder-datastore/config/pwfile ]
-  do
-    sleep 2
-  done
+  export PGPASSWORD PGUSER
 
-  export PGPASSWORD
-  PGPASSWORD=$(cat /hab/svc/builder-datastore/config/pwfile)
+  if [ "${RDS_ENABLED:-false}" = "false" ]; then
+    while [ ! -f /hab/svc/builder-datastore/config/pwfile ]
+    do
+      sleep 2
+    done
+
+    PGUSER='hab'
+    PGPASSWORD=$(cat /hab/svc/builder-datastore/config/pwfile)
+  else
+    PGUSER=${RDS_USER:-hab}
+    PGPASSWORD=${RDS_PASSWORD:-hab}
+  fi
 
   export ANALYTICS_ENABLED=${ANALYTICS_ENABLED:="false"}
   export ANALYTICS_COMPANY_ID
@@ -54,15 +63,26 @@ configure() {
     ANALYTICS_COMPANY_NAME=""
   fi
 
+  # don't write out the builder-minio user.toml if using S3 or Artifactory directly
+  if [ "${S3_ENABLED:-false}" = "false" ] && [ "${ARTIFACTORY_ENABLED:-false}" = "false" ]; then
   mkdir -p /hab/svc/builder-minio
   cat <<EOT > /hab/svc/builder-minio/user.toml
 key_id = "$MINIO_ACCESS_KEY"
 secret_key = "$MINIO_SECRET_KEY"
 bucket_name = "$MINIO_BUCKET"
 EOT
+  fi
 
   mkdir -p /hab/svc/builder-api
-  if [ ${ARTIFACTORY_ENABLED:-false} = "true" ]; then
+  export S3_BACKEND="minio"
+  if [ "${S3_ENABLED:-false}" = "true" ]; then
+    S3_BACKEND="aws"
+    MINIO_ENDPOINT=$S3_REGION
+    MINIO_ACCESS_KEY=$S3_ACCESS_KEY
+    MINIO_SECRET_KEY=$S3_SECRET_KEY
+    MINIO_BUCKET=$S3_BUCKET
+  fi
+  if [ "${ARTIFACTORY_ENABLED:-false}" = "true" ]; then
     FEATURES_ENABLED="ARTIFACTORY"
   else
     FEATURES_ENABLED=""
@@ -95,7 +115,7 @@ client_id = "$OAUTH_CLIENT_ID"
 client_secret = "$OAUTH_CLIENT_SECRET"
 
 [s3]
-backend = "minio"
+backend = "$S3_BACKEND"
 key_id = "$MINIO_ACCESS_KEY"
 secret_key = "$MINIO_SECRET_KEY"
 endpoint = "$MINIO_ENDPOINT"
@@ -110,10 +130,12 @@ repo = "$ARTIFACTORY_REPO"
 ttl = 15
 
 [datastore]
+user = "$PGUSER"
 password = "$PGPASSWORD"
 connection_timeout_sec = 5
 host = "$PG_HOST"
 port = $PG_PORT
+ssl_mode = "prefer"
 EOT
 
   mkdir -p /hab/svc/builder-api-proxy
@@ -199,10 +221,12 @@ upload_ssl_certificate() {
 }
 
 start_builder() {
-  init_datastore
-  start_datastore
+  if [ "${RDS_ENABLED:-false}" = "false" ]; then
+    init_datastore
+    start_datastore
+  fi
   configure
-  if ! [ ${ARTIFACTORY_ENABLED:-false} = "true" ]; then
+  if [ "${ARTIFACTORY_ENABLED:-false}" = "false" ] && [ "${S3_ENABLED:-false}" = "false" ]; then
     start_minio
   fi
   start_memcached
