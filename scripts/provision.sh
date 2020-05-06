@@ -33,6 +33,8 @@ password = 'hab'
 EOT
 }
 
+configure_backend() {
+}
 configure() {
   export PGPASSWORD PGUSER
 
@@ -237,17 +239,71 @@ start_builder() {
   upload_ssl_certificate
 }
 
-if command -v useradd > /dev/null; then
-  sudo useradd --system --no-create-home hab || true
-else
-  sudo adduser --system hab || true
-fi
-if command -v groupadd > /dev/null; then
-  sudo groupadd --system hab || true
-else
-  sudo addgroup --system hab || true
-fi
+gen_frontend_bootstrap_bundle() {
+  mkdir -p /hab/bootstrap_bundle/keys /hab/bootstrap_bundle/certs /hab/bootstrap_bundle/configs
 
-sudo systemctl start hab-sup
-sleep 2
-start_builder
+  cp /hab/svc/builder-api/files/*.pub /hab/bootstrap_bundle/keys
+  cp /hab/svc/builder-api/files/*.box.key /hab/bootstrap_bundle/keys
+
+  for cert in /hab/svc/builder-api-proxy/files/*; do
+    cp $cert /hab/bootstrap_bundle/certs
+  done
+
+  cp /hab/svc/builder-api/user.toml /hab/bootstrap_bundle/configs
+
+  type tar  > /dev/null 2>&1 || install_tar
+
+  tar -cvf /hab/bootstrap_bundle.tar /hab/bootstrap_bundle
+}
+
+install_tar() {
+  hab pkg path core/tar >/dev/null 2>&1 || hab pkg install core/tar -b
+}
+
+Help() {
+  # Display Help
+  echo 
+  echo "Habitat Builder Service Provisioning Script"
+  echo ""
+  echo "Syntax: provision [--help] [--frontend] [-h|-f]"
+  echo "options:"
+  echo "h, --help     Print this Help."
+  echo "f, --frontend Provision only a front-end/API."
+  echo 
+
+}
+
+create_users() {
+  if command -v useradd > /dev/null; then
+    sudo useradd --system --no-create-home hab || true
+  else
+    sudo adduser --system hab || true
+  fi
+  if command -v groupadd > /dev/null; then
+    sudo groupadd --system hab || true
+  else
+    sudo addgroup --system hab || true
+  fi
+}
+
+for arg in "$@"
+do
+	if [ "$arg" == "--help" ] || [ "$arg" == "-h" ]; then
+		Help
+	elif [ "$arg" == "--gen-bootstrap" ]; then
+		gen_frontend_bootstrap_bundle
+	elif [ "$arp" == "--frontend"] || [ "$arg" == "-f" ]; then
+		create_users
+		sudo systemctl start hab-sup
+		start_memcached
+		start_api
+		start_api_proxy
+		sleep 2
+	else
+		create_users
+		sudo systemctl start hab-sup
+		sleep 2
+		start_builder
+		gen_frontend_bootstrap_bundle
+	fi
+done
