@@ -293,18 +293,30 @@ generate_frontend_bootstrap_bundle() {
 
 start_frontend_from_bootstrap_bundle() {
   if [ ! -f /hab/bootstrap_bundle.tar ]; then
-    echo "ERROR: /hab/bootstrap_bundle.tar does not exist! hint: run './install.sh --gen-bootstrap'"
+    echo "ERROR: /hab/bootstrap_bundle.tar does not exist!"
+    echo "hint: run './install.sh --generate-bootstrap'"
     echo "from any other functioning node running the builder-api service"
     exit 1
   fi
   if hab svc status habitat/builder-api >/dev/null 2>&1; then
     echo "ERROR: ${BLDR_ORIGIN}/builder-api is already running on this node!"
     echo "This script is only intended to be run on nodes that do not already"
-    echo "have builder-api installed or configured."
+    echo "have builder-api installed or configured. This process could be"
+    echo "data destructive if performed on a pre-existing builder api node."
     echo
     echo "To proceed, unload ${BLDR_ORIGIN}/builder-api and its svc directory."
     exit 1
   fi
+
+  if hab svc status habitat/builder-datastore >/dev/null 2>&1; then
+    echo "ERROR: ${BLDR_ORIGIN}/builder-datastore is running on this node!"
+    echo "This script is only intended to be run on nodes that do not already"
+    echo "have builder services installed, --install-frontend should not be used "
+    echo "on a node running habitat/builder-datastore"
+    echo
+    exit 1
+  fi
+
 
   echo "Extracting bootstrap bundle from /hab/bootstrap_bundle.tar"
   tar xvf /hab/bootstrap_bundle.tar -C /
