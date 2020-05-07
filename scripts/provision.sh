@@ -2,16 +2,21 @@
 
 set -eou pipefail
 
+
+check_envfile() {
 if [ -f ../bldr.env ]; then
   # shellcheck disable=SC1091
   source ../bldr.env
 elif [ -f /vagrant/bldr.env ]; then
   # shellcheck disable=SC1091
   source /vagrant/bldr.env
+elif [ -f /hab/bootstrap_bundle/configs/bldr.env ]; then
+  source /hab/bootstrap_bundle/configs/bldr.env
 else
   echo "ERROR: bldr.env file is missing!"
   exit 1
 fi
+}
 
 # Defaults
 BLDR_ORIGIN=${BLDR_ORIGIN:="habitat"}
@@ -266,15 +271,19 @@ generate_frontend_bootstrap_bundle() {
   else
     mkdir -p /hab/bootstrap_bundle/keys /hab/bootstrap_bundle/certs /hab/bootstrap_bundle/configs
 
-    cp /hab/svc/builder-api/files/*.pub /hab/bootstrap_bundle/keys
-    cp /hab/svc/builder-api/files/*.box.key /hab/bootstrap_bundle/keys
+      cp /hab/svc/builder-api/files/*.pub /hab/bootstrap_bundle/keys
+      cp /hab/svc/builder-api/files/*.box.key /hab/bootstrap_bundle/keys
 
-    for cert in /hab/svc/builder-api-proxy/files/*; do
-      cp "${cert}" /hab/bootstrap_bundle/certs
-    done
+    if [ $APP_SSL_ENABLED == true ]; then
+      for cert in /hab/svc/builder-api-proxy/files/*; do
+        cp "${cert}" /hab/bootstrap_bundle/certs
+      done
+    fi
 
     cp /hab/svc/builder-api/user.toml /hab/bootstrap_bundle/configs/builder-api-user.toml
     cp /hab/svc/builder-api-proxy/user.toml /hab/bootstrap_bundle/configs/builder-api-proxy-user.toml
+
+    cp ../bldr.env /hab/bootstrap_bundle/configs
 
     type tar  > /dev/null 2>&1 || install_tar
 
@@ -298,8 +307,9 @@ start_frontend_from_bootstrap_bundle() {
   fi
 
   echo "Extracting bootstrap bundle from /hab/bootstrap_bundle.tar"
-  tar xvf /hab/bootstrap_bundle.tar
+  tar xvf /hab/bootstrap_bundle.tar -C /
 
+  check_envfile
   start_init
   start_frontend
   sleep 4
@@ -311,9 +321,11 @@ start_frontend_from_bootstrap_bundle() {
   done
   echo
   echo "Uploading SSL Certificates"
-  for cert in /hab/bootstrap_bundle/certs/*; do
-    hab file upload builder-api-proxy.default "$(date +%s)" "$cert"
-  done
+  if [ $APP_SSL_ENABLED == true ]; then
+    for cert in /hab/bootstrap_bundle/certs/*; do
+      hab file upload builder-api-proxy.default "$(date +%s)" "$cert"
+    done
+  fi
   echo
   echo "Copying user.toml files"
   cp -f /hab/bootstrap_bundle/configs/builder-api-user.toml /hab/svc/builder-api/user.toml
@@ -358,6 +370,7 @@ create_users() {
 }
 
 if [ "$#" -eq 0 ]; then
+    check_envfile
     start_init
     start_builder
   else
