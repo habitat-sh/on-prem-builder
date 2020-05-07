@@ -3,10 +3,10 @@
 set -eou pipefail
 
 if [ -f ../bldr.env ]; then
-# shellcheck disable=SC1091
+  # shellcheck disable=SC1091
   source ../bldr.env
 elif [ -f /vagrant/bldr.env ]; then
-# shellcheck disable=SC1091
+  # shellcheck disable=SC1091
   source /vagrant/bldr.env
 else
   echo "ERROR: bldr.env file is missing!"
@@ -17,8 +17,8 @@ fi
 BLDR_ORIGIN=${BLDR_ORIGIN:="habitat"}
 
 sudo () {
-    [[ $EUID = 0 ]] || set -- command sudo -E "$@"
-    "$@"
+  [[ $EUID = 0 ]] || set -- command sudo -E "$@"
+  "$@"
 }
 
 init_datastore() {
@@ -33,8 +33,6 @@ password = 'hab'
 EOT
 }
 
-configure_backend() {
-}
 configure() {
   export PGPASSWORD PGUSER
 
@@ -67,8 +65,8 @@ configure() {
 
   # don't write out the builder-minio user.toml if using S3 or Artifactory directly
   if [ "${S3_ENABLED:-false}" = "false" ] && [ "${ARTIFACTORY_ENABLED:-false}" = "false" ]; then
-  mkdir -p /hab/svc/builder-minio
-  cat <<EOT > /hab/svc/builder-minio/user.toml
+    mkdir -p /hab/svc/builder-minio
+    cat <<EOT > /hab/svc/builder-minio/user.toml
 key_id = "$MINIO_ACCESS_KEY"
 secret_key = "$MINIO_SECRET_KEY"
 bucket_name = "$MINIO_BUCKET"
@@ -140,8 +138,8 @@ port = $PG_PORT
 ssl_mode = "prefer"
 EOT
 
-  mkdir -p /hab/svc/builder-api-proxy
-  cat <<EOT > /hab/svc/builder-api-proxy/user.toml
+mkdir -p /hab/svc/builder-api-proxy
+cat <<EOT > /hab/svc/builder-api-proxy/user.toml
 log_level="info"
 enable_builder = false
 app_url = "${APP_URL}"
@@ -210,7 +208,7 @@ generate_bldr_keys() {
 }
 
 upload_ssl_certificate() {
-  if [ ${APP_SSL_ENABLED} = true ]; then
+  if [ "${APP_SSL_ENABLED}" = "true" ]; then
     echo "SSL enabled - uploading certificate files"
     if ! [ -f "../ssl-certificate.crt" ] || ! [ -f "../ssl-certificate.key" ]; then
       pwd
@@ -222,6 +220,18 @@ upload_ssl_certificate() {
   fi
 }
 
+start_init() {
+    create_users
+    sudo systemctl start hab-sup
+    sleep 2
+}
+
+start_frontend() {
+  start_memcached
+  start_api
+  start_api_proxy
+}
+
 start_builder() {
   if [ "${RDS_ENABLED:-false}" = "false" ]; then
     init_datastore
@@ -231,29 +241,37 @@ start_builder() {
   if [ "${ARTIFACTORY_ENABLED:-false}" = "false" ] && [ "${S3_ENABLED:-false}" = "false" ]; then
     start_minio
   fi
-  start_memcached
-  start_api
-  start_api_proxy
+  start_frontend
   sleep 2
   generate_bldr_keys
   upload_ssl_certificate
 }
 
+
 gen_frontend_bootstrap_bundle() {
+  echo "Generating frontend bootstrap bundle"
   mkdir -p /hab/bootstrap_bundle/keys /hab/bootstrap_bundle/certs /hab/bootstrap_bundle/configs
 
   cp /hab/svc/builder-api/files/*.pub /hab/bootstrap_bundle/keys
   cp /hab/svc/builder-api/files/*.box.key /hab/bootstrap_bundle/keys
 
   for cert in /hab/svc/builder-api-proxy/files/*; do
-    cp $cert /hab/bootstrap_bundle/certs
+    cp "${cert}" /hab/bootstrap_bundle/certs
   done
 
   cp /hab/svc/builder-api/user.toml /hab/bootstrap_bundle/configs
 
   type tar  > /dev/null 2>&1 || install_tar
 
-  tar -cvf /hab/bootstrap_bundle.tar /hab/bootstrap_bundle
+  tar -cvf /hab/bootstrap_bundle.tar /hab/bootstrap_bundle && echo "saved: /hab/bootstrap_bundle.tar"
+}
+
+install_frontend_from_bootstrap_bundle() {
+  if [ ! -f /hab/boostrap_bundle.tar ]; then
+    echo "ERROR: /hab/bootstrap_bundle.tar does not exist! hint: run './install.sh --gen-bootstrap' \
+      from any other functioning node running the builder-api service"
+    exit 1
+  fi
 }
 
 install_tar() {
@@ -262,14 +280,14 @@ install_tar() {
 
 Help() {
   # Display Help
-  echo 
+  echo
   echo "Habitat Builder Service Provisioning Script"
   echo ""
   echo "Syntax: provision [--help] [--frontend] [-h|-f]"
   echo "options:"
   echo "h, --help     Print this Help."
   echo "f, --frontend Provision only a front-end/API."
-  echo 
+  echo
 
 }
 
@@ -286,24 +304,21 @@ create_users() {
   fi
 }
 
-for arg in "$@"
+for arg in "$@:-default"
 do
-	if [ "$arg" == "--help" ] || [ "$arg" == "-h" ]; then
-		Help
-	elif [ "$arg" == "--gen-bootstrap" ]; then
-		gen_frontend_bootstrap_bundle
-	elif [ "$arp" == "--frontend"] || [ "$arg" == "-f" ]; then
-		create_users
-		sudo systemctl start hab-sup
-		start_memcached
-		start_api
-		start_api_proxy
-		sleep 2
-	else
-		create_users
-		sudo systemctl start hab-sup
-		sleep 2
-		start_builder
-		gen_frontend_bootstrap_bundle
-	fi
+  if [ "$arg" == "--help" ] || [ "$arg" == "-h" ]; then
+    Help
+  elif [ "$arg" == "--gen-bootstrap" ]; then
+    gen_frontend_bootstrap_bundle
+  elif [ "$arg" == "--install-frontend" ]; then
+    install_frontend_from_bootstrap_bundle
+  elif [ "$arg" == "--frontend" ] || [ "$arg" == "-f" ]; then
+    start_init
+    start_frontend
+  # default, when no args are passed
+  else
+    start_init
+    start_builder
+    gen_frontend_bootstrap_bundle
+  fi
 done
