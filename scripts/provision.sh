@@ -157,6 +157,10 @@ proxy_send_timeout = 180
 proxy_read_timeout = 180
 enable_gzip = true
 enable_caching = true
+limit_req_zone_unknown = "\$limit_unknown zone=unknown:10m rate=30r/s"
+limit_req_unknown      = "burst=90 nodelay"
+limit_req_zone_known   = "\$http_x_forwarded_for zone=known:10m rate=30r/s"
+limit_req_known        = "burst=90 nodelay"
 
 [http]
 keepalive_timeout = "180s"
@@ -221,18 +225,24 @@ upload_ssl_certificate() {
 }
 
 start_init() {
-    create_users
-    sudo systemctl start hab-sup
-    sleep 2
+  echo
+  echo "Starting Habitat Supervisor"
+  create_users
+  sudo systemctl start hab-sup
+  sleep 2
 }
 
 start_frontend() {
+  echo
+  echo "Starting Builder Frontend Services"
   start_memcached
   start_api
   start_api_proxy
 }
 
 start_builder() {
+  echo
+  echo "Starting Builder Services"
   if [ "${RDS_ENABLED:-false}" = "false" ]; then
     init_datastore
     start_datastore
@@ -248,30 +258,70 @@ start_builder() {
 }
 
 
-gen_frontend_bootstrap_bundle() {
+generate_frontend_bootstrap_bundle() {
   echo "Generating frontend bootstrap bundle"
-  mkdir -p /hab/bootstrap_bundle/keys /hab/bootstrap_bundle/certs /hab/bootstrap_bundle/configs
+  if [ -f /hab/bootstrap_bundle.tar ]; then
+    echo "INFO: /hab/bootstrap_bundle.tar already exists!"
+    echo "Skipping bundle creation"
+  else
+    mkdir -p /hab/bootstrap_bundle/keys /hab/bootstrap_bundle/certs /hab/bootstrap_bundle/configs
 
-  cp /hab/svc/builder-api/files/*.pub /hab/bootstrap_bundle/keys
-  cp /hab/svc/builder-api/files/*.box.key /hab/bootstrap_bundle/keys
+    cp /hab/svc/builder-api/files/*.pub /hab/bootstrap_bundle/keys
+    cp /hab/svc/builder-api/files/*.box.key /hab/bootstrap_bundle/keys
 
-  for cert in /hab/svc/builder-api-proxy/files/*; do
-    cp "${cert}" /hab/bootstrap_bundle/certs
-  done
+    for cert in /hab/svc/builder-api-proxy/files/*; do
+      cp "${cert}" /hab/bootstrap_bundle/certs
+    done
 
-  cp /hab/svc/builder-api/user.toml /hab/bootstrap_bundle/configs
+    cp /hab/svc/builder-api/user.toml /hab/bootstrap_bundle/configs/builder-api-user.toml
+    cp /hab/svc/builder-api-proxy/user.toml /hab/bootstrap_bundle/configs/builder-api-proxy-user.toml
 
-  type tar  > /dev/null 2>&1 || install_tar
+    type tar  > /dev/null 2>&1 || install_tar
 
-  tar -cvf /hab/bootstrap_bundle.tar /hab/bootstrap_bundle && echo "saved: /hab/bootstrap_bundle.tar"
+    tar -cvf /hab/bootstrap_bundle.tar /hab/bootstrap_bundle && echo "saved: /hab/bootstrap_bundle.tar"
+  fi
 }
 
-install_frontend_from_bootstrap_bundle() {
-  if [ ! -f /hab/boostrap_bundle.tar ]; then
-    echo "ERROR: /hab/bootstrap_bundle.tar does not exist! hint: run './install.sh --gen-bootstrap' \
-      from any other functioning node running the builder-api service"
+start_frontend_from_bootstrap_bundle() {
+  if [ ! -f /hab/bootstrap_bundle.tar ]; then
+    echo "ERROR: /hab/bootstrap_bundle.tar does not exist! hint: run './install.sh --gen-bootstrap'"
+    echo "from any other functioning node running the builder-api service"
     exit 1
   fi
+  if hab svc status habitat/builder-api >/dev/null 2>&1; then
+    echo "ERROR: ${BLDR_ORIGIN}/builder-api is already running on this node!"
+    echo "This script is only intended to be run on nodes that do not already"
+    echo "have builder-api installed or configured."
+    echo
+    echo "To proceed, unload ${BLDR_ORIGIN}/builder-api and its svc directory."
+    exit 1
+  fi
+
+  echo "Extracting bootstrap bundle from /hab/bootstrap_bundle.tar"
+  tar xvf /hab/bootstrap_bundle.tar
+
+  start_init
+  start_frontend
+  sleep 4
+
+  echo
+  echo "Uploading Package Signing Keys.."
+  for key in /hab/bootstrap_bundle/keys/*; do
+    hab file upload "builder-api.default" "$(date +%s)" "$key"
+  done
+  echo
+  echo "Uploading SSL Certificates"
+  for cert in /hab/bootstrap_bundle/certs/*; do
+    hab file upload builder-api-proxy.default "$(date +%s)" "$cert"
+  done
+  echo
+  echo "Copying user.toml files"
+  cp -f /hab/bootstrap_bundle/configs/builder-api-user.toml /hab/svc/builder-api/user.toml
+  cp -f /hab/bootstrap_bundle/configs/builder-api-proxy-user.toml /hab/svc/builder-api-proxy/user.toml
+
+  hab svc stop "${BLDR_ORIGIN}/builder-api"
+  sleep 2
+  hab svc start "${BLDR_ORIGIN}/builder-api"
 }
 
 install_tar() {
@@ -283,10 +333,13 @@ Help() {
   echo
   echo "Habitat Builder Service Provisioning Script"
   echo ""
-  echo "Syntax: provision [--help] [--frontend] [-h|-f]"
+  echo "Syntax: $0 <SUBCOMMAND>"
   echo "options:"
-  echo "h, --help     Print this Help."
-  echo "f, --frontend Provision only a front-end/API."
+  echo "-h, --help            Print this Help."
+  echo "--install-frontend    Provision a Frontend/API only."
+  echo "--generate-bootstrap   Generate a bootstrap to be used for scaling our API Frontends"
+  echo
+  echo "The default action, when no arugment are passed, is to provision a node with Frontend and Backend services."
   echo
 
 }
@@ -304,21 +357,18 @@ create_users() {
   fi
 }
 
-for arg in "$@:-default"
-do
-  if [ "$arg" == "--help" ] || [ "$arg" == "-h" ]; then
-    Help
-  elif [ "$arg" == "--gen-bootstrap" ]; then
-    gen_frontend_bootstrap_bundle
-  elif [ "$arg" == "--install-frontend" ]; then
-    install_frontend_from_bootstrap_bundle
-  elif [ "$arg" == "--frontend" ] || [ "$arg" == "-f" ]; then
-    start_init
-    start_frontend
-  # default, when no args are passed
-  else
+if [ "$#" -eq 0 ]; then
     start_init
     start_builder
-    gen_frontend_bootstrap_bundle
-  fi
-done
+  else
+    for arg in "$@"
+    do
+      if [ "$arg" == "--help" ] || [ "$arg" == "-h" ]; then
+	Help
+      elif [ "$arg" == "--generate-bootstrap" ]; then
+	generate_frontend_bootstrap_bundle
+      elif [ "$arg" == "--install-frontend" ]; then
+	start_frontend_from_bootstrap_bundle
+      fi
+    done
+fi
