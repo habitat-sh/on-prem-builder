@@ -10,8 +10,8 @@ if [ -f ../bldr.env ]; then
 elif [ -f /vagrant/bldr.env ]; then
   # shellcheck disable=SC1091
   source /vagrant/bldr.env
-elif [ -f /hab/bootstrap_bundle/configs/bldr.env ]; then
-  source /hab/bootstrap_bundle/configs/bldr.env
+elif [ -f /hab/bootstrap_bundle/configs/bldr-frontend.env ]; then
+  source /hab/bootstrap_bundle/configs/bldr-frontend.env
 else
   echo "ERROR: bldr.env file is missing!"
   exit 1
@@ -40,19 +40,23 @@ EOT
 
 configure() {
   export PGPASSWORD PGUSER
+    if [ "${RDS_ENABLED:-false}" = "false" ]; then
+      if [ "$FRONTEND_INSTALL" == 1 ]; then
+        PGUSER='hab'
+        PGPASSWORD=$(cat /hab/bootstrap_bundle/configs/pwfile)
+      else
+        while [ ! -f /hab/svc/builder-datastore/config/pwfile ]
+        do
+          sleep 2
+        done
 
-  if [ "${RDS_ENABLED:-false}" = "false" ]; then
-    while [ ! -f /hab/svc/builder-datastore/config/pwfile ]
-    do
-      sleep 2
-    done
-
-    PGUSER='hab'
-    PGPASSWORD=$(cat /hab/svc/builder-datastore/config/pwfile)
-  else
-    PGUSER=${RDS_USER:-hab}
-    PGPASSWORD=${RDS_PASSWORD:-hab}
-  fi
+        PGUSER='hab'
+        PGPASSWORD=$(cat /hab/svc/builder-datastore/config/pwfile)
+      fi
+    else
+      PGUSER=${RDS_USER:-hab}
+      PGPASSWORD=${RDS_PASSWORD:-hab}
+    fi
 
   export ANALYTICS_ENABLED=${ANALYTICS_ENABLED:="false"}
   export ANALYTICS_COMPANY_ID
@@ -70,12 +74,14 @@ configure() {
 
   # don't write out the builder-minio user.toml if using S3 or Artifactory directly
   if [ "${S3_ENABLED:-false}" = "false" ] && [ "${ARTIFACTORY_ENABLED:-false}" = "false" ]; then
-    mkdir -p /hab/svc/builder-minio
-    cat <<EOT > /hab/svc/builder-minio/user.toml
+    if [ "$FRONTEND_INSTALL" != 1 ]; then
+      mkdir -p /hab/svc/builder-minio
+      cat <<EOT > /hab/svc/builder-minio/user.toml
 key_id = "$MINIO_ACCESS_KEY"
 secret_key = "$MINIO_SECRET_KEY"
 bucket_name = "$MINIO_BUCKET"
 EOT
+    fi
   fi
 
   mkdir -p /hab/svc/builder-api
@@ -265,29 +271,40 @@ start_builder() {
 
 generate_frontend_bootstrap_bundle() {
   echo "Generating frontend bootstrap bundle"
+  if [ $EUID -ne 0 ]; then
+      echo "Exiting... Please run as root or sudo"
+      exit 1
+  fi
+
   if [ -f /hab/bootstrap_bundle.tar ]; then
     echo "INFO: /hab/bootstrap_bundle.tar already exists!"
     echo "Skipping bundle creation"
   else
     mkdir -p /hab/bootstrap_bundle/keys /hab/bootstrap_bundle/certs /hab/bootstrap_bundle/configs
 
+    if [ -f ../bldr-frontend.env ]; then 
+      cp ../bldr-frontend.env /hab/bootstrap_bundle/configs
+    else
+        echo "ERROR: ./bldr-frontend.env does not exist!"
+        echo "hint: If using cloud services (RDS/S3) copy ./bldr.env to ./bldr-frontend.env and update"
+        echo "APP_URL and OAUTH_REDIRECT_URL. Otherwise copy and update entries for POSTGRES_HOST, "
+        echo "MINIO_ENDPOINT and OAUTH_REDIRECT_URL."
+        exit 1 
+    fi
+
       cp /hab/svc/builder-api/files/*.pub /hab/bootstrap_bundle/keys
       cp /hab/svc/builder-api/files/*.box.key /hab/bootstrap_bundle/keys
+      cp /hab/svc/builder-datastore/config/pwfile /hab/bootstrap_bundle/configs
 
-    if [ $APP_SSL_ENABLED == true ]; then
+      if [ "${APP_SSL_ENABLED:-false}" == "true" ]; then
       for cert in /hab/svc/builder-api-proxy/files/*; do
         cp "${cert}" /hab/bootstrap_bundle/certs
       done
     fi
 
-    cp /hab/svc/builder-api/user.toml /hab/bootstrap_bundle/configs/builder-api-user.toml
-    cp /hab/svc/builder-api-proxy/user.toml /hab/bootstrap_bundle/configs/builder-api-proxy-user.toml
-
-    cp ../bldr.env /hab/bootstrap_bundle/configs
-
     type tar  > /dev/null 2>&1 || install_tar
-
     tar -cvf /hab/bootstrap_bundle.tar /hab/bootstrap_bundle && echo "saved: /hab/bootstrap_bundle.tar"
+    chmod 0600 /hab/bootstrap_bundle /hab/bootstrap_bundle.tar
   fi
 }
 
@@ -323,6 +340,7 @@ start_frontend_from_bootstrap_bundle() {
 
   check_envfile
   start_init
+  configure
   start_frontend
   sleep 4
 
@@ -332,20 +350,12 @@ start_frontend_from_bootstrap_bundle() {
     hab file upload "builder-api.default" "$(date +%s)" "$key"
   done
   echo
-  echo "Uploading SSL Certificates"
-  if [ $APP_SSL_ENABLED == true ]; then
+  if [ "${APP_SSL_ENABLED:-false}" == "true" ]; then
+    echo "Uploading SSL Certificates"
     for cert in /hab/bootstrap_bundle/certs/*; do
       hab file upload builder-api-proxy.default "$(date +%s)" "$cert"
     done
   fi
-  echo
-  echo "Copying user.toml files"
-  cp -f /hab/bootstrap_bundle/configs/builder-api-user.toml /hab/svc/builder-api/user.toml
-  cp -f /hab/bootstrap_bundle/configs/builder-api-proxy-user.toml /hab/svc/builder-api-proxy/user.toml
-
-  hab svc stop "${BLDR_ORIGIN}/builder-api"
-  sleep 2
-  hab svc start "${BLDR_ORIGIN}/builder-api"
 }
 
 install_tar() {
@@ -354,18 +364,21 @@ install_tar() {
 
 Help() {
   # Display Help
-  echo
-  echo "Habitat Builder Service Provisioning Script"
-  echo ""
-  echo "Syntax: $0 <SUBCOMMAND>"
-  echo "options:"
-  echo "-h, --help            Print this Help."
-  echo "--install-frontend    Provision a Frontend/API only."
-  echo "--generate-bootstrap   Generate a bootstrap to be used for scaling our API Frontends"
-  echo
-  echo "The default action, when no arugment are passed, is to provision a node with Frontend and Backend services."
-  echo
+  cat <<EOF
+Habitat Builder Service Provisioning Script
+The default action, when no arugment are passed, is to provision a node with Frontend and Backend services.
+ 
+Syntax: $0 <SUBCOMMAND>
 
+options:
+  
+  -h, --help            Print this Help.
+
+  --install-frontend    Provision a Frontend/API only.
+
+  --generate-bootstrap   Generate a bootstrap to be used for scaling our API Frontends
+
+EOF
 }
 
 create_users() {
@@ -389,11 +402,12 @@ if [ "$#" -eq 0 ]; then
     for arg in "$@"
     do
       if [ "$arg" == "--help" ] || [ "$arg" == "-h" ]; then
-	Help
+	    Help
       elif [ "$arg" == "--generate-bootstrap" ]; then
-	generate_frontend_bootstrap_bundle
+	    generate_frontend_bootstrap_bundle
       elif [ "$arg" == "--install-frontend" ]; then
-	start_frontend_from_bootstrap_bundle
+        export FRONTEND_INSTALL=1
+	    start_frontend_from_bootstrap_bundle
       fi
     done
 fi
