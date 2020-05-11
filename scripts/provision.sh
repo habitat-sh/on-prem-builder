@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -eou pipefail
+umask 0022 
 
 
 check_envfile() {
@@ -13,7 +14,7 @@ elif [ -f /vagrant/bldr.env ]; then
 elif [ -f /hab/bootstrap_bundle/configs/bldr-frontend.env ]; then
   source /hab/bootstrap_bundle/configs/bldr-frontend.env
 else
-  echo "ERROR: bldr.env file is missing!"
+  echo "ERROR: bldr.env or bldr-frontend.env file is missing!"
   exit 1
 fi
 }
@@ -26,9 +27,19 @@ sudo () {
   "$@"
 }
 
+user_toml_warn() {
+  if [ -f "/hab/svc/$1/user.toml" ]; then
+      mv "/hab/svc/$1/user.toml" "/hab/svc/$1/user.toml.bak"
+      echo "WARNING: Previous user.toml exists in deprecated location. All user.toml" 
+      echo "files should be deposited into the path /hab/user/$1/config/user.toml."
+      echo "Deprecated user.toml has been renamed user.toml.bak."
+  fi
+}
+
 init_datastore() {
-  mkdir -p /hab/svc/builder-datastore
-  cat <<EOT > /hab/svc/builder-datastore/user.toml
+  user_toml_warn builder-datastore
+  mkdir -p /hab/user/builder-datastore/config
+  cat <<EOT > /hab/user/builder-datastore/config/user.toml
 max_locks_per_transaction = 128
 dynamic_shared_memory_type = 'none'
 
@@ -41,7 +52,7 @@ EOT
 configure() {
   export PGPASSWORD PGUSER
     if [ "${RDS_ENABLED:-false}" = "false" ]; then
-      if [ "$FRONTEND_INSTALL" == 1 ]; then
+      if [ "${FRONTEND_INSTALL:-0}" == 1 ]; then
         PGUSER='hab'
         PGPASSWORD=$(cat /hab/bootstrap_bundle/configs/pwfile)
       else
@@ -74,9 +85,10 @@ configure() {
 
   # don't write out the builder-minio user.toml if using S3 or Artifactory directly
   if [ "${S3_ENABLED:-false}" = "false" ] && [ "${ARTIFACTORY_ENABLED:-false}" = "false" ]; then
-    if [ "$FRONTEND_INSTALL" != 1 ]; then
-      mkdir -p /hab/svc/builder-minio
-      cat <<EOT > /hab/svc/builder-minio/user.toml
+    if [ "${FRONTEND_INSTALL:-0}" != 1 ]; then
+      user_toml_warn builder-minio
+      mkdir -p /hab/user/builder-minio/config
+      cat <<EOT > /hab/user/builder-minio/config/user.toml
 key_id = "$MINIO_ACCESS_KEY"
 secret_key = "$MINIO_SECRET_KEY"
 bucket_name = "$MINIO_BUCKET"
@@ -84,7 +96,7 @@ EOT
     fi
   fi
 
-  mkdir -p /hab/svc/builder-api
+  mkdir -p /hab/user/builder-api/config
   export S3_BACKEND="minio"
   if [ "${S3_ENABLED:-false}" = "true" ]; then
     S3_BACKEND="aws"
@@ -103,7 +115,8 @@ EOT
   fi
   PG_HOST=${POSTGRES_HOST:-localhost}
   PG_PORT=${POSTGRES_PORT:-5432}
-  cat <<EOT > /hab/svc/builder-api/user.toml
+  user_toml_warn builder-api
+  cat <<EOT > /hab/user/builder-api/config/user.toml
 log_level="error,tokio_core=error,tokio_reactor=error,zmq=error,hyper=error"
 jobsrv_enabled = false
 
@@ -148,9 +161,9 @@ host = "$PG_HOST"
 port = $PG_PORT
 ssl_mode = "prefer"
 EOT
-
-mkdir -p /hab/svc/builder-api-proxy
-cat <<EOT > /hab/svc/builder-api-proxy/user.toml
+user_toml_warn builder-api-proxy
+mkdir -p /hab/user/builder-api-proxy/config
+cat <<EOT > /hab/user/builder-api-proxy/config/user.toml
 log_level="info"
 enable_builder = false
 app_url = "${APP_URL}"
