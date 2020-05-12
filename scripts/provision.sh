@@ -299,8 +299,8 @@ generate_frontend_bootstrap_bundle() {
       cp ../bldr-frontend.env /hab/bootstrap_bundle/configs
     else
         echo "ERROR: ./bldr-frontend.env does not exist!"
-        echo "hint: If using cloud services (RDS/S3) copy ./bldr.env to ./bldr-frontend.env and update"
-        echo "APP_URL and OAUTH_REDIRECT_URL. Otherwise copy and update entries for POSTGRES_HOST, "
+        echo "hint: If using cloud services (RDS/S3) copy ./bldr.env to ./bldr-frontend.env and"
+        echo "update OAUTH_REDIRECT_URL. Otherwise copy and update entries for POSTGRES_HOST, "
         echo "MINIO_ENDPOINT and OAUTH_REDIRECT_URL."
         exit 1 
     fi
