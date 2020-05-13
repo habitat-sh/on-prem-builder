@@ -12,9 +12,12 @@ cat NOTICE
 echo
 
 license="${HAB_LICENSE:-}"
+declare response
 
 if [ "$license" == "accept" ] || [ "$license" == "accept-no-persist" ]; then
-  read -r -p "Continue with installation? [y/N] " response
+  echo "INFO: Detected HAB_LICENSE=${HAB_LICENSE}"
+  echo "Continuing with installation"
+  response="y"
 else
   cat LICENSE-NOTICE
   echo
@@ -27,6 +30,6 @@ if [[ "$response" =~ ^([yY][eE][sS]|[yY])+$ ]]; then
     export HAB_LICENSE=accept
     sudo ./install-hab.sh
     sudo ./hab-sup.service.sh
-    sudo ./provision.sh
+    sudo ./provision.sh "$@"
     popd > /dev/null
 fi
