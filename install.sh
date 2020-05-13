@@ -12,7 +12,7 @@ cat NOTICE
 echo
 
 license="${HAB_LICENSE:-}"
-export response
+declare response
 
 if [ "$license" == "accept" ] || [ "$license" == "accept-no-persist" ]; then
   echo "INFO: Detected HAB_LICENSE=${HAB_LICENSE}"
