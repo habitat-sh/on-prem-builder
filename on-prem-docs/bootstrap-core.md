@@ -98,6 +98,11 @@ Configuring a user's workstation to point to the Chef Habitat Builder on-prem sh
 
 The following environment variables should be configured as needed:
 
-1. `HAB_BLDR_URL` - this is the main (and most important) configuration. It should point to the instance of Chef Habitat Builder on-prem that you have set up. The path must end with `bldr/v1/` Example: `https://MY_ON_PREM_URL/bldr/v1/`
+1. `HAB_BLDR_URL` - this is the main (and most important) configuration. It should point to the instance of Chef Habitat Builder on-prem that you have set up. To invoke a Chef Automate-installed on-prem Builder from the command line, use:
+
+```bash
+export HAB_BLDR_URL=https://MY_ON_PREM_URL/bldr/v1/`
+```
+
 2. `HAB_AUTH_TOKEN` - this is the user's auth token that will be needed for private packages (if any), or for operations requiring privileges, for example, package uploads. The user will need to create their auth token and set/use it appropriately.
 3. `SSL_CERT_FILE` - if the Chef Habitat Builder on-prem is configured with SSL and uses a self-signed or other certificate that is not in the trusted chain, then this environment variable can be used on the user's workstation to point the `hab` client to the correct certificate to use when connecting to Chef Habitat Builder on-prem.
