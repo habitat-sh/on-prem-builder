@@ -16,6 +16,8 @@ The minio/S3 data will be copied to the Automate Builder target via minio mirror
 
 The migration of the PostgreSQL data will be done via a `pg_dump` on the source and then restoring with `psql` on the target.
 
+IMPORTANT: For this migration, you will need to configure Chef Automate as an [OAuth Provider for Habitat Builder](https://automate.chef.io/docs/applications-setup/#authenticating-existing-chef-automate-and-builder-installations). You will then create local accounts in Chef Automate that match the userid's from your source Builder instance.
+
 ### Creating a fallback copy of Chef Automate Builder data
 
 Since the data migration is destructive and will overwrite any previous Builder data on the target, perform a backup in case the original state needs to be restored:
@@ -175,7 +177,53 @@ Follow these steps on the target Automate Builder node:
    sudo chef-automate dev start-converge
    ```
 
-Your database data should be restored and ready for use! Log into the web UI and verify all your origin, package and user metadata exists.
+Your database data should be restored and ready for use!
+
+### Chef Automate Builder Authentication
+
+Log into the web UI and verify all your origin, package and user metadata exists.
+
+If, for some reason, you are unable to log into the UI, you can reset the admin password:
+
+```
+sudo chef-automate iam admin-access restore <new_password>
+```
+
+You should then be able to log into the UI with the `admin` user and the password set above.
+
+The next step is to create local users in Chef Automate with matching usernames as the ones from the source Builder.
+
+1. View the usernames from the PostgreSQL accounts table
+
+   ```
+   sudo chef-automate dev psql automate-builder-api
+   automate-builder-api=# \d accounts;
+					  Table "public.accounts"
+     Column   |           Type           | Collation | Nullable |                 Default
+   ------------+--------------------------+-----------+----------+-----------------------------------------
+   id         | bigint                   |           | not null | next_id_v1('accounts_id_seq'::regclass)
+   name       | text                     |           |          |
+   email      | text                     |           |          |
+   created_at | timestamp with time zone |           |          | now()
+   updated_at | timestamp with time zone |           |          | now()
+   Indexes:
+      "accounts_pkey" PRIMARY KEY, btree (id)
+      "accounts_name_key" UNIQUE CONSTRAINT, btree (name)
+
+   automate-builder-api=# select name from accounts;
+   name
+  -------
+   admin
+   jm
+   (2 rows)
+
+   automate-builder-api=# \q
+   ```
+
+1. For _each_ of the names returned from the SELECT query above, you will need to create a matching username locally. Navigate in Chef Automate UI->Settings->Users->Create User.
+
+Once you have created matching usernames in Chef Automate, the Builder users should be able to authenticate as before with respect to the passwords that were set in Chef Automate.
+User's `$HAB_AUTH_TOKEN`s will remain the same as those from the source Builder.
 
 ## Validation
 
