@@ -16,7 +16,7 @@ The minio/S3 data will be copied to the Automate Builder target via minio mirror
 
 The migration of the PostgreSQL data will be done via a `pg_dump` on the source and then restoring with `psql` on the target.
 
-IMPORTANT: For this migration, you will need to configure Chef Automate as an [OAuth Provider for Habitat Builder](https://automate.chef.io/docs/applications-setup/#authenticating-existing-chef-automate-and-builder-installations). You will then create local accounts in Chef Automate that match the userid's from your source Builder instance.
+IMPORTANT: For this migration, you will need to configure Chef Automate as an [OAuth Provider for Habitat Builder](https://automate.chef.io/docs/applications-setup/#authenticating-existing-chef-automate-and-builder-installations). Following the PostgreSQL data migration, you will need to create local accounts in Chef Automate that match the userids from your source Builder instance.
 
 ### Creating a fallback copy of Chef Automate Builder data
 
