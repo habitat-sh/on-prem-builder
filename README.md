@@ -82,3 +82,7 @@ The documentation for Builder on-prem is located in the [on-prem-docs](on-prem-d
 1. [Using Artifactory with Builder On-Prem](on-prem-docs/artifactory.md)
 1. [High Availability / Disaster Recovery](on-prem-docs/warm-spare.md)
 1. [Scaling Frontends](on-prem-docs/scaling.md)
+
+#### Data Migration to Chef Automate deployed Builder
+
+1. [Data migration](on-prem-docs/migration.md)
