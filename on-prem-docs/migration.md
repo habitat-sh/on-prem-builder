@@ -3,10 +3,6 @@
 Long Term Support for On-Prem Builder is provided for installations of [Builder via Chef Automate](https://automate.chef.io/docs/on-prem-builder/).
 This document will guide you through the steps necessary to migrate your On-Prem Builder data into an Automate Builder.
 
-NOTE: The migration will overwrite any existing data in Automate Builder (target) with the data from your current On-Prem (source) installation. The assumption is that the Automate Builder target node is not yet in use.
-
-## Preparing for a Migration
-
 The data that Builder stores is fairly lightweight and thus the migration strategy is pretty straightforward. On-Prem Builder has two types of data that will need to be migrated:
 
 1. Minio/S3 habitat artifacts
@@ -16,25 +12,27 @@ The minio/S3 data will be copied to the Automate Builder target via minio mirror
 
 The migration of the PostgreSQL data will be done via a `pg_dump` on the source and then restoring with `psql` on the target.
 
-IMPORTANT: For this migration, you will need to configure Chef Automate as an [OAuth Provider for Habitat Builder](https://automate.chef.io/docs/applications-setup/#authenticating-existing-chef-automate-and-builder-installations). Following the PostgreSQL data migration, you will need to create local accounts in Chef Automate that match the userids from your source Builder instance.
+## Prerequisites
 
-### Creating a fallback copy of Chef Automate Builder data
+Read the following prerequisite items carefully and ensure that each is addressed.
 
-Since the data migration is destructive and will overwrite any previous Builder data on the target, perform a backup in case the original state needs to be restored:
+1. The migration will overwrite any existing data in Automate Builder (target) with the data from your current On-Prem (source) installation. The assumption is that the Automate Builder target node is not yet in use.
+
+1. Configure Chef Automate as an [OAuth Provider for Habitat Builder](https://automate.chef.io/docs/applications-setup/#authenticating-existing-chef-automate-and-builder-installations). Following the PostgreSQL data migration, you will need to create local accounts in Chef Automate that match the userids from your source Builder instance.
+
+1. Since the data migration is destructive and will overwrite any previous Builder data on the target, perform a backup in case the original state needs to be restored:
 
 ```
 sudo chef-automate backup create
 ```
 
-### Validating Versions
-
-It is the Builder API that runs database migrations and is responsible for making schema changes, ensuring that the PostgreSQL tables are all up to date.
+1. It is the Builder API that runs database migrations and is responsible for making schema changes, ensuring that the PostgreSQL tables are all up to date.
 Check that your target Automate Builder instance is running the same or newer Builder API version than your current On-Prem Builder (source). This is required to ensure that there are no PostgreSQL schema incompatibilities. The Builder API service on the target Automate Builder node will run any migrations necessary to update the PostgreSQL data and schemas to the correct format. Therefore the Automate Builder target must be the same or newer version.
 
 To check the API version installed on the source and target Builder nodes run:
 
 ```
-hab pkg path habitat/builder-api
+sudo hab svc status | grep habitat/builder-api/
 ```
 
 The versions on the target must be equal or newer to the source version.
@@ -42,6 +40,21 @@ The versions on the target must be equal or newer to the source version.
 If it is not, perform an upgrade for target as follows:
 
 * Automate Builder [upgrades](https://automate.chef.io/docs/install/#upgrades).
+
+1. Additionally, ensure that the source Builder API version is not older than the following *minimum* required version: `builder-api/7987/20181203194923`
+
+To check the API version installed on the source Builder node run:
+
+```
+sudo hab svc status | grep habitat/builder-api/
+```
+
+The version of the source Builder API must be >= `builder-api/7987/20181203194923`.
+
+If it is not, work with Chef Support to determine your exact configuration and to create an upgrade plan based on the following scenarios:
+
+* [Merging Database Shards](https://github.com/habitat-sh/on-prem-builder/blob/master/on-prem-docs/postgres.md#merging-postgresql-database-shards)
+* [Merging Databases](https://github.com/habitat-sh/on-prem-builder/blob/master/on-prem-docs/postgres.md#merging-postgresql-databases)
 
 ## Minio Artifact (.hart) Migration
 
@@ -68,7 +81,7 @@ A simple backup process of the source Builder Minio data might look like this:
 1. Start the API service back up if it was stopped
 
   ```
-   hab svc start habitat/builder-api`
+   sudo hab svc start habitat/builder-api`
   ```
 
 ### Importing the Minio Backup Copy
