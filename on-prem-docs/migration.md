@@ -22,53 +22,53 @@ Read the following prerequisite items carefully and ensure that each is addresse
 
 1. Since the data migration is destructive and will overwrite any previous Builder data on the target, perform a backup in case the original state needs to be restored:
 
-```
-sudo chef-automate backup create
-```
+   ```
+   sudo chef-automate backup create
+   ```
 
 1. It is the Builder API that runs database migrations and is responsible for making schema changes, ensuring that the PostgreSQL tables are all up to date.
 Check that your target Automate Builder instance is running the same or newer Builder API version than your current On-Prem Builder (source). This is required to ensure that there are no PostgreSQL schema incompatibilities. The Builder API service on the target Automate Builder node will run any migrations necessary to update the PostgreSQL data and schemas to the correct format. Therefore the Automate Builder target must be the same or newer version.
 
-To check the API version installed on the source and target Builder nodes run:
+   To check the API version installed on the source and target Builder nodes run:
 
-```
-sudo hab svc status | grep habitat/builder-api/
-```
+   ```
+   sudo hab svc status | grep habitat/builder-api/
+   ```
 
-The versions on the target must be equal or newer to the source version.
+   The versions on the target must be equal or newer to the source version.
 
-If it is not, perform an upgrade for target as follows:
+   If it is not, perform an upgrade for target as follows:
 
-* Automate Builder [upgrades](https://automate.chef.io/docs/install/#upgrades).
+   * Automate Builder [upgrades](https://automate.chef.io/docs/install/#upgrades).
 
 1. Additionally, ensure that the source Builder API version is not older than the following *minimum* required version: `builder-api/7987/20181203194923`
 
-To check the API version installed on the source Builder node run:
+   To check the API version installed on the source Builder node run:
 
-```
-sudo hab svc status | grep habitat/builder-api/
-```
+   ```
+   sudo hab svc status | grep habitat/builder-api/
+   ```
 
-The version of the source Builder API must be >= `builder-api/7987/20181203194923`.
+   The version of the source Builder API must be >= `builder-api/7987/20181203194923`.
 
-If it is not, work with Chef Support to determine your exact configuration and to create an upgrade plan based on the following scenarios:
+   If it is not, work with Chef Support to determine your exact configuration and to create an upgrade plan based on the following scenarios:
 
-* [Merging Database Shards](https://github.com/habitat-sh/on-prem-builder/blob/master/on-prem-docs/postgres.md#merging-postgresql-database-shards)
-* [Merging Databases](https://github.com/habitat-sh/on-prem-builder/blob/master/on-prem-docs/postgres.md#merging-postgresql-databases)
+   * [Merging Database Shards](https://github.com/habitat-sh/on-prem-builder/blob/master/on-prem-docs/postgres.md#merging-postgresql-database-shards)
+   * [Merging Databases](https://github.com/habitat-sh/on-prem-builder/blob/master/on-prem-docs/postgres.md#merging-postgresql-databases)
 
 ## Minio Artifact (.hart) Migration
 
 Whether your source package files are in Minio or in S3, you can leverage the [minio client](https://docs.min.io/docs/minio-client-quickstart-guide.html) to perform what more or less amounts to a filesystem backup that you will then restore into the target Minio. You are going to create a copy of the Minio data on another filesystem or directory that can either be copied to or mounted on the target Automate Builder node.
 
-### Creating a Minio Backup Copy
+## Creating a Minio Backup Copy
 
-A simple backup process of the source Builder Minio data might look like this:
+A simple backup process of the source Builder Minio data might look like the steps below.
 
 1. Shut down the API to ensure no active transactions are occurring. (Optional but preferred)
 
-  ```
+   ```
    hab svc stop habitat/builder-api`
-  ```
+   ```
 
 1. Mirror the minio data to a different directory that has adequate space
 
@@ -76,15 +76,15 @@ A simple backup process of the source Builder Minio data might look like this:
    sudo mkdir /opt/data/minio_backup
    sudo ./mc mirror /hab/svc/builder-minio/data/habitat-builder-artifact-store.local /opt/data/minio_backup
    sudo tar cvf /opt/data/minio_backup.tar /opt/data/minio_backup
-  ```
+   ```
 
 1. Start the API service back up if it was stopped
 
-  ```
+   ```
    sudo hab svc start habitat/builder-api`
-  ```
+   ```
 
-### Importing the Minio Backup Copy
+## Importing the Minio Backup Copy
 
 Use the following steps in order to sync the Minio package data into the target Automate Builder. This will overwrite any existing data that is in the Automate Builder Minio depot. Create a backup first `sudo chef-automate backup create` if one does not already exist.
 
@@ -162,15 +162,15 @@ Follow these steps on the target Automate Builder node:
 
 1. Kill off any lingering processes still connected to PostgreSQL
 
-  ```
-  sudo pkill -9 -f "postgres: automate-builder-api"
-  ```
+   ```
+   sudo pkill -9 -f "postgres: automate-builder-api"
+   ```
 
 1. Rename the old database - you can drop it later if desired.
 
-  ```
-  sudo hab pkg exec chef/automate-platform-tools pg-helper rename-if-exists automate-builder-api automate-builder-api.orig -c /hab/svc/automate-gateway/config/service.crt -k /hab/svc/automate-gateway/config/service.key -r /hab/svc/automate-gateway/config/root_ca.crt
-  ```
+   ```
+   sudo hab pkg exec chef/automate-platform-tools pg-helper rename-if-exists automate-builder-api automate-builder-api.orig -c /hab/svc/automate-gateway/config/service.crt -k /hab/svc/automate-gateway/config/service.key -r /hab/svc/automate-gateway/config/root_ca.crt
+   ```
 
 1. Create an empty database
 
@@ -192,15 +192,15 @@ Follow these steps on the target Automate Builder node:
 
 Your database data should be restored and ready for use!
 
-### Chef Automate Builder Authentication
+## Chef Automate Builder Authentication
 
 Log into the web UI and verify all your origin, package and user metadata exists.
 
 If, for some reason, you are unable to log into the UI, you can reset the admin password:
 
-```
-sudo chef-automate iam admin-access restore <new_password>
-```
+   ```
+   sudo chef-automate iam admin-access restore <new_password>
+   ```
 
 You should then be able to log into the UI with the `admin` user and the password set above.
 
@@ -208,57 +208,57 @@ The next step is to create local users in Chef Automate with matching usernames 
 
 1. View the usernames from the PostgreSQL accounts table
 
-   ```
-   sudo chef-automate dev psql automate-builder-api
-   automate-builder-api=# \d accounts;
-					  Table "public.accounts"
-     Column   |           Type           | Collation | Nullable |                 Default
-   ------------+--------------------------+-----------+----------+-----------------------------------------
-   id         | bigint                   |           | not null | next_id_v1('accounts_id_seq'::regclass)
-   name       | text                     |           |          |
-   email      | text                     |           |          |
-   created_at | timestamp with time zone |           |          | now()
-   updated_at | timestamp with time zone |           |          | now()
-   Indexes:
-      "accounts_pkey" PRIMARY KEY, btree (id)
-      "accounts_name_key" UNIQUE CONSTRAINT, btree (name)
+      ```
+      sudo chef-automate dev psql automate-builder-api
+      automate-builder-api=# \d accounts;
+                  Table "public.accounts"
+      Column   |           Type           | Collation | Nullable |                 Default
+      ------------+--------------------------+-----------+----------+-----------------------------------------
+      id         | bigint                   |           | not null | next_id_v1('accounts_id_seq'::regclass)
+      name       | text                     |           |          |
+      email      | text                     |           |          |
+      created_at | timestamp with time zone |           |          | now()
+      updated_at | timestamp with time zone |           |          | now()
+      Indexes:
+         "accounts_pkey" PRIMARY KEY, btree (id)
+         "accounts_name_key" UNIQUE CONSTRAINT, btree (name)
 
-   automate-builder-api=# select name from accounts;
-   name
-  -------
-   admin
-   jm
-   (2 rows)
+      automate-builder-api=# select name from accounts;
+      name
+      -------
+      admin
+      jm
+      (2 rows)
 
-   automate-builder-api=# \q
-   ```
+      automate-builder-api=# \q
+      ```
 
 1. For _each_ of the names returned from the SELECT query above, you will need to create a matching username locally. Navigate in Chef Automate UI->Settings->Users->Create User.
 
 Once you have created matching usernames in Chef Automate, the Builder users should be able to authenticate as before with respect to the passwords that were set in Chef Automate.
 User's `$HAB_AUTH_TOKEN`s will remain the same as those from the source Builder.
 
-## Validation
+## Migration Validation
 
 A package download operation is an easy way to validate PostgreSQL and Minio data are valid
 
-1. Download a package from the target Automate Builder
+Download a package from the target Automate Builder
 
-  ```
+   ```
    hab pkg download core/acl --url https://localhost/bldr/v1 --download-directory downloads
-  ```
+   ```
 
-### Troubleshooting
+## Troubleshooting
 
 If you need to go into the database on the target Automate Builder node for any reason, such as perhaps to interrogate some account tables you can use the following command which will drop you into a sql shell
 
-```
-sudo chef-automate dev psql automate-builder-api
-```
+   ```
+   sudo chef-automate dev psql automate-builder-api
+   ```
 
 If you need to restore a fallback backup that you made prior to a migration you can run a restore
 
-```
-sudo chef-automate backup list
-sudo chef-automate backup restore <id>
-```
+   ```
+   sudo chef-automate backup list
+   sudo chef-automate backup restore <id>
+   ```
