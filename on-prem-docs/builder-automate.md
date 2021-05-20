@@ -1,6 +1,6 @@
 # Builder + Automate
 
-Use Chef Automate to authenticate with Chef Habitat Builder.
+The Chef Automate _Applications Dashboard_ provides observability into your Chef Habitat Builder on-prem installation. See [Setting up the Applications Dashboard](https://automate.chef.io/docs/applications-setup/) for information and installation guidance.
 
 The Chef Habitat 0.85.0 release simplifies custom certificate management, making authentication with Chef Automate easier. Install Builder on-prem and authenticate with Automate in five steps. This is possible because Habitat now looks for custom certificates in its `~/.hab/cache/ssl` directory (or `/hab/cache/ssl` when running as root). Copying self-signed and custom certificates to the cache directory automatically makes them available to the Habitat client.
 
