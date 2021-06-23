@@ -37,6 +37,7 @@ core/hab-bintray-publish
 core/hab-butterfly
 core/habitat-aspnet-sample
 core/hab-launcher
+core/hab-pkg-export-container
 core/hab-pkg-export-docker
 core/hab-pkg-export-tar
 core/hab-plan-build-ps1
