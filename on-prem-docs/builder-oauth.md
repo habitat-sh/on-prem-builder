@@ -86,7 +86,7 @@ In order to install the on-prem Chef Habitat Builder in an airgapped (no direct 
 1. Download the Chef Habitat [cli tool](https://api.bintray.com/content/habitat/stable/linux/x86_64/hab-%24latest-x86_64-linux.tar.gz?bt_package=hab-x86_64-linux)
 
     ```bash
-    curl -Lo hab.tar.gz https://api.bintray.com/content/habitat/stable/linux/x86_64/hab-%24latest-x86_64-linux.tar.gz?bt_package=hab-x86_64-linux
+    curl -Lo hab.tar.gz https://packages.chef.io/files/stable/habitat/latest/hab-x86_64-linux.tar.gz
     ```
 
 1. Create the Habitat Builder package bundle from the [Builder Seed List](https://github.com/habitat-sh/on-prem-builder/blob/master/package_seed_lists/builder_x86_64-linux_stable) package seed list and download it
@@ -157,7 +157,7 @@ hab-sup(AG): The habitat/builder-api-proxy service was successfully loaded
 
 Do a `hab svc status` to check the status of all the services. They may take a few seconds to all come up.
 
-If things don't work as expected (eg, if all the services are not in the `up` state), please see the Troubleshooting section below.
+If things don't work as expected (eg, if all the services are not in the `up` state), please see the [Troubleshooting](troubleshooting.md) documentation.
 
 ## Minio Web UI
 
