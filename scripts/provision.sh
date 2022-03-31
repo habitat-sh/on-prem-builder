@@ -51,7 +51,7 @@ EOT
 
 configure() {
   export PGPASSWORD PGUSER
-    if [ "${RDS_ENABLED:-false}" = "false" ]; then
+    if [ "${PG_EXT_ENABLED:-false}" = "false" ]; then
       if [ "${FRONTEND_INSTALL:-0}" == 1 ]; then
         PGUSER='hab'
         PGPASSWORD=$(cat /hab/bootstrap_bundle/configs/pwfile)
@@ -65,8 +65,8 @@ configure() {
         PGPASSWORD=$(cat /hab/svc/builder-datastore/config/pwfile)
       fi
     else
-      PGUSER=${RDS_USER:-hab}
-      PGPASSWORD=${RDS_PASSWORD:-hab}
+      PGUSER=${PG_USER:-hab}
+      PGPASSWORD=${PG_PASSWORD:-hab}
     fi
 
   export ANALYTICS_ENABLED=${ANALYTICS_ENABLED:="false"}
@@ -267,7 +267,7 @@ start_frontend() {
 start_builder() {
   echo
   echo "Starting Builder Services"
-  if [ "${RDS_ENABLED:-false}" = "false" ]; then
+  if [ "${PG_EXT_ENABLED:-false}" = "false" ]; then
     init_datastore
     start_datastore
   fi
