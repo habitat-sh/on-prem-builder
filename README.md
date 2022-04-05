@@ -33,7 +33,6 @@ The following are minimum requirements for installation/deployment of the Chef H
 * Chef recommends:
   * 50 GB disk space for trial deployments
   * 100 GB disk space for production deployments
-* Deploy services single-node - scale out is not yet supported
 * Outbound network (HTTPS) connectivity to WAN is required for the _initial_ install
 * Inbound network connectivity from LAN (HTTP/HTTPS) is required for internal clients to access the Chef Habitat Builder on-prem
 * OAuth2 authentication provider (Chef Automate v2, Azure AD, GitHub, GitHub Enterprise, GitLab, Okta and Bitbucket (cloud) have been verified - additional providers may be added on request)
