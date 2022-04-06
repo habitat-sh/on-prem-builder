@@ -3,22 +3,6 @@
 set -eou pipefail
 umask 0022 
 
-
-check_envfile() {
-if [ -f ../bldr.env ]; then
-  # shellcheck disable=SC1091
-  source ../bldr.env
-elif [ -f /vagrant/bldr.env ]; then
-  # shellcheck disable=SC1091
-  source /vagrant/bldr.env
-elif [ -f /hab/bootstrap_bundle/configs/bldr-frontend.env ]; then
-  source /hab/bootstrap_bundle/configs/bldr-frontend.env
-else
-  echo "ERROR: bldr.env or bldr-frontend.env file is missing!"
-  exit 1
-fi
-}
-
 # Defaults
 BLDR_ORIGIN=${BLDR_ORIGIN:="habitat"}
 
@@ -51,22 +35,12 @@ EOT
 
 configure() {
   export PGPASSWORD PGUSER
-    if [ "${PG_EXT_ENABLED:-false}" = "false" ]; then
-      if [ "${FRONTEND_INSTALL:-0}" == 1 ]; then
-        PGUSER='hab'
-        PGPASSWORD=$(cat /hab/bootstrap_bundle/configs/pwfile)
-      else
-        while [ ! -f /hab/svc/builder-datastore/config/pwfile ]
-        do
-          sleep 2
-        done
-
-        PGUSER='hab'
-        PGPASSWORD=$(cat /hab/svc/builder-datastore/config/pwfile)
-      fi
-    else
+    if [ "${PG_EXT_ENABLED:-false}" = "true" ]; then
       PGUSER=${PG_USER:-hab}
       PGPASSWORD=${PG_PASSWORD:-hab}
+    else
+      PGUSER="hab"
+      PGPASSWORD=""
     fi
 
   export ANALYTICS_ENABLED=${ANALYTICS_ENABLED:="false"}
@@ -81,6 +55,11 @@ configure() {
     ANALYTICS_WRITE_KEY=""
     ANALYTICS_COMPANY_ID=""
     ANALYTICS_COMPANY_NAME=""
+  fi
+
+  export LOAD_BALANCED="false"
+  if [ "${HAB_BLDR_PEER_ARG:-}" != "" ]; then
+    LOAD_BALANCED="true"
   fi
 
   # don't write out the builder-minio user.toml if using S3 or Artifactory directly
@@ -167,6 +146,7 @@ cat <<EOT > /hab/user/builder-api-proxy/config/user.toml
 log_level="info"
 enable_builder = false
 app_url = "${APP_URL}"
+load_balanced = ${LOAD_BALANCED}
 
 [oauth]
 provider = "$OAUTH_PROVIDER"
@@ -270,6 +250,16 @@ start_builder() {
   if [ "${PG_EXT_ENABLED:-false}" = "false" ]; then
     init_datastore
     start_datastore
+    while [ ! -f /hab/svc/builder-datastore/config/pwfile ]
+    do
+      sleep 2
+    done
+    local pg_pass=$(cat /hab/svc/builder-datastore/config/pwfile)
+    cat <<EOT > pg_pass.toml
+[datastore]
+password = "$pg_pass"
+EOT
+  hab config apply builder-api.default $(date +%s) pg_pass.toml
   fi
   configure
   if [ "${ARTIFACTORY_ENABLED:-false}" = "false" ] && [ "${S3_ENABLED:-false}" = "false" ]; then
@@ -281,53 +271,7 @@ start_builder() {
   upload_ssl_certificate
 }
 
-
-generate_frontend_bootstrap_bundle() {
-  echo "Generating frontend bootstrap bundle"
-  if [ $EUID -ne 0 ]; then
-      echo "Exiting... Please run as root or sudo"
-      exit 1
-  fi
-
-  if [ -f /hab/bootstrap_bundle.tar ]; then
-    echo "INFO: /hab/bootstrap_bundle.tar already exists!"
-    echo "Skipping bundle creation"
-  else
-    mkdir -p /hab/bootstrap_bundle/keys /hab/bootstrap_bundle/certs /hab/bootstrap_bundle/configs
-
-    if [ -f ../bldr-frontend.env ]; then 
-      cp ../bldr-frontend.env /hab/bootstrap_bundle/configs
-    else
-        echo "ERROR: ./bldr-frontend.env does not exist!"
-        echo "hint: If using cloud services (RDS/S3) copy ./bldr.env to ./bldr-frontend.env and"
-        echo "update OAUTH_REDIRECT_URL. Otherwise copy and update entries for POSTGRES_HOST, "
-        echo "MINIO_ENDPOINT and OAUTH_REDIRECT_URL."
-        exit 1 
-    fi
-
-      cp /hab/svc/builder-api/files/*.pub /hab/bootstrap_bundle/keys
-      cp /hab/svc/builder-api/files/*.box.key /hab/bootstrap_bundle/keys
-      cp /hab/svc/builder-datastore/config/pwfile /hab/bootstrap_bundle/configs
-
-      if [ "${APP_SSL_ENABLED:-false}" == "true" ]; then
-      for cert in /hab/svc/builder-api-proxy/files/*; do
-        cp "${cert}" /hab/bootstrap_bundle/certs
-      done
-    fi
-
-    type tar  > /dev/null 2>&1 || install_tar
-    tar -cvf /hab/bootstrap_bundle.tar /hab/bootstrap_bundle && echo "saved: /hab/bootstrap_bundle.tar"
-    chmod 0600 /hab/bootstrap_bundle /hab/bootstrap_bundle.tar
-  fi
-}
-
-start_frontend_from_bootstrap_bundle() {
-  if [ ! -f /hab/bootstrap_bundle.tar ]; then
-    echo "ERROR: /hab/bootstrap_bundle.tar does not exist!"
-    echo "hint: run './install.sh --generate-bootstrap'"
-    echo "from any other functioning node running the builder-api service"
-    exit 1
-  fi
+install_frontend() {
   if hab svc status habitat/builder-api >/dev/null 2>&1; then
     echo "ERROR: ${BLDR_ORIGIN}/builder-api is already running on this node!"
     echo "This script is only intended to be run on nodes that do not already"
@@ -347,28 +291,24 @@ start_frontend_from_bootstrap_bundle() {
     exit 1
   fi
 
-
-  echo "Extracting bootstrap bundle from /hab/bootstrap_bundle.tar"
-  tar xvf /hab/bootstrap_bundle.tar -C /
-
-  check_envfile
   start_init
   configure
   start_frontend
   sleep 4
 
-  echo
-  echo "Uploading Package Signing Keys.."
-  for key in /hab/bootstrap_bundle/keys/*; do
-    hab file upload "builder-api.default" "$(date +%s)" "$key"
+  local key_retry=0
+  while ! ls /hab/svc/builder-api/files/*.pub &>/dev/null
+  do
+    if [ $key_retry -eq 5 ]; then
+      echo "builder key never showed up on ring...generating."
+      generate_bldr_keys
+      upload_ssl_certificate
+      break
+    fi
+    echo "waiting for builder key..."
+    key_retry=$((++key_retry))
+    sleep 5
   done
-  echo
-  if [ "${APP_SSL_ENABLED:-false}" == "true" ]; then
-    echo "Uploading SSL Certificates"
-    for cert in /hab/bootstrap_bundle/certs/*; do
-      hab file upload builder-api-proxy.default "$(date +%s)" "$cert"
-    done
-  fi
 }
 
 install_tar() {
@@ -408,19 +348,16 @@ create_users() {
 }
 
 if [ "$#" -eq 0 ]; then
-    check_envfile
     start_init
     start_builder
   else
     for arg in "$@"
     do
       if [ "$arg" == "--help" ] || [ "$arg" == "-h" ]; then
-	    Help
-      elif [ "$arg" == "--generate-bootstrap" ]; then
-	    generate_frontend_bootstrap_bundle
+	      Help
       elif [ "$arg" == "--install-frontend" ]; then
         export FRONTEND_INSTALL=1
-	    start_frontend_from_bootstrap_bundle
+        install_frontend
       fi
     done
 fi

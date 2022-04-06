@@ -8,6 +8,19 @@ sudo () {
     "$@"
 }
 
+check_envfile() {
+if [ -f ../bldr.env ]; then
+  # shellcheck disable=SC1091
+  source ../bldr.env
+elif [ -f /vagrant/bldr.env ]; then
+  # shellcheck disable=SC1091
+  source /vagrant/bldr.env
+else
+  echo "ERROR: bldr.env file is missing!"
+  exit 1
+fi
+}
+
 cat NOTICE
 echo
 
@@ -29,6 +42,7 @@ if [[ "$response" =~ ^([yY][eE][sS]|[yY])+$ ]]; then
     pushd scripts > /dev/null
     export HAB_LICENSE=accept
     sudo ./install-hab.sh
+    check_envfile
     sudo ./hab-sup.service.sh
     sudo ./provision.sh "$@"
     popd > /dev/null
