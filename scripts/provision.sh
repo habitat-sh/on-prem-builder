@@ -200,6 +200,41 @@ start_memcached() {
   sudo hab svc load "${BLDR_ORIGIN}/builder-memcached" --channel "${BLDR_CHANNEL}" --force
 }
 
+start_jobsrv() {
+  sudo hab svc load "${BLDR_ORIGIN}/builder-jobsrv" --channel stable --force
+}
+
+apply_jobsrv_config() {
+  echo "jobsrv_enabled=true" | sudo hab config apply builder-api.default $(date +%s)
+  echo "api.features_enabled='jobsrv'" | sudo hab config apply builder-api.default $(date +%s)
+
+  #  This will work if GITHUB_APP_ID is defined. Not currently in bldr.env.
+  echo "github.app_id=$GITHUB_APP_ID" | sudo hab config apply builder-api.default $(date +%s)
+  echo "oauth.client_id='$OAUTH_CLIENT_ID'" | sudo hab config apply builder-api-proxy.default $(date +%s)
+
+  APP_HOST=$(echo ${APP_URL} | awk -F[/:] '{print $4}')
+  echo "oauth.redirect_url='${APP_HOST}'" | sudo hab config apply builder-api.default $(date +%s)
+  echo "github.app_id=$GITHUB_APP_ID" | sudo hab config apply builder-api-proxy.default $(date +%s)
+  echo "enable_builder=true" | sudo hab config apply builder-api-proxy.default $(date +%s)
+  echo "datastore.password='$PGPASSWORD'" | sudo hab config apply builder-jobsrv.default $(date +%s)
+}
+
+start_worker() {
+  sudo hab svc load "${BLDR_ORIGIN}/builder-worker" --bind=jobsrv:builder-jobsrv.default --bind=depot:builder-api-proxy.default --channel stable --force
+
+}
+
+apply_worker_config() {
+  #  This will work if GITHUB_APP_ID is defined. Not currently in bldr.env.
+  echo "github.app_id=$GITHUB_APP_ID" | sudo hab config apply builder-worker.default $(date +%s)
+}
+
+apply_db_password() {
+  PW=$(cat /hab/svc/builder-datastore/config/pwfile)
+  echo "datastore.password='$PW'" | sudo hab config apply builder-api.default $(date +%s)
+  echo "datastore.password='$PW'" | sudo hab config apply builder-jobsrv.default $(date +%s)
+}
+
 generate_bldr_keys() {
   mapfile -t keys < <(find /hab/cache/keys -name "bldr-*.pub")
 
@@ -358,6 +393,32 @@ if [ "$#" -eq 0 ]; then
       elif [ "$arg" == "--install-frontend" ]; then
         export FRONTEND_INSTALL=1
         install_frontend
+      elif [ "$arg" == "--install-jobsrv" ]; then
+        echo "Processing arg $arg"
+	#  Bail if $GITHUB_APP_ID is not set.
+	if [ "${GITHUB_APP_ID+x}" != x ]; then
+	  echo "Environment variable GITHUB_APP_ID must be set"
+	  exit 1
+	fi
+
+	if [ "${BUILDER_GITHUB_APP_PEM+x}" != x ]; then
+	  echo "Environment variable BUILDER_GITHUB_APP_PEM must be set"
+	  exit 1
+	fi
+
+	start_init
+	start_frontend
+	start_builder
+
+	cp $BUILDER_GITHUB_APP_PEM /hab/svc/builder-api/files
+	cp $BUILDER_GITHUB_APP_PEM /hab/svc/builder-worker/files
+        start_worker
+        apply_worker_config
+
+        start_jobsrv
+	apply_jobsrv_config
+      elif [ "$arg" == "--setdb-password" ]; then
+	apply_db_password
       fi
     done
 fi
