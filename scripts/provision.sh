@@ -272,7 +272,20 @@ EOT
 }
 
 install_frontend() {
-  if hab svc status habitat/builder-api >/dev/null 2>&1; then
+  #Check if postgresql or minio service installations are also requested.
+  
+  if [ "${POSTGRESQL_INSTALL:-0}" = 1 || "${MINIO_INSTALL:-0}" = 1]; then
+    echo "ERROR: --install-frontend can not not be used along with  "
+    echo "--install-postgresql or --install-minio"
+    echo
+    exit 1
+  fi
+
+  #Check if api and datastore services are already running.
+  api_stat=$(sudo hab svc status 2> /dev/null | sed -n 's/.*habitat\/builder-api\///p' | awk '{print $4}')
+  db_stat=$(sudo hab svc status 2> /dev/null | sed -n 's/.*habitat\/builder-datastore\///p' | awk '{print $4}')
+
+  if [ "$api_stat" = up ]; then
     echo "ERROR: ${BLDR_ORIGIN}/builder-api is already running on this node!"
     echo "This script is only intended to be run on nodes that do not already"
     echo "have builder-api installed or configured. This process could be"
@@ -282,7 +295,7 @@ install_frontend() {
     exit 1
   fi
 
-  if hab svc status habitat/builder-datastore >/dev/null 2>&1; then
+  if [ "$db_stat" = up ]; then
     echo "ERROR: ${BLDR_ORIGIN}/builder-datastore is running on this node!"
     echo "This script is only intended to be run on nodes that do not already"
     echo "have builder services installed, --install-frontend should not be used "
@@ -311,6 +324,67 @@ install_frontend() {
   done
 }
 
+install_postgresql() {
+  #Check if externally hosted PostgreSQL is enabled
+  if [ "${PG_EXT_ENABLED:-false}" = "true" ]; then
+    echo "ERROR: --install-postgresql can not not be used if "
+    echo "you are using externally hosted PostgreSQL(RDS, Azure Database for PostgreSql etc)."
+    echo "Set PG_EXT_ENABLED=false to fix this error."
+    echo
+    exit 1
+  fi
+
+  start_init
+  configure
+  start_datastore
+  sleep 4
+
+  local key_retry=0
+  while ! ls /hab/svc/builder-api/files/*.pub &>/dev/null
+  do
+    if [ $key_retry -eq 5 ]; then
+      echo "builder key never showed up on ring...generating."
+      generate_bldr_keys
+      upload_ssl_certificate
+      break
+    fi
+    echo "waiting for builder key..."
+    key_retry=$((++key_retry))
+    sleep 5
+  done
+}
+
+install_minio() {
+  #Check if using S3 or Artifactory directly
+  if [ "${S3_ENABLED:-false}" = "true" ] || [ "${ARTIFACTORY_ENABLED:-false}" = "true" ]; then
+    echo "ERROR: --install-minio can not not be used if "
+    echo "you are using S3 or Artifactory directly. "
+    echo "Set S3_ENABLED=false and ARTIFACTORY_ENABLED=false to fix this error."
+    echo
+    exit 1
+  fi
+
+  start_init
+  configure
+  start_minio
+  sleep 4
+
+  local key_retry=0
+  while ! ls /hab/svc/builder-api/files/*.pub &>/dev/null
+  do
+    if [ $key_retry -eq 5 ]; then
+      echo "builder key never showed up on ring...generating."
+      generate_bldr_keys
+      upload_ssl_certificate
+      break
+    fi
+    echo "waiting for builder key..."
+    key_retry=$((++key_retry))
+    sleep 5
+  done
+
+}
+
 install_tar() {
   hab pkg path core/tar >/dev/null 2>&1 || hab pkg install core/tar -b
 }
@@ -328,6 +402,10 @@ options:
   -h, --help            Print this Help.
 
   --install-frontend    Provision a Frontend/API only.
+
+  --install-postgresql  Provision the datastore only.
+
+  --install-minio       Provision the minio server only.
 
   --generate-bootstrap   Generate a bootstrap to be used for scaling our API Frontends
 
@@ -358,6 +436,12 @@ if [ "$#" -eq 0 ]; then
       elif [ "$arg" == "--install-frontend" ]; then
         export FRONTEND_INSTALL=1
         install_frontend
+      elif [ "$arg" == "--install-postgresql" ]; then
+        export POSTGRESQL_INSTALL=1
+        install_postgresql
+      elif [ "$arg" == "--install-minio" ]; then
+        export MINIO_INSTALL=1
+        install_minio
       fi
     done
 fi
