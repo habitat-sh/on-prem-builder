@@ -329,20 +329,6 @@ install_postgresql() {
   configure
   start_datastore
   sleep 4
-
-  local key_retry=0
-  while ! ls /hab/svc/builder-api/files/*.pub &>/dev/null
-  do
-    if [ $key_retry -eq 5 ]; then
-      echo "builder key never showed up on ring...generating."
-      generate_bldr_keys
-      upload_ssl_certificate
-      break
-    fi
-    echo "waiting for builder key..."
-    key_retry=$((++key_retry))
-    sleep 5
-  done
 }
 
 install_minio() {
@@ -358,21 +344,6 @@ install_minio() {
   configure
   start_minio
   sleep 4
-
-  local key_retry=0
-  while ! ls /hab/svc/builder-api/files/*.pub &>/dev/null
-  do
-    if [ $key_retry -eq 5 ]; then
-      echo "builder key never showed up on ring...generating."
-      generate_bldr_keys
-      upload_ssl_certificate
-      break
-    fi
-    echo "waiting for builder key..."
-    key_retry=$((++key_retry))
-    sleep 5
-  done
-
 }
 
 install_tar() {
