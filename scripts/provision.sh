@@ -449,6 +449,10 @@ if [ "$#" -eq 0 ]; then
         export POSTGRESQL_INSTALL=1
       elif [ "$arg" == "--install-minio" ]; then
         export MINIO_INSTALL=1
+      else
+        echo ERROR: Invalid argument $arg
+        echo "Use -h or --help to view the available options."
+        exit 1
       fi
     done
     install_options
