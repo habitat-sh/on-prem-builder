@@ -271,15 +271,33 @@ EOT
   upload_ssl_certificate
 }
 
+#This function will validate if uncompatible options are provided together
+validate_args() {
+  case "$1" in
+    "FRONTEND_INSTALL") if [ "${POSTGRESQL_INSTALL:-0}" = 1 -o "${MINIO_INSTALL:-0}" = 1 ]; then
+                            echo "ERROR: --install-frontend can not not be used along with -install-postgresql or --install-minio "
+                            echo
+                            exit 1
+                        fi
+    ;;
+    "POSTGRESQL_INSTALL") if [ "${FRONTEND_INSTALL:-0}" = 1 ]; then
+                            echo "ERROR: --install-postgresql can not not be used along with -install-frontend "
+                            echo
+                            exit 1
+                          fi
+    ;;
+    "MINIO_INSTALL") if [ "${FRONTEND_INSTALL:-0}" = 1 ]; then
+                        echo "ERROR: --install-minio can not not be used along with -install-frontend "
+                        echo
+                        exit 1
+                     fi
+    ;;
+  esac
+}
+
 install_frontend() {
   #Check if postgresql or minio service installations are also requested.
-  
-  if [ "${POSTGRESQL_INSTALL:-0}" = 1 || "${MINIO_INSTALL:-0}" = 1]; then
-    echo "ERROR: --install-frontend can not not be used along with  "
-    echo "--install-postgresql or --install-minio"
-    echo
-    exit 1
-  fi
+  validate_args "FRONTEND_INSTALL"
 
   #Check if api and datastore services are already running.
   api_stat=$(sudo hab svc status 2> /dev/null | sed -n 's/.*habitat\/builder-api\///p' | awk '{print $4}')
@@ -325,10 +343,12 @@ install_frontend() {
 }
 
 install_postgresql() {
+  validate_args "POSTGRESQL_INSTALL"
+
   #Check if externally hosted PostgreSQL is enabled
   if [ "${PG_EXT_ENABLED:-false}" = "true" ]; then
-    echo "ERROR: --install-postgresql can not not be used if "
-    echo "you are using externally hosted PostgreSQL(RDS, Azure Database for PostgreSql etc)."
+    echo "ERROR: --install-postgresql can not not be used if you are using"
+    echo "externally hosted PostgreSQL(RDS, Azure Database for PostgreSql etc)."
     echo "Set PG_EXT_ENABLED=false to fix this error."
     echo
     exit 1
@@ -355,10 +375,11 @@ install_postgresql() {
 }
 
 install_minio() {
+  validate_args "MINIO_INSTALL"
+
   #Check if using S3 or Artifactory directly
   if [ "${S3_ENABLED:-false}" = "true" ] || [ "${ARTIFACTORY_ENABLED:-false}" = "true" ]; then
-    echo "ERROR: --install-minio can not not be used if "
-    echo "you are using S3 or Artifactory directly. "
+    echo "ERROR: --install-minio can not not be used if you are using S3 or Artifactory directly."
     echo "Set S3_ENABLED=false and ARTIFACTORY_ENABLED=false to fix this error."
     echo
     exit 1
