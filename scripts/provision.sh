@@ -283,7 +283,7 @@ install_frontend() {
     echo "data destructive if performed on a pre-existing builder api node."
     echo
     echo "To proceed, unload ${BLDR_ORIGIN}/builder-api and its svc directory."
-    exit 1
+    return
   fi
 
   if [ "$db_stat" = up ]; then
@@ -292,7 +292,7 @@ install_frontend() {
     echo "have builder services installed, --install-frontend should not be used "
     echo "on a node running habitat/builder-datastore"
     echo
-    exit 1
+    return
   fi
 
   start_init
@@ -322,7 +322,7 @@ install_postgresql() {
     echo "externally hosted PostgreSQL(RDS, Azure Database for PostgreSql etc)."
     echo "Set PG_EXT_ENABLED=false to fix this error."
     echo
-    exit 1
+    return
   fi
 
   start_init
@@ -351,7 +351,7 @@ install_minio() {
     echo "ERROR: --install-minio can not not be used if you are using S3 or Artifactory directly."
     echo "Set S3_ENABLED=false and ARTIFACTORY_ENABLED=false to fix this error."
     echo
-    exit 1
+    return
   fi
 
   start_init
