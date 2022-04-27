@@ -272,11 +272,8 @@ EOT
 }
 
 install_frontend() {
-  #Check if api and datastore services are already running.
-  api_stat=$(sudo hab svc status 2> /dev/null | sed -n 's/.*habitat\/builder-api\///p' | awk '{print $4}')
-  db_stat=$(sudo hab svc status 2> /dev/null | sed -n 's/.*habitat\/builder-datastore\///p' | awk '{print $4}')
-
-  if [ "$api_stat" = up ]; then
+  #Check if api and datastore services are already configures or installed.
+  if sudo hab svc status habitat/builder-api >/dev/null 2>/dev/null; then
     echo "ERROR: ${BLDR_ORIGIN}/builder-api is already running on this node!"
     echo "This script is only intended to be run on nodes that do not already"
     echo "have builder-api installed or configured. This process could be"
@@ -286,7 +283,7 @@ install_frontend() {
     return
   fi
 
-  if [ "$db_stat" = up ]; then
+  if sudo hab svc status habitat/builder-datastore >/dev/null 2>/dev/null; then
     echo "ERROR: ${BLDR_ORIGIN}/builder-datastore is running on this node!"
     echo "This script is only intended to be run on nodes that do not already"
     echo "have builder services installed, --install-frontend should not be used "
