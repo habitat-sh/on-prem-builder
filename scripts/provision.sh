@@ -244,13 +244,8 @@ start_frontend() {
   start_api_proxy
 }
 
-start_builder() {
-  echo
-  echo "Starting Builder Services"
-  if [ "${PG_EXT_ENABLED:-false}" = "false" ]; then
-    init_datastore
-    start_datastore
-    while [ ! -f /hab/svc/builder-datastore/config/pwfile ]
+set_pg_password() {
+  while [ ! -f /hab/svc/builder-datastore/config/pwfile ]
     do
       sleep 2
     done
@@ -260,6 +255,15 @@ start_builder() {
 password = "$pg_pass"
 EOT
   hab config apply builder-api.default $(date +%s) pg_pass.toml
+}
+
+start_builder() {
+  echo
+  echo "Starting Builder Services"
+  if [ "${PG_EXT_ENABLED:-false}" = "false" ]; then
+    init_datastore
+    start_datastore
+    set_pg_password
   fi
   configure
   if [ "${ARTIFACTORY_ENABLED:-false}" = "false" ] && [ "${S3_ENABLED:-false}" = "false" ]; then
@@ -323,8 +327,9 @@ install_postgresql() {
   fi
 
   start_init
-  configure
+  init_datastore
   start_datastore
+  set_pg_password
   sleep 4
 }
 
@@ -364,8 +369,6 @@ options:
   --install-postgresql  Provision the datastore only.
 
   --install-minio       Provision the minio server only.
-
-  --generate-bootstrap   Generate a bootstrap to be used for scaling our API Frontends
 
 EOF
 }
