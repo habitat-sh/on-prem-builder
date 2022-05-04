@@ -330,6 +330,7 @@ install_postgresql() {
   init_datastore
   start_datastore
   set_pg_password
+  configure
   sleep 4
 }
 
