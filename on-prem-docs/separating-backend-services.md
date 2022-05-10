@@ -24,7 +24,7 @@ Additionally, you will need to edit (or create if it is not already present) `HA
 MinIO is an open source object storage server. Chef Habitat Builder on-prem uses Minio to store habitat artifacts (.harts).
 
 ### Install Minio
-Run the minio install script from the new node that will run the minio service to store all the artifacts 
+Run the minio install script from the new node that will run the minio service to store all the artifacts
 ```bash
 ./install.sh --install-minio
 ```
