@@ -18,7 +18,7 @@ In the case that your on-prem-builder cluster is backed by cloud services, you w
 
 In the case that you are _not_ backing your cluster with cloud services you will need to update the values of `OAUTH_REDIRECT_URL`, `POSTGRES_HOST`, and `MINIO_ENDPOINT`.
 
-Additionally, you will need to edit (or create if it is not alreadu present) `HAB_BLDR_PEER_ARG` to include all frontend and backend nodes hosting builder services. The format is as follows:
+Additionally, you will need to edit (or create if it is not already present) `HAB_BLDR_PEER_ARG` to include all frontend and backend nodes hosting builder services. The format is as follows:
 
 ```
 --peer host1 --peer host2 --peer host3

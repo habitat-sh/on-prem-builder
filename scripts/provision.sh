@@ -319,7 +319,7 @@ install_frontend() {
 install_postgresql() {
   #Check if externally hosted PostgreSQL is enabled
   if [ "${PG_EXT_ENABLED:-false}" = "true" ]; then
-    echo "ERROR: --install-postgresql can not not be used if you are using"
+    echo "ERROR: --install-postgresql can not be used if you are using"
     echo "externally hosted PostgreSQL(RDS, Azure Database for PostgreSql etc)."
     echo "Set PG_EXT_ENABLED=false to fix this error."
     echo
@@ -337,7 +337,7 @@ install_postgresql() {
 install_minio() {
   #Check if using S3 or Artifactory directly
   if [ "${S3_ENABLED:-false}" = "true" ] || [ "${ARTIFACTORY_ENABLED:-false}" = "true" ]; then
-    echo "ERROR: --install-minio can not not be used if you are using S3 or Artifactory directly."
+    echo "ERROR: --install-minio can not be used if you are using S3 or Artifactory directly."
     echo "Set S3_ENABLED=false and ARTIFACTORY_ENABLED=false to fix this error."
     echo
     return
