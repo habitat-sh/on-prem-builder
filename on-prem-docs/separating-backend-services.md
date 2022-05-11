@@ -6,6 +6,11 @@ You can now have a setup where the postgresql service runs on one node and minio
 ## Pre-requisites
 The bldr.env file for your single on-prem builder node contains most of the information required setup minio and postgresql on it and will be used during the installation process.
 
+Modify your `bldr.env` based on the same config in `bldr.env.sample`
+```bash
+cp bldr.env.sample bldr.env
+```
+
 For the setting up the minio server on a separate node, make sure that `S3_ENABLED` and `ARTIFACTORY_ENABLED` in the bldr.env are set to `false`.
 This must be ensured as minio server can not be used if you are using S3 or Artifactory directly.
 
@@ -44,9 +49,7 @@ Run the postgresql install script from the the node
 ```
 
 ### Connecting to Datastore node
-The bldr.env of the nodes have to modified in order to connect to the datastore running on a different node. Following are the fields that have to be updated onto the nodes that are trying to connect to the Datastore:
+The value of `POSTGRES_HOST` in the bldr.env file has to be mapped to the Node where the Datastore service is running in order to connect to it.
 
-* `PG_EXT_ENABLED` has to be set to true
-* `POSTGRES_HOST` has to be mapped to the Node where the Datastore is running
 
 #### NOTE: Please refer this [documentat](./scaling.md) for setting up and scaling the front end.

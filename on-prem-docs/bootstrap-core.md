@@ -12,7 +12,7 @@ Next, generate a Personal Access Token for bootstrapping the `core` packages, as
 
 Select your Gravatar icon on the top right corner of the Chef Habitat Builder on-prem web page, and then select **Profile**. This will take you to a page where you can generate your access token. Make sure to save it securely.
 
-## Bootstrap Builder with Habitat Packages (**New**)
+## Bootstrap Builder with Habitat Packages
 
 Chef Habitat Builder on-prem has no pre-installed package sets. You must populate your Builder instance by uploading packages.
 With Habitat *0.88.0*, two new commands were introduced to assist in bootstrapping an on-prem Builder instance with a set of stable packages:
@@ -46,51 +46,6 @@ The following section illustrates the steps required to bootstrap the on-prem Bu
     export HAB_AUTH_TOKEN=<your_on-prem_Builder_instance_token>
     hab pkg bulkupload --url https://your-builder.tld --channel stable builder_bootstrap/
     ```
-
-## Bootstrap `core` packages (**Deprecated**)
-
-*Important*: This methodology is now deprecated in favor of the download/bulkupload flow described above.
-
-*Important*: Create a `core` origin before starting this process. The process will fail without first having a `core` origin.
-
-Chef Habitat Builder on-prem has no pre-installed packages. To bootstrap a set of stable `core` origin packages (refer to the [core-plans repo](https://github.com/habitat-sh/core-plans)), you can do the following:
-
-1. Export your Personal Access Token as `HAB_AUTH_TOKEN` to your environment
-
-    ```bash
-    export HAB_AUTH_TOKEN=<your token>
-    ```
-
-1. Run the population script, passing the root URL of your new Chef Habitat Builder on-prem as the last argument (Replace `http` with `https` in the URL if SSL is enabled)
-
-    ```bash
-    sudo -E ./scripts/on-prem-archive.sh populate-depot http://${BUILDER_HOSTNAME_OR_IP}`
-    ```
-
-This is quite a lengthy process, so be patient. It will download a *large* (~ 14GB currently) archive of the latest stable core plans, and then install them to your Chef Habitat Builder on-prem.
-
-Please ensure that you have plenty of free disk space available for hosting the `core` packages as well as for managing your own packages. Updated packages install without deleting any existing packages, so plan disk space accordingly.
-
-## Synchronizing 'core' packages from an upstream (**Deprecated**)
-
-*Important*: This methodology is now deprecated in favor of the download/bulkupload flow described above.
-
-*Important*: Create a `core` origin before starting this process. The process will fail without first having a `core` origin.
-
-It is possible to also use the 'on-prem-archive.sh' script to synchronize the Chef Habitat Builder on-prem using the public Chef Habitat Builder site as an 'upstream'.
-
-This allows new stable core packages from the upstream to get created in the Chef Habitat Builder on-prem instance automatically.
-
-If your Chef Habitat Builder on-prem instance will have continued outgoing internet connectivity, you may wish to periodically run the script to check for updates.
-
-1. Export your Personal Access Token as `HAB_AUTH_TOKEN` to your environment (e.g, `export HAB_AUTH_TOKEN=<your token>`)
-1. `sudo -E ./scripts/on-prem-archive.sh sync-packages http://${BUILDER_HOSTNAME_OR_IP} base-plans`, passing the root URL of your new Chef Habitat Builder on-prem as the last argument. Replace `http` with `https` in the URL if SSL is enabled.
-
-The 'base-plans' parameter restricts the sync to a smaller subset of the core packages. If you wish to synchronize all core packages, omit the 'base-plans' parameter from the script. Note that it will take much longer for the synchronization of all packages. Generally, it will only take a few minutes for base packages to synchronize.
-
-You can also run the sync-packages functionality to initially populate the local Chef Habitat Builder on-prem.
-
-*NOTE*: This functionality is being provided as an alpha - please log any issues found in the on-prem-builder repo.
 
 ## Configuring a user workstation
 
