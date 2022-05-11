@@ -52,4 +52,4 @@ Run the postgresql install script from the the node
 The value of `POSTGRES_HOST` in the bldr.env file has to be mapped to the Node where the Datastore service is running in order to connect to it.
 
 
-#### NOTE: Please refer this [documentat](./scaling.md) for setting up and scaling the front end.
+#### NOTE: Please refer this [document](./scaling.md) for setting up and scaling the front end.
