@@ -1,12 +1,17 @@
 # Separating Backend Services (minio/postgresql)
 
 The on-prem-builder install.sh script now supports separation of the backend components i.e datastore and minio server onto different nodes.
-You can now have a setup where the postgresql service runs on one node and minio runs on another. Both can be designed to communicate to one another and to a third or more nodes running the front-end services. 
+You can now have a setup where the postgresql service runs on one node and minio runs on another. Both can be configured to communicate with other nodes running the front-end services.
 
 ## Pre-requisites
-The bldr.env file for your single on-prem builder node contains most of the information required setup minio and postgresql on it and will be used during the installation process.
+The bldr.env file contains all of the information required to setup minio and postgresql and will be used during the installation process.
 
-Modify your `bldr.env` based on the same config in `bldr.env.sample`
+If your node has already had an older instance of on-prem components on it, run the following to clean up your environment.
+```bash
+./uninstall.sh
+```
+
+Modify the `bldr.env.sample` file and save it to `bldr.env` .
 ```bash
 cp bldr.env.sample bldr.env
 ```
@@ -35,7 +40,7 @@ Run the minio install script from the new node that will run the minio service t
 ```
 
 ### Connecting to Minio server node
-Now that your Minio server is up and running on its own node, it is crucial to know how to connect your other backend and frontend nodes to it.
+Now that your Minio server is up and running on its own node, it is crucial to know how to connect your frontend nodes to it.
 The `MINIO_ENDPOINT` in the bldr.env file has to be mapped to the Node where the Minio server is running.
 You can then access the Minio UI using the `MINIO_ENDPOINT` URL.
 
@@ -49,7 +54,7 @@ Run the postgresql install script from the the node
 ```
 
 ### Connecting to Datastore node
-The value of `POSTGRES_HOST` in the bldr.env file has to be mapped to the Node where the Datastore service is running in order to connect to it.
+The value of `POSTGRES_HOST` in the bldr.env file on the front end nodes must be mapped to the Node where the Datastore service is running in order to connect to it.
 
 
 #### NOTE: Please refer this [document](./scaling.md) for setting up and scaling the front end.
