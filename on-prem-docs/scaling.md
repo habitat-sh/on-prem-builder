@@ -14,11 +14,13 @@ The on-prem-builder install.sh script now supports scaling front-end nodes as a 
 ### Create and update bldr.env
 The bldr.env file for your single on-prem builder node contains most of the information required to bootstrap a new front-end and will be used during the installation process. However, some configuration will need to change.
 
-In the case that your on-prem-builder cluster is backed by cloud services, you will need to update the value of `OAUTH_REDIRECT_URL`. When running multiple front-end instances this value should be pointed to your load-balancer. 
+Update the values of `OAUTH_REDIRECT_URL`, `OAUTH_CLIENT_ID` and `OAUTH_CLIENT_SECRET` as per the on-premise OAuth2 provider.
 
-In the case that you are _not_ backing your cluster with cloud services you will need to update the values of `OAUTH_REDIRECT_URL`, `POSTGRES_HOST`, and `MINIO_ENDPOINT`.
+In the case that your on-prem-builder cluster is backed by cloud services and you are running multiple front-end instances `OAUTH_REDIRECT_URL` should be pointed to your load-balancer. 
 
-Additionally, you will need to edit (or create if it is not alreadu present) `HAB_BLDR_PEER_ARG` to include all frontend and backend nodes hosting builder services. The format is as follows:
+In the case that you are _not_ backing your cluster with cloud services you will need to update the values of `POSTGRES_HOST`, and `MINIO_ENDPOINT`.
+
+Additionally, you will need to edit (or create if it is not already present) `HAB_BLDR_PEER_ARG` to include all frontend and backend nodes hosting builder services. The format is as follows:
 
 ```
 --peer host1 --peer host2 --peer host3

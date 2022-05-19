@@ -173,4 +173,4 @@ At that point you should be able to log in using your configured OAuth provider.
 
 ## Next Steps
 
-[Bootstrap Core Origin](/docs/bootstrap-core.md)
+[Bootstrap Core Origin](./bootstrap-core.md)
