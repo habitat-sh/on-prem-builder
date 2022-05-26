@@ -181,23 +181,23 @@ EOT
 }
 
 start_api() {
-  sudo hab svc load "${BLDR_ORIGIN}/builder-api" --bind memcached:builder-memcached.default --channel "${BLDR_CHANNEL}" --force
+  sudo hab svc load "${BLDR_ORIGIN}/${BLDR_PKG_API}" --bind memcached:builder-memcached.default --channel "${BLDR_CHANNEL}" --force
 }
 
 start_api_proxy() {
-  sudo hab svc load "${BLDR_ORIGIN}/builder-api-proxy" --bind http:builder-api.default --channel "${BLDR_CHANNEL}" --force
+  sudo hab svc load "${BLDR_ORIGIN}/${BLDR_PKG_API_PROXY}" --bind http:builder-api.default --channel "${BLDR_CHANNEL}" --force
 }
 
 start_datastore() {
-  sudo hab svc load "${BLDR_ORIGIN}/builder-datastore" --channel "${BLDR_CHANNEL}" --force
+  sudo hab svc load "${BLDR_ORIGIN}/${BLDR_PKG_DATASTORE}" --channel "${BLDR_CHANNEL}" --force
 }
 
 start_minio() {
-  sudo hab svc load "${BLDR_ORIGIN}/builder-minio" --channel "${BLDR_CHANNEL}" --force
+  sudo hab svc load "${BLDR_ORIGIN}/${BLDR_PKG_MINIO}" --channel "${BLDR_CHANNEL}" --force
 }
 
 start_memcached() {
-  sudo hab svc load "${BLDR_ORIGIN}/builder-memcached" --channel "${BLDR_CHANNEL}" --force
+  sudo hab svc load "${BLDR_ORIGIN}/${BLDR_PKG_MEMCACHED}" --channel "${BLDR_CHANNEL}" --force
 }
 
 generate_bldr_keys() {
@@ -407,7 +407,18 @@ install_options()
   fi
 }
 
+check_envfile() {
+if [ -f ./pkg-idents.env ]; then
+  # shellcheck disable=SC1091
+  source ./pkg-idents.env
+else
+  echo "ERROR: pkg-idents.env file is missing!"
+  exit 1
+fi
+}
+
 if [ "$#" -eq 0 ]; then
+    check_envfile
     start_init
     start_builder
   else
