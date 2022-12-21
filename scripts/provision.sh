@@ -140,6 +140,12 @@ host = "$PG_HOST"
 port = $PG_PORT
 ssl_mode = "prefer"
 EOT
+
+if [ "${OAUTH_PROVIDER}" = "chef-automate" ]; then
+  ALLOW_OAUTH_ORIGIN="allow_oauth_origin = \"https://$(echo $OAUTH_USERINFO_URL | awk -F[/:] '{print $4}')\""
+else
+  ALLOW_OAUTH_ORIGIN=""
+fi
 user_toml_warn builder-api-proxy
 mkdir -p /hab/user/builder-api-proxy/config
 cat <<EOT > /hab/user/builder-api-proxy/config/user.toml
@@ -165,6 +171,7 @@ limit_req_zone_unknown = "\$limit_unknown zone=unknown:10m rate=30r/s"
 limit_req_unknown      = "burst=90 nodelay"
 limit_req_zone_known   = "\$http_x_forwarded_for zone=known:10m rate=30r/s"
 limit_req_known        = "burst=90 nodelay"
+$ALLOW_OAUTH_ORIGIN
 
 [http]
 keepalive_timeout = "180s"

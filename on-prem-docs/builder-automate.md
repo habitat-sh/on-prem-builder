@@ -2,19 +2,15 @@
 
 The Chef Automate _Applications Dashboard_ provides observability into your Chef Habitat Builder on-prem installation. See [Setting up the Applications Dashboard](https://automate.chef.io/docs/applications-setup/) for information and installation guidance.
 
-The Chef Habitat 0.85.0 release simplifies custom certificate management, making authentication with Chef Automate easier. Install Builder on-prem and authenticate with Automate in five steps. This is possible because Habitat now looks for custom certificates in its `~/.hab/cache/ssl` directory (or `/hab/cache/ssl` when running as root). Copying self-signed and custom certificates to the cache directory automatically makes them available to the Habitat client.
-
 ## Chef Habitat On-Prem + Chef Automate
 
 Configuring Chef Habitat on-prem to use Chef Automate's Authentication takes five steps:
 
-1. Patch the Chef Automate `automate-credentials.toml` to recognize Chef Habitat
+1. Patch the Chef Automate configuration to recognize Chef Habitat
 1. Set up the Chef Habitat Builder on-prem `bldr.env` to use Chef Automate's authentication
-1. Copy the any custom certificate `.crt` and `.key` files to the same location as the `./install.sh` script.
+1. Copy your custom builder certificate files (`.crt` and `.key`) to the same location as the `./install.sh` script.
 1. Install Chef Habitat Builder on-prem
 1. Copy Automate's certificate to the `/hab/cache/ssl` directory
-
-For existing Chef Automate installations, copy the TLS certificate from the Chef Automate `config.toml` under the `load_balancer.v1.sys.frontend_tls` entry and save it as `automate-cert.pem` in the `/hab/cache/ssl` directory on Chef Habitat Builder on-prem.
 
 ### Step One: Patch Chef Automate's Configuration
 
@@ -60,13 +56,11 @@ To authenticate with Chef Automate, create a patch with the Chef Automate comman
     Success: Configuration patched
     ```
 
-1. For existing Chef Automate installations, copy the TLS certificate from the Chef Automate `config.toml` under the `load_balancer.v1.sys.frontend_tls` entry and save it to your workstation as `automate-cert.pem`
-
 1. Exit Chef Automate
 
 ### Step Two: Set up `bldr.env`
 
-1. From the command line, access the location where you will install Chef Habitat Builder on-prem:
+1. SSH to your Chef Habitat Builder on-prem instance:
 
     ```bash
     ssh <builder hostname>
@@ -74,7 +68,7 @@ To authenticate with Chef Automate, create a patch with the Chef Automate comman
     ssh <ipaddress>
     ```
 
-1. From Builder host command line, install Chef Habitat Builder on-prem package:
+1. Clone the Chef Habitat Builder on-prem repository:
 
     ```bash
     git clone https://github.com/habitat-sh/on-prem-builder.git
@@ -99,18 +93,16 @@ To authenticate with Chef Automate, create a patch with the Chef Automate comman
     ```
 
 1. Edit `bldr.env`:
-      * Match the `SSL` with the `URL`. The `APP_SSL_ENABLED` configuration coordinates  with the type of hypertext transfer protocol named in `APP_URL`.
-        * To disable SSL, use `APP_SSL_ENABLED=false` and a `APP_URL` beginning with `http`.
-        * To enable SSL, use `APP_SSL_ENABLED=true` and a `APP_URL` beginning with `https`.
-      * Always be closing. Close the Builder addresses provided in `APP_URL` and `OAUTH_REDIRECT_URL` with a forward slash, `/`.
-        * `https://chef-builder.test` will NOT work.
-        * `https://chef-builder.test/` will work.
-  This `bldr.env` example shows an on-prem SSL-enabled Habitat Builder authenticating using Chef Automate's OAuth.
-  `APP_SSL_ENABLED=true` and the `APP_URL` starts with `https`.
+    * SSL must be enabled in Builder in order to authenticate against Automate, use `APP_SSL_ENABLED=true` and a `APP_URL` beginning with `https`.
+    * Set `OAUTH_PROVIDER` to `chef-automate`.
+    * Set the values of `OAUTH_USERINFO_URL`, `OAUTH_AUTHORIZE_URL`, and `OAUTH_TOKEN_URL` appropriate for your Automate server name.
+    * Always be closing. Close the Builder addresses provided in `APP_URL` and `OAUTH_REDIRECT_URL` with a forward slash, `/`.
+      * `https://chef-builder.test` will NOT work.
+      * `https://chef-builder.test/` will work.
 
-### Step Three: Put the Certs with the Install Script
+### Step Three: Put the Builder Certs with the Install Script
 
-If necessary, rename the custom certificates cert file as `ssl-certificate.crt` and the key file as `ssl-certificate.key`. Habitat recognizes only these names and will not recognize any other names. Copy the `ssl-certificate.crt` and `ssl-certificate.key` files to the same directory as the `./install.sh` script.
+Rename the custom Builder certificates cert file as `ssl-certificate.crt` and the key file as `ssl-certificate.key`. Habitat recognizes only these names and will not recognize any other names. Copy the `ssl-certificate.crt` and `ssl-certificate.key` files to the same directory as the `./install.sh` script.
 
 1. Locate the SSL certificate and key pair.
 1. Copy the key pair to the same directory as the install script, which is `/on-prem-builder`, if the repository was not renamed.
@@ -131,17 +123,15 @@ If necessary, rename the custom certificates cert file as `ssl-certificate.crt` 
     cat ./ssl-certificate.crt
     ```
 
-1. For existing Chef Automate installations, move the `cert.pem` that you saved /hab/cache/ssl
-
 ### Step Four: Install Builder
 
 1. Run the install script. This installs both Chef Habitat Builder on-prem and the Chef Habitat datastore:
 
     ```bash
-    bash ./install.sh
+    sudo ./install.sh
     ```
 
-1. Accept both licenses.
+1. Accept the licenses.
 1. All services should report back as `up`. It make take a few minutes to come up.
 
     ```bash
@@ -176,9 +166,8 @@ If necessary, rename the custom certificates cert file as `ssl-certificate.crt` 
     #-----END CERTIFICATE-----
     ```
 
-1. Make a file for you cert at `/hab/cache/ssl/`, such as `automate-cert.crt`. For a `.pem` file, `automate-cert.pem`. Overwriting `cert.pem` will cause your Builder installation to fail.
+1. Make a file for your cert at `/hab/cache/ssl/`, such as `automate-cert.crt`.
 1. Paste the Chef Automate certificate into your file, `/hab/cache/ssl/automate-cert.crt`
-1. For existing Chef Automate installations, copy the `automate-cert.pem` file that you saved on your workstation in step one to the `/hab/cache/ssl/` directory.
 1. Restart builder
 
     ```bash
