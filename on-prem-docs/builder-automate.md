@@ -41,6 +41,8 @@ To authenticate with Chef Automate, create a patch with the Chef Automate comman
     bldr_client_secret = "0123456789abcdef0123456789abcdef01234567"
     ```
 
+    Note that the `OAUTH_CLIENT_ID` and `OAUTH_CLIENT_SECRET` values above match the default values in the bldr.env.sample file which you will edit in the next step. You may chnge these values but they must match the `OAUTH_CLIENT_ID` and `OAUTH_CLIENT_SECRET` in your on prem builder's `bldr.env` file.
+
 1. Apply the `patch-automate.toml` to the Chef Automate configuration from the command line:
 
     ```bash
@@ -95,7 +97,7 @@ To authenticate with Chef Automate, create a patch with the Chef Automate comman
 1. Edit `bldr.env`:
     * SSL must be enabled in Builder in order to authenticate against Automate, use `APP_SSL_ENABLED=true` and a `APP_URL` beginning with `https`.
     * Set `OAUTH_PROVIDER` to `chef-automate`.
-    * Set the values of `OAUTH_USERINFO_URL`, `OAUTH_AUTHORIZE_URL`, and `OAUTH_TOKEN_URL` appropriate for your Automate server name.
+    * Set the values of `OAUTH_USERINFO_URL`, `OAUTH_AUTHORIZE_URL`, and `OAUTH_TOKEN_URL` to the example values provided in the `sample.bldr.env` file substituting `<your.automate.domain>` with your Automate server or domain name.
     * Always be closing. Close the Builder addresses provided in `APP_URL` and `OAUTH_REDIRECT_URL` with a forward slash, `/`.
       * `https://chef-builder.test` will NOT work.
       * `https://chef-builder.test/` will work.
@@ -110,7 +112,7 @@ Rename the custom Builder certificates cert file as `ssl-certificate.crt` and th
 1. If you're testing this workflow, make your own key pair and copy them to `/on-prem-builder`.
 
   ```bash
-  sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/ssl-certificate.key -out /etc/ssl/certs/ssl-certificate.crt %>
+  sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/ssl-certificate.key -out /etc/ssl/certs/ssl-certificate.crt
   sudo cp /etc/ssl/private/ssl-certificate.key .
   sudo cp /etc/ssl/certs/ssl-certificate.crt .
   sudo chown vagrant:vagrant ssl-certificate.*
