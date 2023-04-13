@@ -1,6 +1,26 @@
 # Front-end Scaling
 With any tiered or HA deployment of the builder services you'll likely want to horizontally scale your front-end nodes. The most common deployment pattern for this usecase is a pool of front-end nodes fronted by a load-balancer.
 
+### System Recommendations
+The hardware requirement for an API node is low, however your node-count and usage statistics might alter our recommendation. For our live builder SaaS we are using compute optimized 36vcpu machines with 60Gbs of ram. This is obviously for a live running SaaS service with many thousands of supervisors checking in at any given time. Our disk space does not matter on a new api node as disk is not a resource the API should ever put into contention outside of possibly logging.
+
+It's worth mentioning these are only recommendations and we don't make promises on performance at these scales. However, the intention is for these nodes to be run in a pool behind a load-balancer.
+
+For a small deployment (tens of nodes):
+CPU: 2vcpu
+RAM: 4Gb
+DISK: 20Gb
+
+For a mid-sized deployment (hundreds of nodes):
+CPU: 8vcpu
+Ram: 16Gb
+DISK: 20Gb
+
+For a large deployment (thousands of nodes):
+CPU: 16+vcpu
+RAM: 32+Gb
+DISK: 20Gb
+
 ## Deploying New Front-ends
 The on-prem-builder install.sh script now supports scaling front-end nodes as a deployment pattern. It is required that new front-ends be deployed on a separate compute from your initial on-prem deployment. Since builder services will now need to communicate accross your network between the frontend and backend nodes, you must open the folowing ports to these nodes in order to guarantee your on-prem builder properly functions:
 
