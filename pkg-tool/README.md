@@ -16,12 +16,15 @@ The tool can be run with:
 
 ```
 hab pkg exec habitat/pkg-tool pkg-tool --origins <ORIGIN LIST> --bldr-url <BLDR URL>
-``
+```
 
 `ORIGIN LIST` is either a single origin name or a comma separated list of origins.
 `BLDR_RRL` is the URL for your on-prem habitat builder (depot).
 
 example:
+
+```
 hab pkg exec habitat/pkg-tool pkg-tool --origins mwrock3,habitat --bldr-url https://bldr.habitat.sh
+```
 
 This will find all packages in both the `mwrock3` and `habitat` origins on `https://bldr.habitat.sh` and list them along with all of their dependent packages in a file named `packages.txt`.
