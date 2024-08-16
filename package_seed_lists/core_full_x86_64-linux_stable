@@ -12,7 +12,6 @@ core/artifactory
 core/artifactory-pro
 core/asciinema
 core/aspcud
-core/aspnet-sample
 core/atk
 core/at-spi2-atk
 core/at-spi2-core
@@ -394,7 +393,6 @@ core/linux-headers
 core/linux-headers-musl
 core/linux-pam
 core/llvm
-core/llvm5
 core/llvm7
 core/local-lib
 core/logback
@@ -456,8 +454,6 @@ core/nettle
 core/net-tools
 core/nghttp2
 core/nginx
-core/nginx-builder-api
-core/nginx-cc-demo
 core/ninja
 core/nload
 core/nmap
@@ -470,7 +466,6 @@ core/node7
 core/node8
 core/node9
 core/node_exporter
-core/nodejs-tutorial-app
 core/npth
 core/nspr
 core/nss
@@ -492,7 +487,6 @@ core/openssl-musl
 core/openvpn
 core/optipng
 core/p11-kit
-core/p4broker
 core/packer
 core/pango
 core/papi
@@ -590,8 +584,6 @@ core/scaffolding-go
 core/scaffolding-go17
 core/scaffolding-gradle
 core/scaffolding-node
-core/scaffolding-python
-core/scaffolding-python2
 core/scaffolding-ruby
 core/sccache
 core/scons
@@ -603,7 +595,6 @@ core/sensu-agent
 core/sensu-backend
 core/sentinel
 core/serf
-core/server-jre
 core/shadow
 core/shared-mime-info
 core/shellcheck
@@ -619,7 +610,6 @@ core/sqlite
 core/sshpass
 core/storm
 core/strace
-core/stringencoders
 core/subversion
 core/sudo
 core/sumologic
