@@ -200,7 +200,7 @@ start_datastore() {
 }
 
 start_minio() {
-  sudo hab svc load "${BLDR_ORIGIN}/builder-minio" --channel "${BLDR_CHANNEL}" --force
+  sudo hab svc load "${BLDR_ORIGIN}/builder-minio" --channel "${BLDR_MINIO_CHANNEL}" --force
 }
 
 start_memcached() {
