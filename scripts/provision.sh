@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -eou pipefail
-umask 0022 
+umask 0022
 
 # Defaults
 BLDR_ORIGIN=${BLDR_ORIGIN:="habitat"}
@@ -14,7 +14,7 @@ sudo () {
 user_toml_warn() {
   if [ -f "/hab/svc/$1/user.toml" ]; then
       mv "/hab/svc/$1/user.toml" "/hab/svc/$1/user.toml.bak"
-      echo "WARNING: Previous user.toml exists in deprecated location. All user.toml" 
+      echo "WARNING: Previous user.toml exists in deprecated location. All user.toml"
       echo "files should be deposited into the path /hab/user/$1/config/user.toml."
       echo "Deprecated user.toml has been renamed user.toml.bak."
   fi
@@ -200,7 +200,7 @@ start_datastore() {
 }
 
 start_minio() {
-  sudo hab svc load "${BLDR_ORIGIN}/builder-minio" --channel "${BLDR_MINIO_CHANNEL}" --force
+  sudo hab svc load "${BLDR_ORIGIN}/builder-minio" --channel "${BLDR_MINIO_CHANNEL:=$BLDR_CHANNEL}" --force
 }
 
 start_memcached() {
@@ -365,11 +365,11 @@ Help() {
   cat <<EOF
 Habitat Builder Service Provisioning Script
 The default action, when no arugment are passed, is to provision a node with Frontend and Backend services.
- 
+
 Syntax: $0 <SUBCOMMAND>
 
 options:
-  
+
   -h, --help            Print this Help.
 
   --install-frontend    Provision a Frontend/API only.
