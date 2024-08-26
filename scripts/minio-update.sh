@@ -2,7 +2,7 @@
 
 declare -a deps
 this_script=$0
-deps=('core/aws-cli' 'core/bc' 'core/coreutils')
+deps=('core/aws-cli' 'core/bc' 'core/coreutils' )
 requirements_check_failure=false
 bucket_contents_file=${BUCKET_CONTENTS_FILE:-${PWD}/minio-update-bldr-bucket-objects.txt}
 waypoint=${WAYPOINT:-$PWD/minio-update-bldr-bucket-objects}
@@ -12,33 +12,46 @@ declare -a opts
 # Ancillary Functions
 ################################################################################
 
-function _sudo () { 
+function _sudo () {
   [[ $EUID = 0 ]] || set -- command sudo -E "$@"
   "$@"
 }
 
-function _hab_exec () { 
+function _hab_exec () {
   pkg=$1; shift
   _sudo hab pkg exec $pkg -- "$@"
 }
 
-function aws () { 
+function _hab_install () {
+  pkg=$1; shift
+  echo ""
+  echo "$pkg not installed, installing"
+  if _sudo hab pkg install $pkg -- "$@"; then
+    echo "$pkg install succeeded"
+  else
+    requirements_check_failure=true
+    echo "$pkg install failed"
+  fi
+  echo ""
+}
+
+function aws () {
   _hab_exec 'core/aws-cli' aws $@
 }
 
-function tr() { 
+function tr() {
   _hab_exec 'core/coreutils' tr $@
 }
 
-function bc() { 
+function bc() {
   _hab_exec 'core/bc' bc $@
 }
 
-function df() { 
+function df() {
   _hab_exec 'core/coreutils' df $@
 }
 
-function _is_hab_installed () { 
+function _is_hab_installed () {
   if ! command -v hab &> /dev/null; then
     echo "Please ensure that the hab binary is installed and on your path."
     echo "More information at https://docs.chef.io/habitat/install_habitat/"
@@ -46,19 +59,15 @@ function _is_hab_installed () {
   fi
 }
 
-function _are_dependencies_installed () { 
+function _are_dependencies_installed () {
   for x in "${deps[@]}"; do
     if ! hab pkg env $x &> /dev/null; then
-      echo ""
-      echo "$x is not available as a habitat package."
-      echo "To resolve, run the following: 'sudo hab pkg install $x'"
-      echo ""
-      requirements_check_failure=true
+      _hab_install $x
     fi
   done
 }
 
-function _prerequisites_check () { 
+function _prerequisites_check () {
   echo ""
   echo "-- CHECKING dependecies"
   _is_hab_installed
@@ -70,7 +79,7 @@ function _prerequisites_check () {
 # "Private" Functions
 ################################################################################
 
-function _cfg_environ () { 
+function _cfg_environ () {
 
   source "../bldr.env"
   s3_url="s3://$MINIO_BUCKET"
@@ -105,7 +114,7 @@ function _local_storage_check () {
   fi
 }
 
-function _minio_check { 
+function _minio_check {
   echo ""
   echo "-- CHECKING MinIO"
   if [[ $(curl -s -w "%{http_code}" "$MINIO_ENDPOINT/minio/health/live") == 200 ]]; then
@@ -115,16 +124,16 @@ function _minio_check {
     exit
   fi
   local output=$(aws ${opts[*]} s3 ls)
-  if [[ $output =~ $MINIO_BUCKET ]]; then 
+  if [[ $output =~ $MINIO_BUCKET ]]; then
     echo "MinIO credentials valid"
   else
     echo "MinIO credentials invalid"
     exit
   fi
-  
+
 }
 
-function _print_var { 
+function _print_var {
   echo "$1=${!1}"
 }
 
@@ -137,26 +146,26 @@ function usage () {
 
 	  usage:
 	    This documentation
-	
+
 	  print_env:
 	    Print environment variables of consequence from bldr.env
-	
+
 	  preflight_checks:
 	    Checks to ensure proper functioning
-	
+
 	  download:
 	    Download objects from the MinIO bucket to the local filesystem
-	
+
 	  upgrade:
 	    Upgrade from on-prem-stable channel to bldr-2620307099961720832
-	
+
 	  downgrade:
-	    Upgrade from bldr-2620307099961720832 to on-prem-stable channel 
-	
+	    Upgrade from bldr-2620307099961720832 to on-prem-stable channel
+
 	USAGE
 }
 
-function print_env() { 
+function print_env() {
   echo ""
   echo "ENVIROMENT VARIABLES of Consequence"
   echo ""
@@ -175,7 +184,7 @@ function print_env() {
   echo ""
 }
 
-function _enumerate_bucket_objects () { 
+function _enumerate_bucket_objects () {
   aws ${opts[*]} s3 ls $s3_url \
     --recursive --human-readable --summarize \
     > $bucket_contents_file
@@ -184,7 +193,7 @@ function _enumerate_bucket_objects () {
   echo "Review this file to ensure that what will be downloaded is what you expect"
 }
 
-function review_local_storage_needs () { 
+function review_local_storage_needs () {
   echo "-- REVIEWING local storage needs"
   _report_space_needed
   _report_space_available
@@ -225,7 +234,7 @@ function upgrade_minio () {
   sudo sh -c "find /hab/svc/builder-minio/data/ -maxdepth 1 -mindepth 1 -type d | xargs rm -rf"
   sudo ./install.sh
   popd > /dev/null
-  upload_bucket_objects 
+  upload_bucket_objects
 }
 
 function downgrade_minio () {
@@ -240,9 +249,9 @@ function downgrade_minio () {
   sudo sh -c "find /hab/svc/builder-minio/data/ -maxdepth 1 -mindepth 1 -type d | xargs rm -rf"
   sudo -E ./install.sh
   popd > /dev/null
-  upload_bucket_objects 
+  upload_bucket_objects
 }
-  
+
 ################################################################################
 # "main function"
 ################################################################################
