@@ -2,7 +2,7 @@
 
 declare -a deps
 this_script=$0
-deps=('core/aws-cli' 'core/bc' 'core/coreutils' )
+deps=('core/aws-cli' 'core/bc' 'core/coreutils')
 requirements_check_failure=false
 bucket_contents_file=${BUCKET_CONTENTS_FILE:-${PWD}/minio-update-bldr-bucket-objects.txt}
 waypoint=${WAYPOINT:-$PWD/minio-update-bldr-bucket-objects}
@@ -55,6 +55,7 @@ function _is_hab_installed () {
   if ! command -v hab &> /dev/null; then
     echo "Please ensure that the hab binary is installed and on your path."
     echo "More information at https://docs.chef.io/habitat/install_habitat/"
+    echo ""
     requirements_check_failure=true
   fi
 }
@@ -71,6 +72,7 @@ function _prerequisites_check () {
   echo ""
   echo "-- CHECKING dependecies"
   _is_hab_installed
+  $requirements_check_failure && exit || echo "The hab binary is installed"
   _are_dependencies_installed
   $requirements_check_failure && exit || echo "All dependencies are installed"
 }
