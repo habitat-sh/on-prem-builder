@@ -10,3 +10,6 @@ results/
 *.tfvars
 *.crt
 *.key
+minio-update-bldr-bucket-objects/
+minio-update-bldr-bucket-objects.txt
+pg_pass.toml
