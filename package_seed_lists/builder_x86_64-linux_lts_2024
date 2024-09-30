@@ -1,0 +1,8 @@
+core/hab
+core/hab-sup
+core/hab-launcher
+habitat/builder-api
+habitat/builder-api-proxy
+habitat/builder-datastore
+habitat/builder-minio
+habitat/builder-memcached

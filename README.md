@@ -50,11 +50,6 @@ Once installed, the following functionality will be available to users:
 * Package builds using the `hab` client and Chef Habitat Studio
 * Ability to import core packages from the upstream Chef Habitat Builder
 
-The following Chef Habitat Builder on-prem functionalities are *NOT* currently available:
-
-* Automated package builds using Chef Habitat Builder on-prem
-* Automated package exports using Chef Habitat Builder on-prem
-
 ## Documentation
 
 The documentation for Builder on-prem is located in the [on-prem-docs](on-prem-docs/getting-started.md) directory.
