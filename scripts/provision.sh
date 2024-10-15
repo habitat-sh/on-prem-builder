@@ -409,6 +409,7 @@ install_options()
       install_postgresql
     fi
     if [ "${MINIO_INSTALL:-0}" = 1 ]; then
+      ./minio-migrate.sh
       install_minio
     fi
   fi
