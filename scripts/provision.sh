@@ -5,6 +5,7 @@ umask 0022
 
 # Defaults
 BLDR_ORIGIN=${BLDR_ORIGIN:="habitat"}
+LATEST_MINIO_VERSION="2023-11-01T01-57-10Z"
 
 sudo () {
   [[ $EUID = 0 ]] || set -- command sudo -E "$@"
@@ -200,7 +201,22 @@ start_datastore() {
 }
 
 start_minio() {
+  set +e
+  is_minio_migration_needed
+  migration_needed=$?
+  set -e
+  
+  if [ "$migration_needed" -eq 1 ]; then
+    echo MinIO migration required
+    bash ./minio-update.sh download
+    sudo sh -c "find /hab/svc/builder-minio/data/ -maxdepth 1 -mindepth 1 -type d | xargs rm -rf"
+  fi
+
   sudo hab svc load "${BLDR_ORIGIN}/builder-minio" --channel "${BLDR_MINIO_CHANNEL:=$BLDR_CHANNEL}" --force
+
+  if [ "$migration_needed" -eq 1 ]; then
+    bash ./minio-update.sh upload
+  fi
 }
 
 start_memcached() {
@@ -220,6 +236,18 @@ generate_bldr_keys() {
 
   hab file upload "builder-api.default" "$(date +%s)" "/hab/cache/keys/${KEY_NAME}.pub"
   hab file upload "builder-api.default" "$(date +%s)" "/hab/cache/keys/${KEY_NAME}.box.key"
+}
+
+is_minio_migration_needed() {
+  installed_version=$(hab pkg path core/minio | cut -d '/' -f6)
+
+  if [ "$installed_version" = "$LATEST_MINIO_VERSION" ]; then
+    return 0
+  elif [[ "$installed_version" < "$LATEST_MINIO_VERSION" ]]; then
+    return 1
+  else
+    return 0
+  fi
 }
 
 upload_ssl_certificate() {
@@ -409,7 +437,6 @@ install_options()
       install_postgresql
     fi
     if [ "${MINIO_INSTALL:-0}" = 1 ]; then
-      ./minio-migrate.sh
       install_minio
     fi
   fi
