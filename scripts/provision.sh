@@ -5,7 +5,7 @@ umask 0022
 
 # Defaults
 BLDR_ORIGIN=${BLDR_ORIGIN:="habitat"}
-LATEST_MINIO_VERSION="2023-11-01T01-57-10Z"
+BREAKING_MINIO_VERSION="2023-11-01T01-57-10Z"
 
 sudo () {
   [[ $EUID = 0 ]] || set -- command sudo -E "$@"
@@ -201,6 +201,7 @@ start_datastore() {
 }
 
 start_minio() {
+  bash ./minio-update.sh preflight_checks
   set +e
   is_minio_migration_needed
   migration_needed=$?
@@ -208,6 +209,7 @@ start_minio() {
   
   if [ "$migration_needed" -eq 1 ]; then
     echo MinIO migration required
+    backup_minio_data
     bash ./minio-update.sh download
     sudo sh -c "find /hab/svc/builder-minio/data/ -maxdepth 1 -mindepth 1 -type d | xargs rm -rf"
   fi
@@ -217,6 +219,15 @@ start_minio() {
   if [ "$migration_needed" -eq 1 ]; then
     bash ./minio-update.sh upload
   fi
+}
+
+backup_minio_data() {
+  sudo mkdir -p /hab/svc/builder-minio-bkp/data/
+
+  sudo cp -r /hab/svc/builder-minio/data/* /hab/svc/builder-minio-bkp/data/
+
+  echo "Old MinIO data has been backed up to /hab/svc/builder-minio-bkp/data/"
+
 }
 
 start_memcached() {
@@ -241,9 +252,7 @@ generate_bldr_keys() {
 is_minio_migration_needed() {
   installed_version=$(hab pkg path core/minio | cut -d '/' -f6)
 
-  if [ "$installed_version" = "$LATEST_MINIO_VERSION" ]; then
-    return 0
-  elif [[ "$installed_version" < "$LATEST_MINIO_VERSION" ]]; then
+  if [[ "$installed_version" < "$BREAKING_MINIO_VERSION" ]]; then
     return 1
   else
     return 0
