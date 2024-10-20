@@ -220,7 +220,7 @@ function preflight_checks () {
   echo ""
 }
 
-function downloand_bucket_objects () {
+function download_bucket_objects () {
   aws ${opts[*]} s3 sync $s3_url $waypoint
 }
 
@@ -264,7 +264,7 @@ case "${1}" in
   usage ) usage ;;
   print_env ) print_env ;;
   preflight_checks ) preflight_checks ;;
-  download ) downloand_bucket_objects ;;
+  download ) download_bucket_objects ;;
   upgrade ) upgrade_minio ;;
   downgrade ) downgrade_minio ;;
   upload ) upload_bucket_objects ;;

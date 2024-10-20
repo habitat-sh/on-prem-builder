@@ -5,6 +5,7 @@ umask 0022
 
 # Defaults
 BLDR_ORIGIN=${BLDR_ORIGIN:="habitat"}
+BREAKING_MINIO_VERSION="2023-11-01T01-57-10Z"
 
 sudo () {
   [[ $EUID = 0 ]] || set -- command sudo -E "$@"
@@ -200,7 +201,41 @@ start_datastore() {
 }
 
 start_minio() {
-  sudo hab svc load "${BLDR_ORIGIN}/builder-minio" --channel "${BLDR_MINIO_CHANNEL:=$BLDR_CHANNEL}" --force
+  
+  set +e
+  is_minio_migration_needed
+  migration_needed=$?
+  set -e
+  
+  if [ "$migration_needed" -eq 1 ]; then
+    sudo hab svc load "${BLDR_ORIGIN}/builder-minio" --channel "stable" --force
+    bash ./minio-update.sh preflight_checks
+    echo MinIO migration required
+    backup_minio_data
+    echo starting minio
+
+    bash ./minio-update.sh download
+    sudo sh -c "find /hab/svc/builder-minio/data/ -maxdepth 1 -mindepth 1 -type d | xargs rm -rf"
+    sudo hab svc unload "${BLDR_ORIGIN}/builder-minio"
+  fi
+
+  response=$(curl -s "https://bldr.habitat.sh/v1/depot/channels/$BLDR_ORIGIN/$BLDR_CHANNEL/pkgs/builder-minio/latest")
+  channel_version=$(echo "$response" | jq -r '.ident.version')
+  channel_release=$(echo "$response" | jq -r '.ident.release')
+  sudo hab svc load "${BLDR_ORIGIN}/builder-minio/$channel_version/$channel_release" --channel "${BLDR_MINIO_CHANNEL:=$BLDR_CHANNEL}" --force
+
+  if [ "$migration_needed" -eq 1 ]; then
+    bash ./minio-update.sh upload
+  fi
+}
+
+backup_minio_data() {
+  sudo mkdir -p /hab/svc/builder-minio-bkp/data/
+
+  sudo cp -r /hab/svc/builder-minio/data/* /hab/svc/builder-minio-bkp/data/
+
+  echo "Old MinIO data has been backed up to /hab/svc/builder-minio-bkp/data/"
+
 }
 
 start_memcached() {
@@ -220,6 +255,20 @@ generate_bldr_keys() {
 
   hab file upload "builder-api.default" "$(date +%s)" "/hab/cache/keys/${KEY_NAME}.pub"
   hab file upload "builder-api.default" "$(date +%s)" "/hab/cache/keys/${KEY_NAME}.box.key"
+}
+
+is_minio_migration_needed() {
+  installed_version=$(hab pkg path core/minio | cut -d '/' -f6)
+
+  response=$(curl -s "https://bldr.habitat.sh/v1/depot/channels/$BLDR_ORIGIN/$BLDR_CHANNEL/pkgs/builder-minio/latest")
+  minio_version_lookup=$(echo "$response" | jq -r '.deps[] | select(.origin == "core" and .name == "minio") | .version')
+  
+  echo minio_version_lookup $minio_version_lookup
+if [[ "${installed_version}" < "${BREAKING_MINIO_VERSION}" ]] && { [[ "${BREAKING_MINIO_VERSION}" < "${minio_version_lookup}" ]] || [ "${BREAKING_MINIO_VERSION}" = "${minio_version_lookup}" ]; }; then
+    return 1
+  else
+    return 0
+  fi
 }
 
 upload_ssl_certificate() {
