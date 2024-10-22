@@ -208,21 +208,21 @@ start_minio() {
   set -e
   
   if [ "$migration_needed" -eq 1 ]; then
-    sudo hab svc load "${BLDR_ORIGIN}/builder-minio" --channel "stable" --force
     bash ./minio-update.sh preflight_checks
+    sudo hab svc load "${BLDR_ORIGIN}/builder-minio" --channel "stable" --force
     echo MinIO migration required
     backup_minio_data
-    echo starting minio
+    echo starting minio download
 
     bash ./minio-update.sh download
-    sudo sh -c "find /hab/svc/builder-minio/data/ -maxdepth 1 -mindepth 1 -type d | xargs rm -rf"
     sudo hab svc unload "${BLDR_ORIGIN}/builder-minio"
+    sudo sh -c "find /hab/svc/builder-minio/data/ -maxdepth 1 -mindepth 1 -type d | xargs rm -rf"
   fi
 
   response=$(curl -s "https://bldr.habitat.sh/v1/depot/channels/$BLDR_ORIGIN/$BLDR_CHANNEL/pkgs/builder-minio/latest")
   channel_version=$(echo "$response" | jq -r '.ident.version')
   channel_release=$(echo "$response" | jq -r '.ident.release')
-  sudo hab svc load "${BLDR_ORIGIN}/builder-minio/$channel_version/$channel_release" --channel "${BLDR_MINIO_CHANNEL:=$BLDR_CHANNEL}" --force
+  sudo hab svc load "${BLDR_ORIGIN}/builder-minio/$channel_version/$channel_release" --channel $BLDR_CHANNEL --force
 
   if [ "$migration_needed" -eq 1 ]; then
     bash ./minio-update.sh upload
@@ -230,11 +230,13 @@ start_minio() {
 }
 
 backup_minio_data() {
-  sudo mkdir -p /hab/svc/builder-minio-bkp/data/
+  echo "Starting MinIO data backup" 
+  
+  sudo mkdir -p /hab/svc/builder-minio/data-bkp/
 
-  sudo cp -r /hab/svc/builder-minio/data/* /hab/svc/builder-minio-bkp/data/
+  sudo cp -r /hab/svc/builder-minio/data/* /hab/svc/builder-minio/data-bkp/
 
-  echo "Old MinIO data has been backed up to /hab/svc/builder-minio-bkp/data/"
+  echo "Old MinIO data has been backed up to /hab/svc/builder-minio/data-bkp/"
 
 }
 
