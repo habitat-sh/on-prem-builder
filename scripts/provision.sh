@@ -219,10 +219,8 @@ start_minio() {
     sudo sh -c "find /hab/svc/builder-minio/data/ -maxdepth 1 -mindepth 1 -type d | xargs rm -rf"
   fi
 
-  response=$(curl -s "https://bldr.habitat.sh/v1/depot/channels/$BLDR_ORIGIN/$BLDR_CHANNEL/pkgs/builder-minio/latest")
-  channel_version=$(echo "$response" | jq -r '.ident.version')
-  channel_release=$(echo "$response" | jq -r '.ident.release')
-  sudo hab svc load "${BLDR_ORIGIN}/builder-minio/$channel_version/$channel_release" --channel $BLDR_CHANNEL --force
+    sudo rm -rf /hab/pkgs/habitat/builder-minio
+    sudo hab svc load "${BLDR_ORIGIN}/builder-minio" --channel $BLDR_CHANNEL --force
 
   if [ "$migration_needed" -eq 1 ]; then
     bash ./minio-update.sh upload
@@ -266,7 +264,7 @@ is_minio_migration_needed() {
   minio_version_lookup=$(echo "$response" | jq -r '.deps[] | select(.origin == "core" and .name == "minio") | .version')
   
   echo minio_version_lookup $minio_version_lookup
-if [[ "${installed_version}" < "${BREAKING_MINIO_VERSION}" ]] && { [[ "${BREAKING_MINIO_VERSION}" < "${minio_version_lookup}" ]] || [ "${BREAKING_MINIO_VERSION}" = "${minio_version_lookup}" ]; }; then
+if [[ "${installed_version}" < "${BREAKING_MINIO_VERSION}" && ! "${BREAKING_MINIO_VERSION}" > "${minio_version_lookup}" ]]; then
     return 1
   else
     return 0
