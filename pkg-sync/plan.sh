@@ -2,7 +2,7 @@ pkg_name=pkg-sync
 pkg_origin=habitat
 pkg_version="0.1.0"
 pkg_maintainer="The Habitat Maintainers <humans@habitat.sh>"
-pkg_build_deps=(core/go21)
+pkg_build_deps=(core/go1_22)
 pkg_bin_dirs=(bin)
 pkg_description="syncs on prem builder packages with latest saas packages."
 
