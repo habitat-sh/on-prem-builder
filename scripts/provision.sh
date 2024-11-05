@@ -224,6 +224,20 @@ start_minio() {
 
   if [ "$migration_needed" -eq 1 ]; then
     bash ./minio-update.sh upload
+    cleanup_migration
+  fi
+}
+
+cleanup_migration() {
+  local leftover_file="minio-update-bldr-bucket-objects.txt"
+  local leftover_dir="minio-update-bldr-bucket-objects"
+
+  if [ -f "$leftover_file" ]; then
+    sudo rm "$leftover_file"
+  fi
+
+  if [ -d "$leftover_dir" ]; then
+    sudo rm -r "$leftover_dir"
   fi
 }
 
