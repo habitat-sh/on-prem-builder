@@ -212,6 +212,11 @@ function upload_bucket_objects () {
   aws ${opts[*]} s3 sync $waypoint $s3_url
 }
 
+function minio_migration_rollback () {
+    sudo cp -a /hab/svc/builder-minio/data-bkp/. /hab/svc/builder-minio/data/
+    sudo hab svc load "${BLDR_ORIGIN}/builder-minio" --channel "stable" --force
+}
+
 function preflight_checks () {
   _prerequisites_check
   _minio_check
@@ -268,6 +273,7 @@ case "${1}" in
   upgrade ) upgrade_minio ;;
   downgrade ) downgrade_minio ;;
   upload ) upload_bucket_objects ;;
+  minio_rollback ) minio_migration_rollback ;;
   * ) usage ;;
 esac
 
