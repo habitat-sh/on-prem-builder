@@ -201,25 +201,25 @@ start_datastore() {
 }
 
 start_minio() {
-  
   set +e
   is_minio_migration_needed
   migration_needed=$?
   set -e
   
   if [ "$migration_needed" -eq 1 ]; then
-    bash ./minio-update.sh preflight_checks
-    sudo hab svc load "${BLDR_ORIGIN}/builder-minio" --channel "stable" --force
     echo MinIO migration required
-    backup_minio_data
+    bash ./minio-update.sh preflight_checks
+    if [ -d "/hab/svc/builder-minio/data/" ]; then
+        backup_minio_data
+    fi
+
     echo starting minio download
 
     bash ./minio-update.sh download
-    sudo hab svc unload "${BLDR_ORIGIN}/builder-minio"
     sudo sh -c "find /hab/svc/builder-minio/data/ -maxdepth 1 -mindepth 1 -type d | xargs rm -rf"
   fi
 
-    sudo rm -rf /hab/pkgs/habitat/builder-minio
+    # sudo rm -rf /hab/pkgs/habitat/builder-minio
     sudo hab svc load "${BLDR_ORIGIN}/builder-minio" --channel $BLDR_CHANNEL --force
 
   if [ "$migration_needed" -eq 1 ]; then
@@ -244,11 +244,18 @@ cleanup_migration() {
 backup_minio_data() {
   echo "Starting MinIO data backup" 
   
+  if [ -d "/hab/svc/builder-minio/data-bkp/" ]; then
+    sudo rm -rf /hab/svc/builder-minio/data-bkp/
+  fi
+
   sudo mkdir -p /hab/svc/builder-minio/data-bkp/
 
-  sudo cp -r /hab/svc/builder-minio/data/* /hab/svc/builder-minio/data-bkp/
-
-  echo "Old MinIO data has been backed up to /hab/svc/builder-minio/data-bkp/"
+  if [ "$(ls -A /hab/svc/builder-minio/data/)" ]; then
+        sudo cp -rf /hab/svc/builder-minio/data/* /hab/svc/builder-minio/data-bkp/
+        echo "Old MinIO data has been backed up to /hab/svc/builder-minio/data-bkp/"
+    else
+        echo "No files to copy from /hab/svc/builder-minio/data/"
+    fi
 
 }
 
