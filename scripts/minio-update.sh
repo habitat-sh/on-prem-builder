@@ -123,14 +123,14 @@ function _minio_check {
     echo "MinIO appears to be up and running"
   else
     echo "MinIO doesn't seem to be accessible at $MINIO_ENDPOINT"
-    exit
+    exit 4
   fi
   local output=$(aws ${opts[*]} s3 ls)
   if [[ $output =~ $MINIO_BUCKET ]]; then
     echo "MinIO credentials valid"
   else
     echo "MinIO credentials invalid"
-    exit
+    exit 4
   fi
 
 }
@@ -213,7 +213,15 @@ function upload_bucket_objects () {
 }
 
 function minio_migration_rollback () {
-    sudo cp -a /hab/svc/builder-minio/data-bkp/. /hab/svc/builder-minio/data/
+    latest_backup=$(ls -d /hab/svc/builder-minio/data-bkp-* | sort -r | head -n 1)
+
+    if [ -n "$latest_backup" ]; then
+        echo "Copying data from latest backup: $latest_backup"
+        sudo cp -a "$latest_backup/." /hab/svc/builder-minio/data/
+    else
+        echo "No backup folder found. Exiting."
+        exit 1
+    fi
     sudo hab svc load "${BLDR_ORIGIN}/builder-minio" --channel "stable" --force
 }
 

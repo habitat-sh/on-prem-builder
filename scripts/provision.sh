@@ -205,27 +205,36 @@ start_minio() {
   is_minio_migration_needed
   migration_needed=$?
   set -e
-  
+
   if [ "$migration_needed" -eq 1 ]; then
     echo MinIO migration required
-    bash ./minio-update.sh preflight_checks
+
     if [ -d "/hab/svc/builder-minio/data/" ]; then
         backup_minio_data
     fi
 
+    sudo hab svc load "${BLDR_ORIGIN}/builder-minio" --channel $BLDR_CHANNEL --force
+    sleep 10
+    bash ./minio-update.sh preflight_checks
+    if [ $? != 0 ]; then
+        echo Minio not running. 
+        exit 1 
+    fi
+    
+    sleep 10
     echo starting minio download
 
     bash ./minio-update.sh download
-    sudo sh -c "find /hab/svc/builder-minio/data/ -maxdepth 1 -mindepth 1 -type d | xargs rm -rf"
-  fi
-
-    # sudo rm -rf /hab/pkgs/habitat/builder-minio
+    sudo hab svc unload "${BLDR_ORIGIN}/builder-minio" 
+    sleep 10
     sudo hab svc load "${BLDR_ORIGIN}/builder-minio" --channel $BLDR_CHANNEL --force
-
-  if [ "$migration_needed" -eq 1 ]; then
+    sleep 10
     bash ./minio-update.sh upload
     cleanup_migration
+  else
+      sudo hab svc load "${BLDR_ORIGIN}/builder-minio" --channel $BLDR_CHANNEL --force
   fi
+
 }
 
 cleanup_migration() {
@@ -243,16 +252,13 @@ cleanup_migration() {
 
 backup_minio_data() {
   echo "Starting MinIO data backup" 
-  
-  if [ -d "/hab/svc/builder-minio/data-bkp/" ]; then
-    sudo rm -rf /hab/svc/builder-minio/data-bkp/
-  fi
+  current_timestamp=$(date +%s)
 
-  sudo mkdir -p /hab/svc/builder-minio/data-bkp/
+  sudo mkdir -p /hab/svc/builder-minio/data-bkp-$current_timestamp/
 
   if [ "$(ls -A /hab/svc/builder-minio/data/)" ]; then
-        sudo cp -rf /hab/svc/builder-minio/data/* /hab/svc/builder-minio/data-bkp/
-        echo "Old MinIO data has been backed up to /hab/svc/builder-minio/data-bkp/"
+        sudo cp -rf /hab/svc/builder-minio/data/* /hab/svc/builder-minio/data-bkp-$current_timestamp/
+        echo "Old MinIO data has been backed up to /hab/svc/builder-minio/data-bkp-$current_timestamp/"
     else
         echo "No files to copy from /hab/svc/builder-minio/data/"
     fi
