@@ -213,7 +213,7 @@ start_minio() {
         backup_minio_data
     fi
 
-    sudo hab svc load "${BLDR_ORIGIN}/builder-minio" --channel $BLDR_CHANNEL --force
+    sudo hab svc load "${BLDR_ORIGIN}/builder-minio" --channel "stable" --force
     sleep 10
     bash ./minio-update.sh preflight_checks
     if [ $? != 0 ]; then
@@ -227,6 +227,8 @@ start_minio() {
     bash ./minio-update.sh download
     sudo hab svc unload "${BLDR_ORIGIN}/builder-minio" 
     sleep 10
+    sudo rm -rf /hab/svc/builder-minio/data/
+    sudo rm -rf /hab/pkgs/habitat/builder-minio/
     sudo hab svc load "${BLDR_ORIGIN}/builder-minio" --channel $BLDR_CHANNEL --force
     sleep 10
     bash ./minio-update.sh upload
