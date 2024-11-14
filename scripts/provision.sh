@@ -287,13 +287,13 @@ generate_bldr_keys() {
 }
 
 is_minio_migration_needed() {
-  installed_version=$(hab pkg path core/minio | cut -d '/' -f6)
+  format_value=$(jq -r '.format' /hab/svc/builder-minio/data/.minio.sys/format.json)
 
   response=$(curl -s "https://bldr.habitat.sh/v1/depot/channels/$BLDR_ORIGIN/$BLDR_CHANNEL/pkgs/builder-minio/latest")
   minio_version_lookup=$(echo "$response" | jq -r '.deps[] | select(.origin == "core" and .name == "minio") | .version')
   
   echo minio_version_lookup $minio_version_lookup
-if [[ "${installed_version}" < "${BREAKING_MINIO_VERSION}" && ! "${BREAKING_MINIO_VERSION}" > "${minio_version_lookup}" ]]; then
+if [[ "${format_value}" == 'fs' && ! "${BREAKING_MINIO_VERSION}" > "${minio_version_lookup}" ]]; then
     return 1
   else
     return 0
