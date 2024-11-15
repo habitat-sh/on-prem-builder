@@ -95,7 +95,6 @@ In order to install the on-prem Chef Habitat Builder in an airgapped (no direct 
      git clone https://github.com/habitat-sh/on-prem-builder.git
      export DOWNLOAD_DIR=/some/base/download/directory
      cd on-prem-builder
-     hab pkg download --target x86_64-linux --channel LTS-2024 --file package_seed_lists/builder_x86_64-linux_lts_2024 --download-directory ${DOWNLOAD_DIR}/builder_packages
      hab pkg download --target x86_64-linux --channel stable --file package_seed_lists/builder_x86_64-linux_stable --download-directory ${DOWNLOAD_DIR}/builder_packages
      ```
 

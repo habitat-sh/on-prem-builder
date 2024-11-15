@@ -9,38 +9,38 @@ Select your Gravatar icon on the top right corner of the Chef Habitat Builder on
 ## Bootstrap Builder with Habitat Packages
 
 Chef Habitat Builder on-prem has no pre-installed package sets. You must populate your Builder instance by uploading packages.
-To assist in bootstrapping an on-prem Builder instance with a set of LTS packages, you can install the habitat/pkg-sync package which will download packages from the public [SaaS Builder](https://bldr.habitat.sh) followed by a bulkupload to your on-prem Builder instance(s).
+To assist in bootstrapping an on-prem Builder instance with a set of core packages, you can install the habitat/pkg-sync package which will download packages from the public [SaaS Builder](https://bldr.habitat.sh) followed by a bulkupload to your on-prem Builder instance(s).
 
-The following snippet illustrates how to bootstrap the on-prem Builder with a set of LTS-2024 core, chef, and chef-platform packages:
+The following snippet illustrates how to bootstrap the on-prem Builder with a set of stable core, chef, and chef-platform packages:
 
     ```bash
-    hab pkg install habitat/pkg-sync
-    hab pkg exec habitat/pkg-sync pkg-sync --bldr-url https://your-builder.tld --channel LTS-2024 --auth <your_public_Builder_instance_token>
+    hab pkg install habitat/pkg-sync --channel LTS-2024
+    hab pkg exec habitat/pkg-sync pkg-sync --bldr-url https://your-builder.tld --channel stable --auth <your_public_Builder_instance_token>
     ```
-This performs a pre-flight check to ensure that you do not have local core, chef, or chef-platform packages in the LTS-2024 channel that are not in the same channel on bldr.habitat.sh. If there are, these local packages must be demoted. Once the pre-flight check passes, pkg-sync will build a list of all the latest LTS-2024 packages that you do not already have and then upload them to your on-prem builder instance.
+This performs a pre-flight check to ensure that you do not have local core, chef, or chef-platform packages in the stable channel that are not in the same channel on bldr.habitat.sh. If there are, these local packages must be demoted. Once the pre-flight check passes, pkg-sync will build a list of all the latest stable packages that you do not already have and then upload them to your on-prem builder instance.
 
 ### Airgapped Environments
 
 Airgapped builder instances must take an alternative approach because pkg-sync will not be able to transfer packages from the public internet to your instance. Instead you will use the `--generate-airgap-list` flag with pkg-sync to build a list of packages that need to be downloaded. Then you will use `hab pkg download` and `hab pkg upload` to download the packages from bldr.habitat.sh and upload them to your instance. Note that `pkg-sync` and `hab pkg download` must be used on a machine with access to the public internet. This will download a bundle you can archive and transfer to your instance. Finally you will use `hab pkg upload` locally on your builder instance to upload the packages into your instance.
 
-The following section illustrates the steps required to bootstrap an airgapped on-prem Builder with a set of LTS-2024 core, chef, and chef-platform packages:
+The following section illustrates the steps required to bootstrap an airgapped on-prem Builder with a set of stable core, chef, and chef-platform packages:
 
 1. Phase 1: download from a machine with internet connectivity
 
     ```bash
-    hab pkg install habitat/pkg-sync
-    hab pkg exec habitat/pkg-sync pkg-sync --generate-airgap-list --channel LTS-2024
-    hab pkg download --target x86_64-linux --channel LTS-2024 --file package_list_x86_64-linux.txt --download-directory builder_bootstrap
-    hab pkg download --target x86_64-windows --channel LTS-2024 --file package_list_x86_64-windows.txt --download-directory builder_bootstrap
+    hab pkg install habitat/pkg-sync --channel LTS-2024
+    hab pkg exec habitat/pkg-sync pkg-sync --generate-airgap-list --channel stable
+    hab pkg download --target x86_64-linux --channel stable --file package_list_x86_64-linux.txt --download-directory builder_bootstrap
+    hab pkg download --target x86_64-windows --channel stable --file package_list_x86_64-windows.txt --download-directory builder_bootstrap
     ```
 
-    Zip up the contents of `builder_bootstrap`. Copy and unzip to the builder instance
+    Archive the contents of `builder_bootstrap`. Copy and extract to the builder instance
 
 1. Phase 2: bulkupload locally on the builder instance
 
     ```bash
     export HAB_AUTH_TOKEN=<your_on-prem_Builder_instance_token>
-    hab pkg bulkupload --url https://your-builder.tld --channel LTS-2024 --auto-create-origins builder_bootstrap/
+    hab pkg bulkupload --url https://your-builder.tld --channel stable --auto-create-origins builder_bootstrap/
     ```
 
 ## Configuring a user workstation

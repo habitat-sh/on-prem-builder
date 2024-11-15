@@ -24,7 +24,6 @@ Each is broken out by the architecture and channel required.
 
 For example, to get the complete Builder infrastructure for Linux,
 ```
-hab pkg download --download-directory download_pkgs --channel=LTS-2024 --target x86\_64-linux  --file package_seed_lists/builder_x86_64-linux_lts_2024
 hab pkg download --download-directory download_pkgs --channel=stable --target x86\_64-linux  --file package_seed_lists/builder_x86_64-linux_stable
 ```
 
@@ -51,4 +50,4 @@ intended as good starting point for building packages.
 
 ## Builder (builder_x86_64-linux_CHANNEL)
 
-This should be just enough packages to get Builder installed on your system. Currently Builder only supports the x86_64-linux platform. You will need both the LTS-2024 channel list and also the stable channel list.
+This should be just enough packages to get Builder installed on your system.

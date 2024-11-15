@@ -36,7 +36,7 @@ var originList = []string{"core", "chef", "chef-platform"}
 // parseArgs parses and validates command-line arguments
 func parseArgs() (bldrURL, channel, auth string, generateListOnly, effortlessOnly, help bool) {
 	flag.StringVar(&bldrURL, "bldr-url", "", "Base URL of your on-prem builder")
-	flag.StringVar(&channel, "channel", "LTS-2024", "Refresh channel to sync")
+	flag.StringVar(&channel, "channel", "stable", "Refresh channel to sync")
 	flag.StringVar(&auth, "auth", "", "Authorization Token for on-prem builder")
 	flag.BoolVar(&generateListOnly, "generate-airgap-list", false, "Output list of package identifiers needed to download to a file in the current directory. If specified, --bldr-url is not required and a sync will not be performed.")
 	// Uncomment once we have LTS-2024 releases for Chef infra and inspec
