@@ -13,6 +13,76 @@ import (
 	"strings"
 )
 
+type PackageList struct {
+	Kind int
+	List map[string][]string
+}
+
+const (
+	PackageListNone int = iota
+	PackageListBuilder
+	PackageListHabitat
+)
+
+func (pl *PackageList) Set(s string) error {
+	switch s {
+	case "none":
+		pl.Kind = PackageListNone
+		return nil
+	case "builder":
+		pl.Kind = PackageListBuilder
+		pl.List = map[string][]string{
+			"x86_64-linux": []string{
+				"core/hab",
+				"core/hab-sup",
+				"core/hab-launcher",
+				"habitat/builder-minio",
+				"habitat/builder-memcahed",
+				"habitat/builder-datastore",
+				"habitat/builder-api",
+				"habitat/builder-api-proxy",
+			},
+		}
+		return nil
+	case "habitat":
+		pl.Kind = PackageListHabitat
+		pl.List = map[string][]string{
+			"x86_64-linux": []string{
+				"core/hab-studio",
+				"core/hab",
+				"core/hab-sup",
+				"core/hab-launcher",
+				"core/hab-pkg-export-container",
+				"core/hab-pkg-export-tar",
+			},
+			"x86_64-windows": []string{
+				"core/hab-studio",
+				"core/hab-plan-build-ps1",
+				"core/windows-service",
+				"core/hab",
+				"core/hab-sup",
+				"core/hab-launcher",
+				"core/hab-pkg-export-container",
+				"core/hab-pkg-export-tar",
+			},
+		}
+		return nil
+	}
+	return fmt.Errorf("unknown package list specified: %s", s)
+}
+
+func (pl PackageList) String() string {
+	switch pl.Kind {
+	case PackageListNone:
+		return "none"
+	case PackageListBuilder:
+		return "builder"
+	case PackageListHabitat:
+		return "habitat"
+	}
+	return "unknown"
+}
+
 type PackageListResponse struct {
 	RangeEnd   int             `json:"range_end"`
 	TotalCount int             `json:"total_count"`
@@ -27,20 +97,20 @@ type PackageIdent struct {
 }
 
 type PackageDetails struct {
-	Target string `json:"target"`
-	Type   string `json:"package_type"`
+	Target   string   `json:"target"`
+	Type     string   `json:"package_type"`
+	Channels []string `json:"channels"`
 }
 
-var originList = []string{"core", "chef", "chef-platform"}
-
 // parseArgs parses and validates command-line arguments
-func parseArgs() (bldrURL, channel, auth string, generateListOnly, effortlessOnly, help bool) {
+func parseArgs() (identsToPromote, origin, bldrURL, channel, auth string, generateListOnly bool, packageList PackageList, help bool) {
+	flag.StringVar(&identsToPromote, "idents-to-promote", "", "File with newline separated package identifiers that will be demoted from all non-unstable channels and promoted to the specified channel")
+	flag.StringVar(&origin, "origin", "core", "Origin to sync")
 	flag.StringVar(&bldrURL, "bldr-url", "", "Base URL of your on-prem builder")
 	flag.StringVar(&channel, "channel", "stable", "Refresh channel to sync")
 	flag.StringVar(&auth, "auth", "", "Authorization Token for on-prem builder")
 	flag.BoolVar(&generateListOnly, "generate-airgap-list", false, "Output list of package identifiers needed to download to a file in the current directory. If specified, --bldr-url is not required and a sync will not be performed.")
-	// Uncomment once we have LTS-2024 releases for Chef infra and inspec
-	// flag.BoolVar(&effortlessOnly, "effortless-only", false, "Only sync effortless packages")
+	flag.Var(&packageList, "package-list", "Only sync packages in list (none, builder, habitat)")
 	flag.BoolVar(&help, "help", false, "Show help message")
 	flag.Parse()
 
@@ -63,32 +133,28 @@ func fetchJSON(url string, target interface{}) error {
 }
 
 // fetchPackages fetches packages for a given origin from the builder service
-func fetchPackages(bldrURL, channel string) ([]string, error) {
+func fetchPackages(origin, bldrURL, channel string) ([]string, error) {
 	rangeSize := 50
 	var result []string
-	for _, origin := range originList {
-		fmt.Printf("\nFinding packages for origin %s in channel %s from %s\n", origin, channel, bldrURL)
-		packageCount := 0
-		for rangeIndex := 0; ; {
-			fmt.Printf("\rFetching range %d-%d...", rangeIndex, rangeIndex+50)
-			var response *PackageListResponse
-			url := fmt.Sprintf("%s/v1/depot/channels/%s/%s/pkgs?range=%d", bldrURL, origin, channel, rangeIndex)
-			err := fetchJSON(url, &response)
-			if err != nil {
-				return nil, fmt.Errorf("\nfailed to fetch package data from %s: %s", url, err.Error())
-			} else {
-				for _, pkg := range response.Data {
-					result = append(result, fmt.Sprintf("%s/%s/%s/%s", pkg.Origin, pkg.Name, pkg.Version, pkg.Release))
-				}
-				packageCount += len(response.Data)
-				rangeIndex += rangeSize
-				if response.TotalCount == 0 || (response.RangeEnd+1) == response.TotalCount {
-					break
-				}
+	fmt.Printf("\nFinding packages for origin %s in channel %s from %s\n", origin, channel, bldrURL)
+	for rangeIndex := 0; ; {
+		fmt.Printf("\rFetching range %d-%d...", rangeIndex, rangeIndex+rangeSize)
+		var response *PackageListResponse
+		url := fmt.Sprintf("%s/v1/depot/channels/%s/%s/pkgs?range=%d", bldrURL, origin, channel, rangeIndex)
+		err := fetchJSON(url, &response)
+		if err != nil {
+			return nil, fmt.Errorf("\nfailed to fetch package data from %s: %s", url, err.Error())
+		} else {
+			for _, pkg := range response.Data {
+				result = append(result, fmt.Sprintf("%s/%s/%s/%s", pkg.Origin, pkg.Name, pkg.Version, pkg.Release))
+			}
+			rangeIndex += rangeSize
+			if response.TotalCount == 0 || (response.RangeEnd+1) == response.TotalCount {
+				break
 			}
 		}
-		fmt.Printf("\nDiscovered %d packages in origin %s\n", packageCount, origin)
 	}
+	fmt.Printf("\nDiscovered %d packages in origin %s\n", len(result), origin)
 	slices.Sort(result)
 	return result, nil
 }
@@ -104,32 +170,30 @@ func fetchDetail(bldrURL, ident string) (*PackageDetails, error) {
 	}
 }
 
-func fetchLatestPackages(channel, target string, localPackages []string) ([]string, error) {
+func fetchLatestPackages(origin, channel, target string, localPackages []string) ([]string, error) {
 	var response *PackageListResponse
 	var result []string
-	for _, origin := range originList {
-		fmt.Printf("\nFetching latest %s packages for origin %s in channel %s from public bldr...\n", target, origin, channel)
-		url := fmt.Sprintf("https://bldr.habitat.sh/v1/depot/channels/%s/%s/pkgs/_latest?target=%s", origin, channel, target)
-		err := fetchJSON(url, &response)
-		if err != nil {
-			return nil, fmt.Errorf("Failed to fetch latest packages from %s: %s", url, err.Error())
-		} else {
-			fmt.Printf("Found %d latest %s packages for %s\n", len(response.Data), target, origin)
-			pkgCount := 0
-			for _, pkg := range response.Data {
-				pkgCount = pkgCount + 1
-				fmt.Printf("\rFetching detail for %d of %d packages", pkgCount, len(response.Data))
-				ident := fmt.Sprintf("%s/%s/%s/%s", pkg.Origin, pkg.Name, pkg.Version, pkg.Release)
-				if !slices.Contains(localPackages, ident) {
-					detail, err := fetchDetail("https://bldr.habitat.sh", ident)
-					if err != nil {
-						fmt.Println("")
-						return nil, err
-					}
-					// filter out native and bootstrap packages used internally
-					if !strings.Contains(pkg.Name, "-stage1") && !strings.Contains(pkg.Name, "-stage0") && !strings.HasPrefix(pkg.Name, "build-tools-") && detail.Type != "Native" {
-						result = append(result, ident)
-					}
+	fmt.Printf("\nFetching latest %s packages for origin %s in channel %s from public bldr...\n", target, origin, channel)
+	url := fmt.Sprintf("https://bldr.habitat.sh/v1/depot/channels/%s/%s/pkgs/_latest?target=%s", origin, channel, target)
+	err := fetchJSON(url, &response)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to fetch latest packages from %s: %s", url, err.Error())
+	} else {
+		fmt.Printf("Found %d latest %s packages for %s\n", len(response.Data), target, origin)
+		pkgCount := 0
+		for _, pkg := range response.Data {
+			pkgCount = pkgCount + 1
+			fmt.Printf("\rFetching detail for %d of %d packages", pkgCount, len(response.Data))
+			ident := fmt.Sprintf("%s/%s/%s/%s", pkg.Origin, pkg.Name, pkg.Version, pkg.Release)
+			if !slices.Contains(localPackages, ident) {
+				detail, err := fetchDetail("https://bldr.habitat.sh", ident)
+				if err != nil {
+					fmt.Println("")
+					return nil, err
+				}
+				// filter out native and bootstrap packages used internally
+				if !strings.Contains(pkg.Name, "-stage1") && !strings.Contains(pkg.Name, "-stage0") && !strings.HasPrefix(pkg.Name, "build-tools-") && detail.Type != "Native" {
+					result = append(result, ident)
 				}
 			}
 		}
@@ -168,19 +232,23 @@ func executeCommand(command string, args ...string) error {
 	return nil
 }
 
-func sync(effortlessOnly bool, channel, bldrURL, auth string, localPackages []string, generateListOnly bool) error {
+func sync(packageList PackageList, origin, channel, bldrURL, auth string, localPackages []string, generateListOnly bool) error {
 	for _, target := range []string{"x86_64-linux", "x86_64-windows"} {
 		var latestPackages []string
 		var err error
 
 		// build a list of all packages that need to be downloaded
-		if effortlessOnly {
-			latestPackages = []string{"chef/chef-infra-client", "chef/inspec", "chef/scaffolding-chef-inspec", "chef/scaffolding-chef-infra"}
-		} else {
-			latestPackages, err = fetchLatestPackages(channel, target, localPackages)
+		if packageList.Kind == PackageListNone {
+			latestPackages, err = fetchLatestPackages(origin, channel, target, localPackages)
 			if err != nil {
 				return err
 			}
+		} else {
+			latestPackages = packageList.List[target]
+		}
+
+		if len(latestPackages) == 0 {
+			continue
 		}
 
 		file, err := os.Create("package_list_" + target + ".txt")
@@ -190,10 +258,6 @@ func sync(effortlessOnly bool, channel, bldrURL, auth string, localPackages []st
 
 		if !generateListOnly {
 			defer os.Remove(file.Name())
-		}
-
-		if len(latestPackages) == 0 {
-			continue
 		}
 
 		for _, pkg := range latestPackages {
@@ -227,15 +291,15 @@ func sync(effortlessOnly bool, channel, bldrURL, auth string, localPackages []st
 	return nil
 }
 
-func preflightCheck(channel, bldrURL, auth string) ([]string, []string, error) {
+func preflightCheck(origin, channel, bldrURL, auth string) ([]string, []string, error) {
 	// Get complete list of all packages in channel on sass builder
-	saasPackages, err := fetchPackages("https://bldr.habitat.sh", channel)
+	saasPackages, err := fetchPackages(origin, "https://bldr.habitat.sh", channel)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	// Get complete list of all packages in channel on customer builder
-	localPackages, err := fetchPackages(bldrURL, channel)
+	localPackages, err := fetchPackages(origin, bldrURL, channel)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -252,11 +316,46 @@ func preflightCheck(channel, bldrURL, auth string) ([]string, []string, error) {
 	return localPackages, foreignPackages, nil
 }
 
+func moveToChannel(identsToPromote, channel, bldrURL, auth string) error {
+	file, err := os.Open(identsToPromote)
+	if err != nil {
+		return fmt.Errorf("\nfailed to open file %s: %s", identsToPromote, err.Error())
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		pkg := scanner.Text()
+		detail, err := fetchDetail(bldrURL, pkg)
+		if err != nil {
+			continue
+		}
+		for _, ch := range detail.Channels {
+			if ch == "unstable" || ch == "channel" {
+				continue
+			}
+			err = executeCommand("hab", "pkg", "demote", "-u", bldrURL, "-z", auth, pkg, ch, detail.Target)
+			if err != nil {
+				return err
+			}
+		}
+		err = executeCommand("hab", "pkg", "promote", "-u", bldrURL, "-z", auth, pkg, channel, detail.Target)
+		if err != nil {
+			return err
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		return fmt.Errorf("\nerror reading file %s: %s", identsToPromote, err.Error())
+	}
+	return nil
+}
+
 func main() {
 	// Dont need errors prefixed with date and time
 	log.SetFlags(0)
 
-	bldrURL, channel, auth, generateListOnly, effortlessOnly, help := parseArgs()
+	identsToPromote, origin, bldrURL, channel, auth, generateListOnly, packageList, help := parseArgs()
 	if help || (bldrURL == "" && !generateListOnly) {
 		fmt.Printf("Usage: %s [OPTIONS]\n", os.Args[0])
 		fmt.Println("Options:")
@@ -264,11 +363,19 @@ func main() {
 		return
 	}
 
-	var localPackages, foreignPackages []string
 	var err error
-	if !generateListOnly {
+	if len(identsToPromote) > 0 {
+		err = moveToChannel(identsToPromote, channel, bldrURL, auth)
+		if err != nil {
+			log.Fatalln(err.Error())
+		}
+		return
+	}
+	var localPackages, foreignPackages []string
+
+	if !generateListOnly && packageList.Kind == PackageListNone {
 		fmt.Printf("Starting preflight check for local %s packages not promoted to %s on bldr.habitat.sh...\n", channel, channel)
-		localPackages, foreignPackages, err = preflightCheck(channel, bldrURL, auth)
+		localPackages, foreignPackages, err = preflightCheck(origin, channel, bldrURL, auth)
 		if err != nil {
 			log.Fatalln(err.Error())
 		}
@@ -302,7 +409,7 @@ func main() {
 		}
 	}
 
-	err = sync(effortlessOnly, channel, bldrURL, auth, localPackages, generateListOnly)
+	err = sync(packageList, origin, channel, bldrURL, auth, localPackages, generateListOnly)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}

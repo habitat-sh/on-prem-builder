@@ -92,17 +92,17 @@ In order to install the on-prem Chef Habitat Builder in an airgapped (no direct 
 1. Create the Habitat Builder package bundle from the Builder seed lists and download them
 
      ```bash
-     git clone https://github.com/habitat-sh/on-prem-builder.git
+     sudo hab pkg install habitat/pkg-sync --channel LTS-2024
      export DOWNLOAD_DIR=/some/base/download/directory
-     cd on-prem-builder
-     hab pkg download --target x86_64-linux --channel stable --file package_seed_lists/builder_x86_64-linux_stable --download-directory ${DOWNLOAD_DIR}/builder_packages
+     hab pkg exec habitat/pkg-sync pkg-sync --channel stable --package-list builder --generate-airgap-list
+     hab pkg download --target x86_64-linux --channel stable --file package_list_x86_64-linux.txt --download-directory ${DOWNLOAD_DIR}/builder_packages
      ```
 
-1. Zip up all the above content, transfer and unzip on the Linux system where Builder will be deployed in the Airgapped environment
+1. Archive `$DOWNLOAD_DIR`, transfer and extract on the Linux system where Builder will be deployed in the Airgapped environment
 
 > Note: The following tasks are intended to be completed on the Airgapped system where Builder will be deployed, in advance of the [Installation](https://github.com/habitat-sh/on-prem-builder/blob/master/README.md#Installation).
 
-1. From the zip archive, install the `hab` binary somewhere in $PATH and ensure it has execute permissions:
+1. From the archive, install the `hab` binary somewhere in $PATH and ensure it has execute permissions:
 
      ```bash
      sudo chmod 755 /usr/bin/hab
