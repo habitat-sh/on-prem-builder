@@ -142,7 +142,6 @@ In order to install the on-prem Chef Habitat Builder in an airgapped (no direct 
 > Note: If the on-prem Builder system is in an Airgapped (non-Internet connected) environment, you must first complete the [prerequisite](https://github.com/habitat-sh/on-prem-builder/blob/master/README.md#prerequisite-tasks-for-an-airgapped-installation-required-if-applicable) tasks detailed earlier.
 
 1. `./install.sh`
-1. `sudo systemctl restart hab-sup`
 
 If everything goes well, you should see output similar to the following showing that the Chef Habitat Builder on-prem services are loaded:
 

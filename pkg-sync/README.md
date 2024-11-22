@@ -10,14 +10,14 @@ Optionally, one can specify a `--package-list` with a value of either `habitat` 
 
 This tool can also be used to generate a list of packages without actually syncing them.
 
-Because of the way `hab pkg bulkupload` works, which `pkg-sync` uses under the hood, one may inadvertantly promote LTS packages to stable. For example, if syncing the `stable` channel or the `stable` habitat package list, there will be many LTS dependencies because the latest habitat stable release has LTS dependencies. The `bulkupload` command will put all top level packages and their dependencies in the channel being synced. So these packages in LTS on the public SAAS builder instance will be promoted to `stable` in the on-prem instance which is very undesirable. To rectify this, one can use the `--idents-to-promote` option and provide a file with newline separated package identifiers that will be demoted from all non-unstable channels and promoted to the specified channel.
+If for any reason, you end up in a state where packages were bulk uploaded and promoted to the wrong channel, one can use the `--idents-to-promote` option and provide a file with newline separated package identifiers that will be demoted from all non-unstable channels and promoted to the specified channel.
 
 ## Usage
 
 Install this package with:
 
 ```
-hab pkg install habitat/pkg-sync --channel LTS-2024
+sudo hab pkg install habitat/pkg-sync --channel LTS-2024
 ```
 
 Examples:

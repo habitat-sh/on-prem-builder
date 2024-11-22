@@ -4,7 +4,7 @@ After a Chef Habitat release, one may want to make the released packages availab
 
 ## Enable Native Package Support
 
-The habitat packages are now built with updated dependencies from the `LTS-2024` channel instead of the `stable` channel. Some of these package dependencies include `native` packages. In order for an on-prem builder instance to host LTS packages or the latest released `stable` habitat packages including these native package dependencies, that builder instance must be configured to allow native package support. This is done by enabling the `nativepackages` feature and specifying `core` as an allowed native package origin. To do this, an on-prem builder's `/hab/user/builder-api/config/user.toml` file should be edited so that the `[api]` section looks as follows:
+Habitat and other products are moving to the LTS channels. A couple of the new LTS supported packages include `native` packages. In order for an on-prem builder instance to host LTS packages, that builder instance must be configured to allow native package support. This is done by enabling the `nativepackages` feature and specifying `core` as an allowed native package origin. To do this, an on-prem builder's `/hab/user/builder-api/config/user.toml` file should be edited so that the `[api]` section looks as follows:
 
 ```
 [api]
@@ -21,16 +21,7 @@ The following snippet illustrates how to refresh the on-prem Builder with a full
 
     ```bash
     sudo hab pkg install habitat/pkg-sync --channel LTS-2024
-    hab pkg exec habitat/pkg-sync pkg-sync --bldr-url https://your-builder.tld --origin core --channel stable --auth <your_public_Builder_instance_token> --package-list habitat
-    # You may now have some LTS packages in the stable channel in the on-prem instance
-    # so you want to move them.
-    # To d oso, first Generate a list of all the latest LTS-2024 package identifiers
-    hab pkg exec habitat/pkg-sync pkg-sync --channel LTS-2024 --origin core --generate-airgap-list
-    # Next, provide that list to --idents-to-promote so that any of those packages
-    # that exist on an on-prem instance are demoted from all non-unstable channels
-    # and promoted to LTS-2024
-    hab pkg exec habitat/pkg-sync pkg-sync --bldr-url https://your-builder.tld --channel LTS-2024 --auth <your_public_Builder_instance_token> --idents-to-promote package_list_x86_64-linux.txt
-    hab pkg exec habitat/pkg-sync pkg-sync --bldr-url https://your-builder.tld --channel LTS-2024 --auth <your_public_Builder_instance_token> --idents-to-promote package_list_x86_64-windows.txt
+    hab pkg exec habitat/pkg-sync pkg-sync --bldr-url https://your-builder.tld --channel stable --auth <your_public_Builder_instance_token> --package-list habitat
     ```
 
 ### Airgapped Environments
@@ -42,21 +33,17 @@ The following section illustrates the steps required to refresh an airgapped on-
 1. Phase 1: download from a machine with internet connectivity
 
     ```bash
-    hab pkg install habitat/pkg-sync --channel LTS-2024
+    sudo hab pkg install habitat/pkg-sync --channel LTS-2024
     hab pkg exec habitat/pkg-sync pkg-sync --generate-airgap-list --channel stable --package-list habitat
     hab pkg download --target x86_64-linux --channel stable --file package_list_x86_64-linux.txt --download-directory habitat_packages
     hab pkg download --target x86_64-windows --channel stable --file package_list_x86_64-windows.txt --download-directory habitat_packages
-    rm package_list_x86_64-*
-    hab pkg exec habitat/pkg-sync pkg-sync --generate-airgap-list --origin core --channel LTS-2024
     ```
 
-    Archive the contents of `habitat_packages`, `package_list_x86_64-linux.txt`, and `package_list_x86_64-windows.txt`. Copy and extract to the builder instance
+    Archive the contents of `habitat_packages`. Copy and extract to the builder instance
 
-1. Phase 2: bulkupload locally on the builder instance and move LTS packages from `stable` to `LTS-2024`
+1. Phase 2: bulkupload locally on the builder instance
 
     ```bash
     export HAB_AUTH_TOKEN=<your_on-prem_Builder_instance_token>
     hab pkg bulkupload --url https://your-builder.tld --channel stable --auto-create-origins habitat_packages/
-    hab pkg exec habitat/pkg-sync pkg-sync --bldr-url https://your-builder.tld --channel LTS-2024 --auth <your_public_Builder_instance_token> --idents-to-promote package_list_x86_64-linux.txt
-    hab pkg exec habitat/pkg-sync pkg-sync --bldr-url https://your-builder.tld --channel LTS-2024 --auth <your_public_Builder_instance_token> --idents-to-promote package_list_x86_64-windows.txt
     ```

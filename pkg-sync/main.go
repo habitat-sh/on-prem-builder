@@ -37,7 +37,7 @@ func (pl *PackageList) Set(s string) error {
 				"core/hab-sup",
 				"core/hab-launcher",
 				"habitat/builder-minio",
-				"habitat/builder-memcahed",
+				"habitat/builder-memcached",
 				"habitat/builder-datastore",
 				"habitat/builder-api",
 				"habitat/builder-api-proxy",
