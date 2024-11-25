@@ -83,27 +83,26 @@ In order to install the on-prem Chef Habitat Builder in an airgapped (no direct 
     curl -LO https://github.com/habitat-sh/on-prem-builder/archive/master.zip
     ```
 
-1. Download the Chef Habitat [cli tool](https://api.bintray.com/content/habitat/stable/linux/x86_64/hab-%24latest-x86_64-linux.tar.gz?bt_package=hab-x86_64-linux)
+1. Download the Chef Habitat [cli tool](https://packages.chef.io/files/stable/habitat/latest/hab-x86_64-linux.tar.gz)
 
     ```bash
     curl -Lo hab.tar.gz https://packages.chef.io/files/stable/habitat/latest/hab-x86_64-linux.tar.gz
     ```
 
-1. Create the Habitat Builder package bundle from the [Builder Seed List](https://github.com/habitat-sh/on-prem-builder/blob/master/package_seed_lists/builder_x86_64-linux_stable) package seed list and download it
+1. Create the Habitat Builder package bundle from the Builder seed lists and download them
 
      ```bash
-     git clone https://github.com/habitat-sh/on-prem-builder.git
+     sudo hab pkg install habitat/pkg-sync --channel LTS-2024
      export DOWNLOAD_DIR=/some/base/download/directory
-     cd on-prem-builder
-     hab pkg download --target x86_64-linux --channel stable --file package_seed_lists/builder_x86_64-linux_stable --download-directory ${DOWNLOAD_DIR}/builder_packages
+     hab pkg exec habitat/pkg-sync pkg-sync --channel stable --package-list builder --generate-airgap-list
+     hab pkg download --target x86_64-linux --channel stable --file package_list_x86_64-linux.txt --download-directory ${DOWNLOAD_DIR}/builder_packages
      ```
 
-1. Create any additional package bundles to upload to Builder from package seed lists as documented in the [Bootstrap Builder](https://github.com/habitat-sh/on-prem-builder/blob/master/README.md#bootstrap-builder-with-habitat-packages-new) section of this README. You can specify `--download-directory ${DOWNLOAD_DIR}/builder_bootstrap` argument to the download command in order to consolidate all bootstrap packages in a single directory
-1. Zip up all the above content, transfer and unzip on the Linux system where Builder will be deployed in the Airgapped environment
+1. Archive `$DOWNLOAD_DIR`, transfer and extract on the Linux system where Builder will be deployed in the Airgapped environment
 
 > Note: The following tasks are intended to be completed on the Airgapped system where Builder will be deployed, in advance of the [Installation](https://github.com/habitat-sh/on-prem-builder/blob/master/README.md#Installation).
 
-1. From the zip archive, install the `hab` binary somewhere in $PATH and ensure it has execute permissions:
+1. From the archive, install the `hab` binary somewhere in $PATH and ensure it has execute permissions:
 
      ```bash
      sudo chmod 755 /usr/bin/hab
@@ -143,7 +142,6 @@ In order to install the on-prem Chef Habitat Builder in an airgapped (no direct 
 > Note: If the on-prem Builder system is in an Airgapped (non-Internet connected) environment, you must first complete the [prerequisite](https://github.com/habitat-sh/on-prem-builder/blob/master/README.md#prerequisite-tasks-for-an-airgapped-installation-required-if-applicable) tasks detailed earlier.
 
 1. `./install.sh`
-1. `sudo systemctl restart hab-sup`
 
 If everything goes well, you should see output similar to the following showing that the Chef Habitat Builder on-prem services are loaded:
 

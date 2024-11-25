@@ -50,11 +50,6 @@ Once installed, the following functionality will be available to users:
 * Package builds using the `hab` client and Chef Habitat Studio
 * Ability to import core packages from the upstream Chef Habitat Builder
 
-The following Chef Habitat Builder on-prem functionalities are *NOT* currently available:
-
-* Automated package builds using Chef Habitat Builder on-prem
-* Automated package exports using Chef Habitat Builder on-prem
-
 ## Documentation
 
 The documentation for Builder on-prem is located in the [on-prem-docs](on-prem-docs/getting-started.md) directory.
@@ -78,6 +73,7 @@ The documentation for Builder on-prem is located in the [on-prem-docs](on-prem-d
 
 1. [Managing the Builder On-Prem Postgres Installation](on-prem-docs/postgres.md)
 1. [Managing the Builder On-Prem Minio Installation](on-prem-docs/minio.md)
+1. [Refreshing the Builder On-Prem with New Habitat Release Packages](on-prem-docs/update-habitat.md)
 1. [Using Artifactory with Builder On-Prem](on-prem-docs/artifactory.md)
 1. [High Availability / Disaster Recovery](on-prem-docs/warm-spare.md)
 1. [Scaling Frontends](on-prem-docs/scaling.md)
