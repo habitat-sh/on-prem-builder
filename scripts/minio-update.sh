@@ -123,14 +123,14 @@ function _minio_check {
     echo "MinIO appears to be up and running"
   else
     echo "MinIO doesn't seem to be accessible at $MINIO_ENDPOINT"
-    exit
+    exit 4
   fi
   local output=$(aws ${opts[*]} s3 ls)
   if [[ $output =~ $MINIO_BUCKET ]]; then
     echo "MinIO credentials valid"
   else
     echo "MinIO credentials invalid"
-    exit
+    exit 4
   fi
 
 }
@@ -212,6 +212,19 @@ function upload_bucket_objects () {
   aws ${opts[*]} s3 sync $waypoint $s3_url
 }
 
+function minio_migration_rollback () {
+    latest_backup=$(ls -d /hab/svc/builder-minio/data-bkp-* | sort -r | head -n 1)
+
+    if [ -n "$latest_backup" ]; then
+        echo "Copying data from latest backup: $latest_backup"
+        sudo cp -a "$latest_backup/." /hab/svc/builder-minio/data/
+    else
+        echo "No backup folder found. Exiting."
+        exit 1
+    fi
+    sudo hab svc load "${BLDR_ORIGIN}/builder-minio" --channel "stable" --force
+}
+
 function preflight_checks () {
   _prerequisites_check
   _minio_check
@@ -220,7 +233,7 @@ function preflight_checks () {
   echo ""
 }
 
-function downloand_bucket_objects () {
+function download_bucket_objects () {
   aws ${opts[*]} s3 sync $s3_url $waypoint
 }
 
@@ -264,10 +277,11 @@ case "${1}" in
   usage ) usage ;;
   print_env ) print_env ;;
   preflight_checks ) preflight_checks ;;
-  download ) downloand_bucket_objects ;;
+  download ) download_bucket_objects ;;
   upgrade ) upgrade_minio ;;
   downgrade ) downgrade_minio ;;
   upload ) upload_bucket_objects ;;
+  minio_rollback ) minio_migration_rollback ;;
   * ) usage ;;
 esac
 

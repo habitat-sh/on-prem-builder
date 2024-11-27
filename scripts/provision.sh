@@ -5,6 +5,7 @@ umask 0022
 
 # Defaults
 BLDR_ORIGIN=${BLDR_ORIGIN:="habitat"}
+BREAKING_MINIO_VERSION="2023-11-01T01-57-10Z"
 
 sudo () {
   [[ $EUID = 0 ]] || set -- command sudo -E "$@"
@@ -200,7 +201,70 @@ start_datastore() {
 }
 
 start_minio() {
-  sudo hab svc load "${BLDR_ORIGIN}/builder-minio" --channel "${BLDR_MINIO_CHANNEL:=$BLDR_CHANNEL}" --force
+  set +e
+  is_minio_migration_needed
+  migration_needed=$?
+  set -e
+
+  if [ "$migration_needed" -eq 1 ]; then
+    echo MinIO migration required
+
+    if [ -d "/hab/svc/builder-minio/data/" ]; then
+        backup_minio_data
+    fi
+
+    sudo hab svc load "${BLDR_ORIGIN}/builder-minio" --channel "stable" --force
+    sleep 10
+    bash ./minio-update.sh preflight_checks
+    if [ $? != 0 ]; then
+        echo Minio not running. 
+        exit 1 
+    fi
+    
+    sleep 10
+    echo starting minio download
+
+    bash ./minio-update.sh download
+    sudo hab svc unload "${BLDR_ORIGIN}/builder-minio" 
+    sleep 10
+    sudo rm -rf /hab/svc/builder-minio/data/
+    sudo rm -rf /hab/pkgs/habitat/builder-minio/
+    sudo hab svc load "${BLDR_ORIGIN}/builder-minio" --channel $BLDR_CHANNEL --force
+    sleep 10
+    bash ./minio-update.sh upload
+    cleanup_migration
+  else
+      sudo hab svc load "${BLDR_ORIGIN}/builder-minio" --channel $BLDR_CHANNEL --force
+  fi
+
+}
+
+cleanup_migration() {
+  local leftover_file="minio-update-bldr-bucket-objects.txt"
+  local leftover_dir="minio-update-bldr-bucket-objects"
+
+  if [ -f "$leftover_file" ]; then
+    sudo rm "$leftover_file"
+  fi
+
+  if [ -d "$leftover_dir" ]; then
+    sudo rm -r "$leftover_dir"
+  fi
+}
+
+backup_minio_data() {
+  echo "Starting MinIO data backup" 
+  current_timestamp=$(date +%s)
+
+  sudo mkdir -p /hab/svc/builder-minio/data-bkp-$current_timestamp/
+
+  if [ "$(ls -A /hab/svc/builder-minio/data/)" ]; then
+        sudo cp -rf /hab/svc/builder-minio/data/* /hab/svc/builder-minio/data-bkp-$current_timestamp/
+        echo "Old MinIO data has been backed up to /hab/svc/builder-minio/data-bkp-$current_timestamp/"
+    else
+        echo "No files to copy from /hab/svc/builder-minio/data/"
+    fi
+
 }
 
 start_memcached() {
@@ -220,6 +284,20 @@ generate_bldr_keys() {
 
   hab file upload "builder-api.default" "$(date +%s)" "/hab/cache/keys/${KEY_NAME}.pub"
   hab file upload "builder-api.default" "$(date +%s)" "/hab/cache/keys/${KEY_NAME}.box.key"
+}
+
+is_minio_migration_needed() {
+  format_value=$(jq -r '.format' /hab/svc/builder-minio/data/.minio.sys/format.json)
+
+  response=$(curl -s "https://bldr.habitat.sh/v1/depot/channels/$BLDR_ORIGIN/$BLDR_CHANNEL/pkgs/builder-minio/latest")
+  minio_version_lookup=$(echo "$response" | jq -r '.deps[] | select(.origin == "core" and .name == "minio") | .version')
+  
+  echo minio_version_lookup $minio_version_lookup
+if [[ "${format_value}" == 'fs' && ! "${BREAKING_MINIO_VERSION}" > "${minio_version_lookup}" ]]; then
+    return 1
+  else
+    return 0
+  fi
 }
 
 upload_ssl_certificate() {
