@@ -6,49 +6,49 @@ umask 0022
 # Defaults
 BLDR_ORIGIN=${BLDR_ORIGIN:="habitat"}
 
-sudo () {
+sudo() {
   [[ $EUID = 0 ]] || set -- command sudo -E "$@"
   "$@"
 }
 
 user_toml_warn() {
   if [ -f "/hab/svc/$1/user.toml" ]; then
-      mv "/hab/svc/$1/user.toml" "/hab/svc/$1/user.toml.bak"
-      echo "WARNING: Previous user.toml exists in deprecated location. All user.toml"
-      echo "files should be deposited into the path /hab/user/$1/config/user.toml."
-      echo "Deprecated user.toml has been renamed user.toml.bak."
+    mv "/hab/svc/$1/user.toml" "/hab/svc/$1/user.toml.bak"
+    echo "WARNING: Previous user.toml exists in deprecated location. All user.toml"
+    echo "files should be deposited into the path /hab/user/$1/config/user.toml."
+    echo "Deprecated user.toml has been renamed user.toml.bak."
   fi
 }
 
 init_datastore() {
   user_toml_warn builder-datastore
   mkdir -p /hab/user/builder-datastore/config
-  cat <<EOT > /hab/user/builder-datastore/config/user.toml
-max_locks_per_transaction = 128
-dynamic_shared_memory_type = 'none'
-
-[superuser]
-name = 'hab'
-password = 'hab'
-EOT
+  cat <<-EOT >/hab/user/builder-datastore/config/user.toml
+		max_locks_per_transaction = 128
+		dynamic_shared_memory_type = 'none'
+		
+		[superuser]
+		name = 'hab'
+		password = 'hab'
+	EOT
 }
 
 configure() {
   export PGPASSWORD PGUSER
-    if [ "${PG_EXT_ENABLED:-false}" = "true" ]; then
-      PGUSER=${PG_USER:-hab}
-      PGPASSWORD=${PG_PASSWORD:-hab}
-    else
-      PGUSER="hab"
-      PGPASSWORD=""
-    fi
+  if [ "${PG_EXT_ENABLED:-false}" = "true" ]; then
+    PGUSER=${PG_USER:-hab}
+    PGPASSWORD=${PG_PASSWORD:-hab}
+  else
+    PGUSER="hab"
+    PGPASSWORD=""
+  fi
 
   export ANALYTICS_ENABLED=${ANALYTICS_ENABLED:="false"}
   export ANALYTICS_COMPANY_ID
   export ANALYTICS_COMPANY_NAME
   export ANALYTICS_WRITE_KEY
 
-  if [ $ANALYTICS_ENABLED = "true" ]; then
+  if [ "$ANALYTICS_ENABLED" = "true" ]; then
     ANALYTICS_WRITE_KEY=${ANALYTICS_WRITE_KEY:="NAwVPW04CeESMW3vtyqjJZmVMNBSQ1K1"}
     ANALYTICS_COMPANY_ID=${ANALYTICS_COMPANY_ID:="builder-on-prem"}
   else
@@ -67,11 +67,11 @@ configure() {
     if [ "${FRONTEND_INSTALL:-0}" != 1 ]; then
       user_toml_warn builder-minio
       mkdir -p /hab/user/builder-minio/config
-      cat <<EOT > /hab/user/builder-minio/config/user.toml
-key_id = "$MINIO_ACCESS_KEY"
-secret_key = "$MINIO_SECRET_KEY"
-bucket_name = "$MINIO_BUCKET"
-EOT
+      cat <<-EOT >/hab/user/builder-minio/config/user.toml
+				key_id = "$MINIO_ACCESS_KEY"
+				secret_key = "$MINIO_SECRET_KEY"
+				bucket_name = "$MINIO_BUCKET"
+			EOT
     fi
   fi
 
@@ -95,96 +95,96 @@ EOT
   PG_HOST=${POSTGRES_HOST:-localhost}
   PG_PORT=${POSTGRES_PORT:-5432}
   user_toml_warn builder-api
-  cat <<EOT > /hab/user/builder-api/config/user.toml
-log_level="error,tokio_core=error,tokio_reactor=error,zmq=error,hyper=error"
-jobsrv_enabled = false
+  cat <<-EOT >/hab/user/builder-api/config/user.toml
+		log_level="error,tokio_core=error,tokio_reactor=error,zmq=error,hyper=error"
+		jobsrv_enabled = false
+		
+		[http]
+		handler_count = 10
+		
+		[api]
+		features_enabled = "$FEATURES_ENABLED"
+		targets = ["x86_64-linux", "x86_64-linux-kernel2", "x86_64-windows"]
+		
+		[depot]
+		jobsrv_enabled = false
+		
+		[oauth]
+		provider = "$OAUTH_PROVIDER"
+		userinfo_url = "$OAUTH_USERINFO_URL"
+		token_url = "$OAUTH_TOKEN_URL"
+		redirect_url = "$OAUTH_REDIRECT_URL"
+		client_id = "$OAUTH_CLIENT_ID"
+		client_secret = "$OAUTH_CLIENT_SECRET"
+		
+		[s3]
+		backend = "$S3_BACKEND"
+		key_id = "$MINIO_ACCESS_KEY"
+		secret_key = "$MINIO_SECRET_KEY"
+		endpoint = "$MINIO_ENDPOINT"
+		bucket_name = "$MINIO_BUCKET"
+		
+		[artifactory]
+		api_url = "$ARTIFACTORY_API_URL"
+		api_key = "$ARTIFACTORY_API_KEY"
+		repo = "$ARTIFACTORY_REPO"
+		
+		[memcache]
+		ttl = 15
+		
+		[datastore]
+		user = "$PGUSER"
+		password = "$PGPASSWORD"
+		connection_timeout_sec = 5
+		host = "$PG_HOST"
+		port = $PG_PORT
+		ssl_mode = "prefer"
+	EOT
 
-[http]
-handler_count = 10
-
-[api]
-features_enabled = "$FEATURES_ENABLED"
-targets = ["x86_64-linux", "x86_64-linux-kernel2", "x86_64-windows"]
-
-[depot]
-jobsrv_enabled = false
-
-[oauth]
-provider = "$OAUTH_PROVIDER"
-userinfo_url = "$OAUTH_USERINFO_URL"
-token_url = "$OAUTH_TOKEN_URL"
-redirect_url = "$OAUTH_REDIRECT_URL"
-client_id = "$OAUTH_CLIENT_ID"
-client_secret = "$OAUTH_CLIENT_SECRET"
-
-[s3]
-backend = "$S3_BACKEND"
-key_id = "$MINIO_ACCESS_KEY"
-secret_key = "$MINIO_SECRET_KEY"
-endpoint = "$MINIO_ENDPOINT"
-bucket_name = "$MINIO_BUCKET"
-
-[artifactory]
-api_url = "$ARTIFACTORY_API_URL"
-api_key = "$ARTIFACTORY_API_KEY"
-repo = "$ARTIFACTORY_REPO"
-
-[memcache]
-ttl = 15
-
-[datastore]
-user = "$PGUSER"
-password = "$PGPASSWORD"
-connection_timeout_sec = 5
-host = "$PG_HOST"
-port = $PG_PORT
-ssl_mode = "prefer"
-EOT
-
-if [ "${OAUTH_PROVIDER}" = "chef-automate" ]; then
-  ALLOW_OAUTH_ORIGIN="allow_oauth_origin = \"https://$(echo $OAUTH_USERINFO_URL | awk -F[/:] '{print $4}')\""
-else
-  ALLOW_OAUTH_ORIGIN=""
-fi
-user_toml_warn builder-api-proxy
-mkdir -p /hab/user/builder-api-proxy/config
-cat <<EOT > /hab/user/builder-api-proxy/config/user.toml
-log_level="info"
-enable_builder = false
-app_url = "${APP_URL}"
-load_balanced = ${LOAD_BALANCED}
-
-[oauth]
-provider = "$OAUTH_PROVIDER"
-client_id = "$OAUTH_CLIENT_ID"
-authorize_url = "$OAUTH_AUTHORIZE_URL"
-redirect_url = "$OAUTH_REDIRECT_URL"
-signup_url = "$OAUTH_SIGNUP_URL"
-
-[nginx]
-max_body_size = "2048m"
-proxy_send_timeout = 180
-proxy_read_timeout = 180
-enable_gzip = true
-enable_caching = true
-limit_req_zone_unknown = "\$limit_unknown zone=unknown:10m rate=30r/s"
-limit_req_unknown      = "burst=90 nodelay"
-limit_req_zone_known   = "\$http_x_forwarded_for zone=known:10m rate=30r/s"
-limit_req_known        = "burst=90 nodelay"
-$ALLOW_OAUTH_ORIGIN
-
-[http]
-keepalive_timeout = "180s"
-
-[server]
-listen_tls = $APP_SSL_ENABLED
-
-[analytics]
-enabled = $ANALYTICS_ENABLED
-company_id = "$ANALYTICS_COMPANY_ID"
-company_name = "$ANALYTICS_COMPANY_NAME"
-write_key = "$ANALYTICS_WRITE_KEY"
-EOT
+  if [ "${OAUTH_PROVIDER}" = "chef-automate" ]; then
+    ALLOW_OAUTH_ORIGIN="allow_oauth_origin = \"https://$(echo "$OAUTH_USERINFO_URL" | awk -F[/:] '{print $4}')\""
+  else
+    ALLOW_OAUTH_ORIGIN=""
+  fi
+  user_toml_warn builder-api-proxy
+  mkdir -p /hab/user/builder-api-proxy/config
+  cat <<-EOT >/hab/user/builder-api-proxy/config/user.toml
+		log_level="info"
+		enable_builder = false
+		app_url = "${APP_URL}"
+		load_balanced = ${LOAD_BALANCED}
+		
+		[oauth]
+		provider = "$OAUTH_PROVIDER"
+		client_id = "$OAUTH_CLIENT_ID"
+		authorize_url = "$OAUTH_AUTHORIZE_URL"
+		redirect_url = "$OAUTH_REDIRECT_URL"
+		signup_url = "$OAUTH_SIGNUP_URL"
+		
+		[nginx]
+		max_body_size = "2048m"
+		proxy_send_timeout = 180
+		proxy_read_timeout = 180
+		enable_gzip = true
+		enable_caching = true
+		limit_req_zone_unknown = "\$limit_unknown zone=unknown:10m rate=30r/s"
+		limit_req_unknown      = "burst=90 nodelay"
+		limit_req_zone_known   = "\$http_x_forwarded_for zone=known:10m rate=30r/s"
+		limit_req_known        = "burst=90 nodelay"
+		$ALLOW_OAUTH_ORIGIN
+		
+		[http]
+		keepalive_timeout = "180s"
+		
+		[server]
+		listen_tls = $APP_SSL_ENABLED
+		
+		[analytics]
+		enabled = $ANALYTICS_ENABLED
+		company_id = "$ANALYTICS_COMPANY_ID"
+		company_name = "$ANALYTICS_COMPANY_NAME"
+		write_key = "$ANALYTICS_WRITE_KEY"
+	EOT
 }
 
 start_api() {
@@ -252,16 +252,16 @@ start_frontend() {
 }
 
 set_pg_password() {
-  while [ ! -f /hab/svc/builder-datastore/config/pwfile ]
-    do
-      sleep 2
-    done
-    local pg_pass=$(cat /hab/svc/builder-datastore/config/pwfile)
-    cat <<EOT > pg_pass.toml
-[datastore]
-password = "$pg_pass"
-EOT
-  hab config apply builder-api.default $(date +%s) pg_pass.toml
+  while [ ! -f /hab/svc/builder-datastore/config/pwfile ]; do
+    sleep 2
+  done
+  local pg_pass
+  pg_pass=$(cat /hab/svc/builder-datastore/config/pwfile)
+  cat <<-EOT >pg_pass.toml
+		[datastore]
+		password = "$pg_pass"
+	EOT
+  hab config apply builder-api.default "$(date +%s)" pg_pass.toml
 }
 
 start_builder() {
@@ -309,8 +309,7 @@ install_frontend() {
   sleep 4
 
   local key_retry=0
-  while ! ls /hab/svc/builder-api/files/*.pub &>/dev/null
-  do
+  while ! ls /hab/svc/builder-api/files/*.pub &>/dev/null; do
     if [ $key_retry -eq 5 ]; then
       echo "builder key never showed up on ring...generating."
       generate_bldr_keys
@@ -362,42 +361,41 @@ install_tar() {
 
 Help() {
   # Display Help
-  cat <<EOF
-Habitat Builder Service Provisioning Script
-The default action, when no arugment are passed, is to provision a node with Frontend and Backend services.
-
-Syntax: $0 <SUBCOMMAND>
-
-options:
-
-  -h, --help            Print this Help.
-
-  --install-frontend    Provision a Frontend/API only.
-
-  --install-postgresql  Provision the datastore only.
-
-  --install-minio       Provision the minio server only.
-
-EOF
+  cat <<-EOF
+		Habitat Builder Service Provisioning Script
+		The default action, when no argument are passed, is to provision a node with Frontend and Backend services.
+		
+		Syntax: $0 <SUBCOMMAND>
+		
+		options:
+		
+		  -h, --help            Print this Help.
+		
+		  --install-frontend    Provision a Frontend/API only.
+		
+		  --install-postgresql  Provision the datastore only.
+		
+		  --install-minio       Provision the minio server only.
+		
+	EOF
 }
 
 create_users() {
-  if command -v useradd > /dev/null; then
+  if command -v useradd >/dev/null; then
     sudo useradd --system --no-create-home hab || true
   else
     sudo adduser --system hab || true
   fi
-  if command -v groupadd > /dev/null; then
+  if command -v groupadd >/dev/null; then
     sudo groupadd --system hab || true
   else
     sudo addgroup --system hab || true
   fi
 }
 
-install_options()
-{
+install_options() {
   if [ "${FRONTEND_INSTALL:-0}" = 1 ]; then
-    if [ "${POSTGRESQL_INSTALL:-0}" = 1 -o "${MINIO_INSTALL:-0}" = 1 ]; then
+    if [[ "${POSTGRESQL_INSTALL:-0}" = 1 || "${MINIO_INSTALL:-0}" = 1 ]]; then
       echo "ERROR: --install-frontend can not not be used along with -install-postgresql or --install-minio "
       echo
       exit 1
@@ -415,24 +413,23 @@ install_options()
 }
 
 if [ "$#" -eq 0 ]; then
-    start_init
-    start_builder
-  else
-    for arg in "$@"
-    do
-      if [ "$arg" == "--help" ] || [ "$arg" == "-h" ]; then
-	      Help
-      elif [ "$arg" == "--install-frontend" ]; then
-        export FRONTEND_INSTALL=1
-      elif [ "$arg" == "--install-postgresql" ]; then
-        export POSTGRESQL_INSTALL=1
-      elif [ "$arg" == "--install-minio" ]; then
-        export MINIO_INSTALL=1
-      else
-        echo "ERROR: Invalid argument provided"
-        echo "Use -h or --help to view the available options."
-        exit 1
-      fi
-    done
-    install_options
+  start_init
+  start_builder
+else
+  for arg in "$@"; do
+    if [ "$arg" == "--help" ] || [ "$arg" == "-h" ]; then
+      Help
+    elif [ "$arg" == "--install-frontend" ]; then
+      export FRONTEND_INSTALL=1
+    elif [ "$arg" == "--install-postgresql" ]; then
+      export POSTGRESQL_INSTALL=1
+    elif [ "$arg" == "--install-minio" ]; then
+      export MINIO_INSTALL=1
+    else
+      echo "ERROR: Invalid argument provided"
+      echo "Use -h or --help to view the available options."
+      exit 1
+    fi
+  done
+  install_options
 fi
