@@ -25,7 +25,6 @@ init_datastore() {
   mkdir -p /hab/user/builder-datastore/config
   cat <<-EOT >/hab/user/builder-datastore/config/user.toml
 		max_locks_per_transaction = 128
-		dynamic_shared_memory_type = 'none'
 		
 		[superuser]
 		name = 'hab'
