@@ -95,6 +95,8 @@ To authenticate with Chef Automate, create a patch with the Chef Automate comman
     ```
 
 1. Edit `bldr.env`:
+    * You must have version chef/automate-builder-api-proxy/0.1.0/20230111051525 or higher of builder-api-proxy, you can check by viewing the hab package storage area on your system
+    * You must set the following setting. Replace AUTOMATE-FQDN with the FQDN of your Automate system: **allow_oauth_origin** should have the value https://AUTOMATE-FQDN/
     * SSL must be enabled in Builder in order to authenticate against Automate, use `APP_SSL_ENABLED=true` and a `APP_URL` beginning with `https`.
     * Set `OAUTH_PROVIDER` to `chef-automate`.
     * Set the values of `OAUTH_USERINFO_URL`, `OAUTH_AUTHORIZE_URL`, and `OAUTH_TOKEN_URL` to the example values provided in the `sample.bldr.env` file substituting `<your.automate.domain>` with your Automate server or domain name.
@@ -191,3 +193,17 @@ Rename the custom Builder certificates cert file as `ssl-certificate.crt` and th
 ## Next Steps
 
 [Bootstrap Core Origin](./bootstrap-core.md)
+
+## Troubleshooting
+
+When the builder is not correctly configured with the **allow_oauth_origin**, or the builder is too old to support the config paramter, you will see error messages like the following even when the rest of the configuration is correct.
+
+```
+currently only Habitat Builder is supported for Oauth2 integration.  expected bldr client_id: automate-builder-api, actual client_id: YZqk2jC47VVyRhhT"
+```
+
+or
+
+```
+failed to pass valid redirect_uri for client_id: automate-builder-api, expected: /bldr, registered for client: https://SOME-BUILDER-SOMEWHERE/
+```
