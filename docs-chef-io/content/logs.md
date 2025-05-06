@@ -1,10 +1,10 @@
 +++
-title = "Example builder.env configuration file"
+title = "Habitat Builder logs"
 
 [menu]
   [menu.habitat]
-    title = "builder.env example"
-    identifier = "habitat/builder/on-prem/overview"
+    title = "Logs"
+    identifier = "habitat/builder/on-prem/logs"
     parent = "habitat/builder/on-prem"
     weight = 20
 +++

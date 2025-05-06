@@ -1,6 +1,5 @@
 +++
 title = "Managing your MinIO artifact store"
-description = "Chef Habitat Builder is Chef's Application Delivery Enterprise hub"
 gh_repo = "on-prem-builder"
 
 [menu]
@@ -19,7 +18,7 @@ Chef Habitat Builder on-prem uses MinIO to store Habitat artifacts (.harts).
 The data that Builder stores is fairly lightweight and thus the backup and DR or Warm Spare strategy is pretty straightforward. On-Prem Builder has two types of data that should be backed up case of a disaster:
 
 1. [PostgreSQL package and user metadata](./postgres.md#postgresql-data-backups)
-1. MinIO habitat artifacts (.harts)
+1. MinIO Habitat artifacts (.harts)
 
 Chef Habitat Builder on-prem supports only MinIO artifact repositories.
 

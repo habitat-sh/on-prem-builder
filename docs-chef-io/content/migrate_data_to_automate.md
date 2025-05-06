@@ -1,26 +1,23 @@
 +++
-title = "Example builder.env configuration file"
+title = "Migrate to a Deployment of Chef Automate with Chef Habitat Builder on-prem"
 
 [menu]
   [menu.habitat]
-    title = "builder.env example"
-    identifier = "habitat/builder/on-prem/overview"
+    title = "Chef Automate"
+    identifier = "habitat/builder/on-prem/migrate"
     parent = "habitat/builder/on-prem"
     weight = 20
 +++
 
+Long-term support for on-prem Builder is provided for installations of [Builder with Chef Automate](https://docs.chef.io/automate/on_prem_builder/).
+This document guides you through the steps necessary to migrate your on-prem Builder data into an Automate Builder.
 
-# Migrate to a Deployment of Automate Builder
+The data that Builder stores is fairly lightweight and thus the migration strategy is pretty straightforward. On-prem Builder has two types of data that will need to be migrated:
 
-Long Term Support for On-Prem Builder is provided for installations of [Builder via Chef Automate](https://automate.chef.io/docs/on-prem-builder/).
-This document will guide you through the steps necessary to migrate your On-Prem Builder data into an Automate Builder.
+- MinIO/S3 Habitat artifacts
+- PostgreSQL package and user metadata
 
-The data that Builder stores is fairly lightweight and thus the migration strategy is pretty straightforward. On-Prem Builder has two types of data that will need to be migrated:
-
-1. MinIO/S3 habitat artifacts
-1. PostgreSQL package and user metadata
-
-The minio/S3 data will be copied to the Automate Builder target via minio mirroring utility.
+The minio/S3 data will be copied to the Automate Builder target via MinIO mirroring utility.
 
 The migration of the PostgreSQL data will be done via a `pg_dump` on the source and then restoring with `psql` on the target.
 
@@ -34,16 +31,16 @@ Read the following prerequisite items carefully and ensure that each is addresse
 
 1. Since the data migration is destructive and will overwrite any previous Builder data on the target, perform a backup in case the original state needs to be restored:
 
-   ```
+   ```shell
    sudo chef-automate backup create
    ```
 
 1. It is the Builder API that runs database migrations and is responsible for making schema changes, ensuring that the PostgreSQL tables are all up to date.
-Check that your target Automate Builder instance is running the same or newer Builder API version than your current On-Prem Builder (source). This is required to ensure that there are no PostgreSQL schema incompatibilities. The Builder API service on the target Automate Builder node will run any migrations necessary to update the PostgreSQL data and schemas to the correct format. Therefore the Automate Builder target must be the same or newer version.
+Check that your target Automate Builder instance is running the same or newer Builder API version than your current on-prem Builder (source). This is required to ensure that there are no PostgreSQL schema incompatibilities. The Builder API service on the target Automate Builder node will run any migrations necessary to update the PostgreSQL data and schemas to the correct format. Therefore the Automate Builder target must be the same or newer version.
 
    To check the API version installed on the source and target Builder nodes run:
 
-   ```
+   ```shell
    sudo hab svc status | grep habitat/builder-api/
    ```
 
@@ -57,7 +54,7 @@ Check that your target Automate Builder instance is running the same or newer Bu
 
    To check the API version installed on the source Builder node run:
 
-   ```
+   ```shell
    sudo hab svc status | grep habitat/builder-api/
    ```
 
@@ -68,7 +65,7 @@ Check that your target Automate Builder instance is running the same or newer Bu
    * [Merging Database Shards](https://github.com/habitat-sh/on-prem-builder/blob/master/on-prem-docs/postgres.md#merging-postgresql-database-shards)
    * [Merging Databases](https://github.com/habitat-sh/on-prem-builder/blob/master/on-prem-docs/postgres.md#merging-postgresql-databases)
 
-## MinIO Artifact (.hart) Migration
+## MinIO Habitat artifact (.hart) Migration
 
 Whether your source package files are in MinIO or in S3, you can leverage the [minio client](https://docs.min.io/docs/minio-client-quickstart-guide.html) to perform what more or less amounts to a filesystem backup that you will then restore into the target MinIO. You are going to create a copy of the MinIO data on another filesystem or directory that can either be copied to or mounted on the target Automate Builder node.
 
@@ -78,13 +75,13 @@ A simple backup process of the source Builder MinIO data might look like the ste
 
 1. Shut down the API to ensure no active transactions are occurring. (Optional but preferred)
 
-   ```
+   ```shell
    hab svc stop habitat/builder-api`
    ```
 
-1. Mirror the minio data to a different directory that has adequate space
+1. Mirror the MinIO data to a different directory that has adequate space
 
-   ```
+   ```shell
    sudo mkdir /opt/data/minio_backup
    sudo ./mc mirror /hab/svc/builder-minio/data/habitat-builder-artifact-store.local /opt/data/minio_backup
    sudo tar cvf /opt/data/minio_backup.tar /opt/data/minio_backup
@@ -92,7 +89,7 @@ A simple backup process of the source Builder MinIO data might look like the ste
 
 1. Start the API service back up if it was stopped
 
-   ```
+   ```shell
    sudo hab svc start habitat/builder-api`
    ```
 
@@ -100,21 +97,21 @@ A simple backup process of the source Builder MinIO data might look like the ste
 
 Use the following steps in order to sync the MinIO package data into the target Automate Builder. This will overwrite any existing data that is in the Automate Builder MinIO depot. Create a backup first `sudo chef-automate backup create` if one does not already exist.
 
-1. Copy the minio directory backup to the target Automate Builder node and expand the .tar
+1. Copy the MinIO directory backup to the target Automate Builder node and expand the .tar
 
-   ```
+   ```shell
    tar xvf minio_backup.tar
    ```
 
 1. Once the data is expanded into a directory on the target Automate Builder node use MinIO client to mirror it into the MinIO service directory
 
-   ```
+   ```shell
    sudo ./mc mirror minio_backup/ /hab/svc/automate-minio/data/depot
    ```
 
 1. Fix the MinIO data directory ownership
 
-   ```
+   ```shell
    sudo chown -R hab:hab /hab/svc/automate-minio/data/depot
    ```
 
@@ -128,25 +125,25 @@ Create a copy of the source Builder's PostgreSQL database by following these ste
 
 1. Shut down the API to ensure no active transactions are occurring. (Optional but preferred)
 
-    ```
+    ```shell
     sudo hab svc stop habitat/builder-api
     ```
 
 1. Export the hab user's PostgreSQL password
 
-    ```
+    ```shell
     export PGPASSWORD=$(sudo cat /hab/svc/builder-datastore/config/pwfile)
     ```
 
 1. Run the `pg_dump` command to create a data backup/copy
 
-    ```
+    ```shell
     hab pkg exec core/postgresql pg_dump --user=hab --host=127.0.0.1 --dbname=builder --clean --encoding=utf8 --if-exists | gzip > pgdump.gz
     ```
 
 1. Start the API service and verify
 
-    ```
+    ```shell
     sudo hab svc start habitat/builder-api
     sudo hab svc status
     ```
@@ -162,43 +159,43 @@ Follow these steps on the target Automate Builder node:
 
 1. Temporarily prevent the auto converge loop from restarting services
 
-   ```
+   ```shell
    sudo chef-automate dev stop-converge
    ```
 
 1. Stop the Builder API
 
-   ```
+   ```shell
    sudo hab stop chef/automate-builder-api
    ```
 
 1. Kill off any lingering processes still connected to PostgreSQL
 
-   ```
+   ```shell
    sudo pkill -9 -f "postgres: automate-builder-api"
    ```
 
 1. Rename the old database - you can drop it later if desired.
 
-   ```
+   ```shell
    sudo hab pkg exec chef/automate-platform-tools pg-helper rename-if-exists automate-builder-api automate-builder-api.orig -c /hab/svc/automate-gateway/config/service.crt -k /hab/svc/automate-gateway/config/service.key -r /hab/svc/automate-gateway/config/root_ca.crt
    ```
 
 1. Create an empty database
 
-   ```
+   ```shell
    sudo hab pkg exec chef/automate-platform-tools pg-helper ensure-service-database automate-builder-api automate-builder-api -c /hab/svc/automate-gateway/config/service.crt -k /hab/svc/automate-gateway/config/service.key -r /hab/svc/automate-gateway/config/root_ca.crt
    ```
 
 1. Import the data captured from the source Builder into the target Builder. There should not be any errors from this command.
 
-   ```
+   ```shell
    gunzip -c pgdump.gz | sed -e "s/OWNER TO hab/OWNER TO \"automate-builder-api\"/" | sudo chef-automate dev psql automate-builder-api
    ```
 
 1. If all went well and there were no errors, restart the converge loop to re-enable all the services:
 
-   ```
+   ```shell
    sudo chef-automate dev start-converge
    ```
 
@@ -210,7 +207,7 @@ Log into the web UI and verify all your origin, package and user metadata exists
 
 If, for some reason, you are unable to log into the UI, you can reset the admin password:
 
-   ```
+   ```shell
    sudo chef-automate iam admin-access restore <new_password>
    ```
 
@@ -220,7 +217,7 @@ The next step is to create local users in Chef Automate with matching usernames 
 
 1. View the usernames from the PostgreSQL accounts table
 
-      ```
+      ```shell
       sudo chef-automate dev psql automate-builder-api
       automate-builder-api=# \d accounts;
                   Table "public.accounts"
@@ -256,7 +253,7 @@ A package download operation is an easy way to validate PostgreSQL and MinIO dat
 
 Download a package from the target Automate Builder
 
-   ```
+   ```shell
    hab pkg download core/acl --url https://localhost/bldr/v1 --download-directory downloads
    ```
 
@@ -264,13 +261,13 @@ Download a package from the target Automate Builder
 
 If you need to go into the database on the target Automate Builder node for any reason, such as perhaps to interrogate some account tables you can use the following command which will drop you into a sql shell
 
-   ```
+   ```shell
    sudo chef-automate dev psql automate-builder-api
    ```
 
 If you need to restore a fallback backup that you made prior to a migration you can run a restore
 
-   ```
+   ```shell
    sudo chef-automate backup list
    sudo chef-automate backup restore <id>
    ```

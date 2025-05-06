@@ -1,25 +1,25 @@
 +++
-title = "Example builder.env configuration file"
+title = "Manage your PostgreSQL Installation"
 
 [menu]
   [menu.habitat]
-    title = "builder.env example"
-    identifier = "habitat/builder/on-prem/overview"
+    title = "PostgreSQL"
+    identifier = "habitat/builder/on-prem/PostgreSQL"
     parent = "habitat/builder/on-prem"
     weight = 20
 +++
 
 
-# Builder on-prem + Postgres
+# Builder on-prem + PostgreSQL
 
-Managing your Postgres Installation
+Managing your PostgreSQL Installation
 
 ## Managing Builder On-Prem PostgreSQL Data
 
 The data that Builder stores is luckily fairly lightweight and thus the backup and DR strategy is pretty straightforward. On-Prem Builder has two types of data that should be backed up case of a disaster:
 
 1. PostgreSQL package and user metadata
-1. [MinIO habitat artifacts](./minio.md#minio-artifact-backups)
+1. [MinIO Habitat artifacts](./minio.md#minio-artifact-backups)
 
 Ideally, you should coordinate the backup of the entire Builder on-prem cluster to happen together. However, the type of data that Builder stores (metadata and artifacts) permits some flexibility in the timing of your backup operations. In the worst case, if a package's metadata is missing from PostgreSQL, you can repopulate it by re-uploading the package with the `--force` flag, for example: `hab pkg upload <path to hartfile> -u <on-prem_url> --force`.
 
@@ -31,7 +31,7 @@ Backing up Builder's PostgreSQL database is the same as for any PostgreSQL datab
         `hab svc stop habitat/builder-api`
 1. Switch to user `hab`
         `sudo su - hab`
-1. Find your Postgres password
+1. Find your PostgreSQL password
         `sudo cat /hab/svc/builder-api/config/config.toml`
 1. Export as envvar
         `export PGPASSWORD=<pw>`
@@ -48,7 +48,7 @@ Restoring a `builder` database is exactly like restoring any other database--whi
 
 1. Switch to user `hab`
         `sudo su - hab`
-1. Find your Postgres password
+1. Find your PostgreSQL password
         `sudo cat /hab/svc/builder-api/config/config.toml`
 1. Export as envvar
         `export PGPASSWORD=<pw>`
@@ -60,7 +60,7 @@ Restoring a `builder` database is exactly like restoring any other database--whi
         `/hab/pkgs/core/postgresql/<version>/<release>/bin/pg_restore --host=<url_of_pg_host> --dbname=builder builder.dump`
 1. Start the on-prem Builder services
 
-    > Note: In some cases your version of Postgres might not have a `createdb` binary in which case you'll want to connect to database to run the create db command.
+    > Note: In some cases your version of PostgreSQL might not have a `createdb` binary in which case you'll want to connect to database to run the create db command.
 
 Your database data should be restored and ready for use!
 
@@ -69,11 +69,11 @@ Your database data should be restored and ready for use!
 This following sections on "Merging Database Shards" and "Merging Databases" is for installations of on-premises depot that were done *prior* to
 August 17th 2018. If you re-install or upgrade to a newer version of the
 on-premises depot, you will be required to also merge your database shards into
-the `public` Postgres database schema. Please follow the steps below.
+the `public` PostgreSQL database schema. Please follow the steps below.
 
 ### Shard Migration Pre-requisites
 
-1. The password to your Postgres database. By default, this is located at
+1. The password to your PostgreSQL database. By default, this is located at
    `/hab/svc/builder-datastore/config/pwfile`
 1. A fresh backup of the two databases present in the on-premises depot,
    `builder_sessionsrv` and `builder_originsrv`. You can create such a backup
@@ -92,7 +92,7 @@ the `public` Postgres database schema. Please follow the steps below.
    again, as the supervisor tries to start the new service, but the service
    dies because the migration hasn't been run.
 1. Optionally, if you want to be extra sure that you're in a good spot to perform the
-   migration, log into the Postgres console and verify that you have empty
+   migration, log into the PostgreSQL console and verify that you have empty
    tables in the `public` schema. A command to do this might look like:
 
    ```shell
@@ -133,11 +133,11 @@ the `public` Postgres database schema. Please follow the steps below.
 This section is for installations of on-premises depot that were done *after*
 the database shard migration listed above. If upgrade to a newer version of the
 on-premises depot, you will be required to also merge databases into
-the `builder` Postgres database. Please follow the steps below.
+the `builder` PostgreSQL database. Please follow the steps below.
 
 ### Database Merge Pre-requisites
 
-1. The password to your Postgres database. By default, this is located at
+1. The password to your PostgreSQL database. By default, this is located at
    `/hab/svc/builder-datastore/config/pwfile`
 1. A fresh backup of the two databases present in the on-premises depot,
    `builder_sessionsrv` and `builder_originsrv`. You can create such a backup

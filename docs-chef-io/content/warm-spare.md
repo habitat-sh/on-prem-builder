@@ -3,8 +3,8 @@ title = "Configure disaster recovery"
 
 [menu]
   [menu.habitat]
-    title = "builder.env example"
-    identifier = "habitat/builder/on-prem/overview"
+    title = "Disaster recovery"
+    identifier = "habitat/builder/on-prem/disaster recovery"
     parent = "habitat/builder/on-prem"
     weight = 20
 +++
@@ -65,10 +65,10 @@ the backup. The Builder database is relatively small, likely only tens of megaby
 
 ### Habitat Artifacts
 
-Habitat Artifacts can exist in one of two locations:
+Habitat artifacts are stored in one of two locations:
 
-1. MinIO
-1. S3 bucket
+- MinIO
+- S3 bucket
 
 In the event that your backend is using MinIO for Artifact storage/retrieval, it should be backed by
 highly available storage. Backing up MinIO data is detailed [here](./minio.md#managing-builder-on-prem-artifacts).

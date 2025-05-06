@@ -4,12 +4,12 @@ title = "Example builder.env configuration file"
 [menu]
   [menu.habitat]
     title = "builder.env example"
-    identifier = "habitat/builder/on-prem/overview"
+    identifier = "habitat/builder/on-prem/builder.env"
     parent = "habitat/builder/on-prem"
     weight = 20
 +++
 
-An example Chef Habitat Builder configuration file.
+This show an example Chef Habitat Builder `builder.env` configuration file.
 
 ```shell
 #!/bin/bash

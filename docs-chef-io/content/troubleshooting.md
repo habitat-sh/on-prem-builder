@@ -1,16 +1,13 @@
 +++
-title = "Example builder.env configuration file"
+title = "Troubleshooting"
 
 [menu]
   [menu.habitat]
-    title = "builder.env example"
-    identifier = "habitat/builder/on-prem/overview"
+    title = "Troubleshooting"
+    identifier = "habitat/builder/on-prem/troubleshooting"
     parent = "habitat/builder/on-prem"
     weight = 20
 +++
-
-
-# Troubleshooting
 
 ## Common Problems
 

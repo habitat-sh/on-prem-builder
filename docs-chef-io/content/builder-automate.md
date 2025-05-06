@@ -3,8 +3,8 @@ title = "Deploy Chef Habitat Builder on-prem with Chef Automate"
 
 [menu]
   [menu.habitat]
-    title = "Bootstrap Core Packages"
-    identifier = "habitat/builder/on-prem/Bootstrap Core Packages"
+    title = "Chef Automate"
+    identifier = "habitat/builder/on-prem/Automate"
     parent = "habitat/builder/on-prem"
     weight = 20
 +++
