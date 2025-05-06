@@ -1,25 +1,25 @@
 +++
-title = "Example builder.env configuration file"
+title = "Manage your PostgreSQL Installation"
 
 [menu]
   [menu.habitat]
-    title = "builder.env example"
-    identifier = "habitat/builder/on-prem/overview"
+    title = "PostgreSQL"
+    identifier = "habitat/builder/on-prem/PostgreSQL"
     parent = "habitat/builder/on-prem"
     weight = 20
 +++
 
 
-# Builder on-prem + Postgres
+# Builder on-prem + PostgreSQL
 
-Managing your Postgres Installation
+Managing your PostgreSQL Installation
 
 ## Managing Builder On-Prem PostgreSQL Data
 
 The data that Builder stores is luckily fairly lightweight and thus the backup and DR strategy is pretty straightforward. On-Prem Builder has two types of data that should be backed up case of a disaster:
 
 1. PostgreSQL package and user metadata
-1. [MinIO habitat artifacts](./minio.md#minio-artifact-backups)
+1. [MinIO Habitat artifacts](./minio.md#minio-artifact-backups)
 
 Ideally, you should coordinate the backup of the entire Builder on-prem cluster to happen together. However, the type of data that Builder stores (metadata and artifacts) permits some flexibility in the timing of your backup operations. In the worst case, if a package's metadata is missing from PostgreSQL, you can repopulate it by re-uploading the package with the `--force` flag, for example: `hab pkg upload <path to hartfile> -u <on-prem_url> --force`.
 
@@ -31,7 +31,7 @@ Backing up Builder's PostgreSQL database is the same as for any PostgreSQL datab
         `hab svc stop habitat/builder-api`
 1. Switch to user `hab`
         `sudo su - hab`
-1. Find your Postgres password
+1. Find your PostgreSQL password
         `sudo cat /hab/svc/builder-api/config/config.toml`
 1. Export as envvar
         `export PGPASSWORD=<pw>`
@@ -48,7 +48,7 @@ Restoring a `builder` database is exactly like restoring any other database--whi
 
 1. Switch to user `hab`
         `sudo su - hab`
-1. Find your Postgres password
+1. Find your PostgreSQL password
         `sudo cat /hab/svc/builder-api/config/config.toml`
 1. Export as envvar
         `export PGPASSWORD=<pw>`
@@ -60,6 +60,6 @@ Restoring a `builder` database is exactly like restoring any other database--whi
         `/hab/pkgs/core/postgresql/<version>/<release>/bin/pg_restore --host=<url_of_pg_host> --dbname=builder builder.dump`
 1. Start the on-prem Builder services
 
-    > Note: In some cases your version of Postgres might not have a `createdb` binary in which case you'll want to connect to database to run the create db command.
+    > Note: In some cases your version of PostgreSQL might not have a `createdb` binary in which case you'll want to connect to database to run the create db command.
 
 Your database data should be restored and ready for use!

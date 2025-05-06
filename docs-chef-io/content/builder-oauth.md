@@ -1,19 +1,13 @@
 +++
-title = "Example builder.env configuration file"
+title = "Authenticating Builder with OAuth services."
 
 [menu]
   [menu.habitat]
-    title = "builder.env example"
-    identifier = "habitat/builder/on-prem/overview"
+    title = "O-Auth"
+    identifier = "habitat/builder/on-prem/o-auth"
     parent = "habitat/builder/on-prem"
     weight = 20
 +++
-
-
-
-# Builder + OAuth
-
-Authenticating Builder with OAuth services.
 
 ## Pre-Requisites
 
@@ -170,7 +164,7 @@ Do a `hab svc status` to check the status of all the services. They may take a f
 
 If things don't work as expected (eg, if all the services are not in the `up` state), see the [Troubleshooting](troubleshooting.md) documentation.
 
-## MinIO Web UI
+## MinIO web UI
 
 The Chef Habitat Builder on-prem stores package artifacts in [MinIO](https://github.com/minio/minio). By default, the MinIO instance will be available on port 9000 (or whatever port you specified in your `bldr.env`). Please confirm that the MinIO UI is available, and that you can log in with the credentials that were specified in your `bldr.env` file. There should already be a bucket created in which to host the artifacts.
 

@@ -1,18 +1,18 @@
 +++
-title = "Example builder.env configuration file"
+title = "Frontend scaling"
 
 [menu]
   [menu.habitat]
-    title = "builder.env example"
-    identifier = "habitat/builder/on-prem/overview"
+    title = "Frontend scaling"
+    identifier = "habitat/builder/on-prem/frontend scaling"
     parent = "habitat/builder/on-prem"
     weight = 20
 +++
 
 
-# Front-end Scaling
+With any tiered or HA deployment of the builder services you'll likely want to horizontally scale your frontend nodes. The most common deployment pattern for this usecase is a pool of frontend nodes fronted by a load-balancer.
 
-With any tiered or HA deployment of the builder services you'll likely want to horizontally scale your front-end nodes. The most common deployment pattern for this usecase is a pool of front-end nodes fronted by a load-balancer.
+## Deploy new Front-ends
 
 ### System Recommendations
 The hardware requirement for an API node is low, however your node-count and usage statistics might alter our recommendation. For our live builder SaaS we are using compute optimized 36vcpu machines with 60Gbs of ram. This is obviously for a live running SaaS service with many thousands of supervisors checking in at any given time. Our disk space does not matter on a new api node as disk is not a resource the API should ever put into contention outside of possibly logging.
@@ -45,19 +45,21 @@ The on-prem-builder install.sh script now supports scaling front-end nodes as a 
 * TCP 11211 - memcached
 
 ### Create and update bldr.env
-The bldr.env file for your single on-prem builder node contains most of the information required to bootstrap a new front-end and will be used during the installation process. However, some configuration will need to change.
+
+The `bldr.env` file for your single on-prem builder node contains most of the information required to bootstrap a new frontend and will be used during the installation process. However, some configuration will need to change.
 
 Update the values of `OAUTH_REDIRECT_URL`, `OAUTH_CLIENT_ID` and `OAUTH_CLIENT_SECRET` as per the on-premise OAuth2 provider.
 
-In the case that your on-prem-builder cluster is backed by cloud services and you are running multiple front-end instances `OAUTH_REDIRECT_URL` should be pointed to your load-balancer. 
+In the case that your on-prem-builder cluster is backed by cloud services and you are running multiple frontend instances `OAUTH_REDIRECT_URL` should be pointed to your load-balancer.
 
 In the case that you are _not_ backing your cluster with cloud services you will need to update the values of `POSTGRES_HOST`, and `MINIO_ENDPOINT`.
 
 Additionally, you will need to edit (or create if it is not already present) `HAB_BLDR_PEER_ARG` to include all frontend and backend nodes hosting builder services. The format is as follows:
 
-```
+```shell
 --peer host1 --peer host2 --peer host3
 ```
 
 ### Install frontend
-Run the front-end install script from each new front-end node `./install.sh --install-frontend`
+
+Run the frontend install script from each new frontend node `./install.sh --install-frontend`

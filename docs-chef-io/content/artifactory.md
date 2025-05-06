@@ -4,7 +4,7 @@ title = "Chef Habitat Builder on-prem and Artifactory"
 [menu]
   [menu.habitat]
     title = "Artifactory"
-    identifier = "habitat/builder/on-prem/overview"
+    identifier = "habitat/builder/on-prem/artifactory"
     parent = "habitat/builder/on-prem"
     weight = 20
 +++
