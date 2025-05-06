@@ -1,10 +1,23 @@
++++
+title = "Example builder.env configuration file"
+
+[menu]
+  [menu.habitat]
+    title = "builder.env example"
+    identifier = "habitat/builder/on-prem/overview"
+    parent = "habitat/builder/on-prem"
+    weight = 20
++++
+
+
+
 # Builder + OAuth
 
 Authenticating Builder with OAuth services.
 
 ## Pre-Requisites
 
-Prior to starting the install, please ensure you have reviewed all the items
+Prior to starting the install, ensure you have reviewed all the items
 in the Requirements section, and have a location for the installation that
 meets all the requirements.
 
@@ -33,7 +46,7 @@ For the configuration below, you will also need to know following *fully qualifi
 * Token Endpoint (example: `https://github.com/login/oauth/access_token`)
 * API Endpoint (example: `https://api.github.com/user`)
 
-For more information, please refer to the developer documentation of these services:
+For more information, refer to the developer documentation of these services:
 
 * [Azure Active Directory](https://docs.microsoft.com/azure/active-directory/develop/active-directory-protocols-oauth-code)
 * [GitHub](https://developer.github.com/apps/building-oauth-apps/authorization-options-for-oauth-apps/)
@@ -45,13 +58,13 @@ For further information on OAuth endpoints, see the Internet Engineering Task Fo
 
 ### Preparing your filesystem (Optional)
 
-Since substantial storage may be required for holding packages, please ensure you have an appropriate amount of free space on your filesystem.
+Since substantial storage may be required for holding packages, ensure you have an appropriate amount of free space on your filesystem.
 
-The package artifacts will be stored in your Minio instance by default, typically at the following location: `/hab/svc/builder-minio/data`
+The package artifacts will be stored in your MinIO instance by default, typically at the following location: `/hab/svc/builder-minio/data`
 
 If you need to add additional storage, it is recommended that you create a mount at `/hab` and point it to your external storage. This is not required if you already have sufficient free space.
 
-*Note*: If you would prefer to use Artifactory instead of Minio for the object storage, please see the [Artifactory](artifactory.md) documentation.
+*Note*: If you would prefer to use Artifactory instead of MinIO for the object storage, see the [Artifactory](artifactory.md) documentation.
 
 ### Procuring SSL certificate (Recommended)
 
@@ -145,7 +158,7 @@ In order to install the on-prem Chef Habitat Builder in an airgapped (no direct 
 
 If everything goes well, you should see output similar to the following showing that the Chef Habitat Builder on-prem services are loaded:
 
-```output
+```shell
 hab-sup(AG): The habitat/builder-datastore service was successfully loaded
 hab-sup(AG): The habitat/builder-minio service was successfully loaded
 hab-sup(AG): The habitat/builder-memcached service was successfully loaded
@@ -155,11 +168,11 @@ hab-sup(AG): The habitat/builder-api-proxy service was successfully loaded
 
 Do a `hab svc status` to check the status of all the services. They may take a few seconds to all come up.
 
-If things don't work as expected (eg, if all the services are not in the `up` state), please see the [Troubleshooting](troubleshooting.md) documentation.
+If things don't work as expected (eg, if all the services are not in the `up` state), see the [Troubleshooting](troubleshooting.md) documentation.
 
-## Minio Web UI
+## MinIO Web UI
 
-The Chef Habitat Builder on-prem stores package artifacts in [Minio](https://github.com/minio/minio). By default, the Minio instance will be available on port 9000 (or whatever port you specified in your `bldr.env`). Please confirm that the Minio UI is available, and that you can log in with the credentials that were specified in your `bldr.env` file. There should already be a bucket created in which to host the artifacts.
+The Chef Habitat Builder on-prem stores package artifacts in [MinIO](https://github.com/minio/minio). By default, the MinIO instance will be available on port 9000 (or whatever port you specified in your `bldr.env`). Please confirm that the MinIO UI is available, and that you can log in with the credentials that were specified in your `bldr.env` file. There should already be a bucket created in which to host the artifacts.
 
 ## Chef Habitat Builder on-prem Web UI
 

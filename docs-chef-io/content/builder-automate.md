@@ -1,10 +1,19 @@
-# Builder + Automate
++++
+title = "Deploy Chef Habitat Builder on-prem with Chef Automate"
 
-The Chef Automate _Applications Dashboard_ provides observability into your Chef Habitat Builder on-prem installation. See [Setting up the Applications Dashboard](https://automate.chef.io/docs/applications-setup/) for information and installation guidance.
+[menu]
+  [menu.habitat]
+    title = "Bootstrap Core Packages"
+    identifier = "habitat/builder/on-prem/Bootstrap Core Packages"
+    parent = "habitat/builder/on-prem"
+    weight = 20
++++
+
+The Chef Automate Applications Dashboard provides observability into your Chef Habitat Builder on-prem installation. For information and installation guidance, see [Setting up the Applications Dashboard](https://docs.chef.io/automate/applications_setup/).
 
 ## Chef Habitat On-Prem + Chef Automate
 
-Configuring Chef Habitat on-prem to use Chef Automate's Authentication takes five steps:
+There are five steps to deploy Chef Habitat on-prem with Chef Automate's authentication.
 
 1. Patch the Chef Automate configuration to recognize Chef Habitat
 1. Set up the Chef Habitat Builder on-prem `bldr.env` to use Chef Automate's authentication
@@ -19,12 +28,16 @@ To authenticate with Chef Automate, create a patch with the Chef Automate comman
 1. From the command line, access Chef Automate, for example:
 
     ```bash
-    ssh <automate hostname>
-    #or
-    ssh <ipaddress>
+    ssh <AUTOMATE_HOSTNAME>
     ```
 
-1. Create the file `patch-automate.toml`:
+    or
+
+    ```bash
+    ssh <IP_ADDRESS>
+    ```
+
+1. Create a patch file called `patch-automate.toml`:
 
     ```bash
     touch patch-automate.toml
@@ -51,7 +64,7 @@ To authenticate with Chef Automate, create a patch with the Chef Automate comman
 
     A successful patch displays the output:
 
-    ```output
+    ```shell
     Updating deployment configuration
     Applying deployment configuration
       Started session-service
@@ -142,7 +155,7 @@ Rename the custom Builder certificates cert file as `ssl-certificate.crt` and th
 
     Should return something similar to:
 
-    ```output
+    ```shell
     package                                        type        desired  state  elapsed (s)  pid    group
     habitat/builder-api/8473/20190830141422        standalone  up       up     595          28302  builder-api.default
     habitat/builder-api-proxy/8467/20190829194024  standalone  up       up     597          28233  builder-api-proxy.default
@@ -161,7 +174,7 @@ Rename the custom Builder certificates cert file as `ssl-certificate.crt` and th
 
     Copy the output to an accessible file.
 
-    ```output
+    ```shell
     # Copy the contents including the begin and end certificate
     # -----BEGIN CERTIFICATE-----
     # Certificate content here

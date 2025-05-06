@@ -1,4 +1,14 @@
-# Bootstrap Core Packages
++++
+title = "Bootstrap Core Packages"
+
+[menu]
+  [menu.habitat]
+    title = "Bootstrap Core Packages"
+    identifier = "habitat/builder/on-prem/Bootstrap Core Packages"
+    parent = "habitat/builder/on-prem"
+    weight = 20
++++
+
 
 ## Generate a Personal Access Token
 
