@@ -1,3 +1,14 @@
++++
+title = "Example builder.env configuration file"
+
+[menu]
+  [menu.habitat]
+    title = "builder.env example"
+    identifier = "habitat/builder/on-prem/overview"
+    parent = "habitat/builder/on-prem"
+    weight = 20
++++
+
 # Separating Backend Services (minio/postgresql)
 
 The on-prem-builder install.sh script now supports separation of the backend components i.e datastore and minio server onto different nodes.
@@ -31,18 +42,18 @@ Additionally, you will need to edit (or create if it is not already present) `HA
 ```
 
 ## Separating MinIO Server
-MinIO is an open source object storage server. Chef Habitat Builder on-prem uses Minio to store habitat artifacts (.harts).
+MinIO is an open source object storage server. Chef Habitat Builder on-prem uses MinIO to store habitat artifacts (.harts).
 
-### Install Minio
+### Install MinIO
 Run the minio install script from the new node that will run the minio service to store all the artifacts
 ```bash
 ./install.sh --install-minio
 ```
 
-### Connecting to Minio server node
-Now that your Minio server is up and running on its own node, it is crucial to know how to connect your frontend nodes to it.
-The `MINIO_ENDPOINT` in the bldr.env file has to be mapped to the Node where the Minio server is running.
-You can then access the Minio UI using the `MINIO_ENDPOINT` URL.
+### Connecting to MinIO server node
+Now that your MinIO server is up and running on its own node, it is crucial to know how to connect your frontend nodes to it.
+The `MINIO_ENDPOINT` in the bldr.env file has to be mapped to the Node where the MinIO server is running.
+You can then access the MinIO UI using the `MINIO_ENDPOINT` URL.
 
 ## Separating postgresql
 The backend datastore can also be setup to run on a separate node.

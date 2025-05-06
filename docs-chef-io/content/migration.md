@@ -1,3 +1,15 @@
++++
+title = "Example builder.env configuration file"
+
+[menu]
+  [menu.habitat]
+    title = "builder.env example"
+    identifier = "habitat/builder/on-prem/overview"
+    parent = "habitat/builder/on-prem"
+    weight = 20
++++
+
+
 # Migrate to a Deployment of Automate Builder
 
 Long Term Support for On-Prem Builder is provided for installations of [Builder via Chef Automate](https://automate.chef.io/docs/on-prem-builder/).
@@ -5,7 +17,7 @@ This document will guide you through the steps necessary to migrate your On-Prem
 
 The data that Builder stores is fairly lightweight and thus the migration strategy is pretty straightforward. On-Prem Builder has two types of data that will need to be migrated:
 
-1. Minio/S3 habitat artifacts
+1. MinIO/S3 habitat artifacts
 1. PostgreSQL package and user metadata
 
 The minio/S3 data will be copied to the Automate Builder target via minio mirroring utility.
@@ -56,13 +68,13 @@ Check that your target Automate Builder instance is running the same or newer Bu
    * [Merging Database Shards](https://github.com/habitat-sh/on-prem-builder/blob/master/on-prem-docs/postgres.md#merging-postgresql-database-shards)
    * [Merging Databases](https://github.com/habitat-sh/on-prem-builder/blob/master/on-prem-docs/postgres.md#merging-postgresql-databases)
 
-## Minio Artifact (.hart) Migration
+## MinIO Artifact (.hart) Migration
 
-Whether your source package files are in Minio or in S3, you can leverage the [minio client](https://docs.min.io/docs/minio-client-quickstart-guide.html) to perform what more or less amounts to a filesystem backup that you will then restore into the target Minio. You are going to create a copy of the Minio data on another filesystem or directory that can either be copied to or mounted on the target Automate Builder node.
+Whether your source package files are in MinIO or in S3, you can leverage the [minio client](https://docs.min.io/docs/minio-client-quickstart-guide.html) to perform what more or less amounts to a filesystem backup that you will then restore into the target MinIO. You are going to create a copy of the MinIO data on another filesystem or directory that can either be copied to or mounted on the target Automate Builder node.
 
-## Creating a Minio Backup Copy
+## Creating a MinIO Backup Copy
 
-A simple backup process of the source Builder Minio data might look like the steps below.
+A simple backup process of the source Builder MinIO data might look like the steps below.
 
 1. Shut down the API to ensure no active transactions are occurring. (Optional but preferred)
 
@@ -84,9 +96,9 @@ A simple backup process of the source Builder Minio data might look like the ste
    sudo hab svc start habitat/builder-api`
    ```
 
-## Importing the Minio Backup Copy
+## Importing the MinIO Backup Copy
 
-Use the following steps in order to sync the Minio package data into the target Automate Builder. This will overwrite any existing data that is in the Automate Builder Minio depot. Create a backup first `sudo chef-automate backup create` if one does not already exist.
+Use the following steps in order to sync the MinIO package data into the target Automate Builder. This will overwrite any existing data that is in the Automate Builder MinIO depot. Create a backup first `sudo chef-automate backup create` if one does not already exist.
 
 1. Copy the minio directory backup to the target Automate Builder node and expand the .tar
 
@@ -94,13 +106,13 @@ Use the following steps in order to sync the Minio package data into the target 
    tar xvf minio_backup.tar
    ```
 
-1. Once the data is expanded into a directory on the target Automate Builder node use Minio client to mirror it into the Minio service directory
+1. Once the data is expanded into a directory on the target Automate Builder node use MinIO client to mirror it into the MinIO service directory
 
    ```
    sudo ./mc mirror minio_backup/ /hab/svc/automate-minio/data/depot
    ```
 
-1. Fix the Minio data directory ownership
+1. Fix the MinIO data directory ownership
 
    ```
    sudo chown -R hab:hab /hab/svc/automate-minio/data/depot
@@ -108,7 +120,7 @@ Use the following steps in order to sync the Minio package data into the target 
 
 The artifact data should now be available for use!
 
-As mentioned before, since the Minio backup/import operation could be dramatically different for different environments, the Minio backup steps cannot be 100% prescriptive. This should give you some ideas to explore though.
+As mentioned before, since the MinIO backup/import operation could be dramatically different for different environments, the MinIO backup steps cannot be 100% prescriptive. This should give you some ideas to explore though.
 
 ## PostgreSQL Data Copy
 
@@ -240,7 +252,7 @@ User's `$HAB_AUTH_TOKEN`s will remain the same as those from the source Builder.
 
 ## Migration Validation
 
-A package download operation is an easy way to validate PostgreSQL and Minio data are valid
+A package download operation is an easy way to validate PostgreSQL and MinIO data are valid
 
 Download a package from the target Automate Builder
 

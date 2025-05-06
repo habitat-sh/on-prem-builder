@@ -1,3 +1,14 @@
++++
+title = "Example builder.env configuration file"
+
+[menu]
+  [menu.habitat]
+    title = "builder.env example"
+    identifier = "habitat/builder/on-prem/overview"
+    parent = "habitat/builder/on-prem"
+    weight = 20
++++
+
 ## Upgrading
 
 Currently, Chef Habitat Builder on-prem services are not set to auto-upgrade. When you wish to upgrade the services, there is a simple uninstall script you can use to stop and unload the services, and remove the services. In order to uninstall, you may do the following:

@@ -1,3 +1,15 @@
++++
+title = "Example builder.env configuration file"
+
+[menu]
+  [menu.habitat]
+    title = "builder.env example"
+    identifier = "habitat/builder/on-prem/overview"
+    parent = "habitat/builder/on-prem"
+    weight = 20
++++
+
+
 # Builder on-prem + Postgres
 
 Managing your Postgres Installation
@@ -7,7 +19,7 @@ Managing your Postgres Installation
 The data that Builder stores is luckily fairly lightweight and thus the backup and DR strategy is pretty straightforward. On-Prem Builder has two types of data that should be backed up case of a disaster:
 
 1. PostgreSQL package and user metadata
-1. [Minio habitat artifacts](./minio.md#minio-artifact-backups)
+1. [MinIO habitat artifacts](./minio.md#minio-artifact-backups)
 
 Ideally, you should coordinate the backup of the entire Builder on-prem cluster to happen together. However, the type of data that Builder stores (metadata and artifacts) permits some flexibility in the timing of your backup operations. In the worst case, if a package's metadata is missing from PostgreSQL, you can repopulate it by re-uploading the package with the `--force` flag, for example: `hab pkg upload <path to hartfile> -u <on-prem_url> --force`.
 
@@ -54,16 +66,16 @@ Your database data should be restored and ready for use!
 
 ## Merging PostgreSQL Database Shards
 
-This following sections on "Merging Database Shards" and "Merging Databases" is for installations of On-Premise Depot that were done *prior* to
+This following sections on "Merging Database Shards" and "Merging Databases" is for installations of on-premises depot that were done *prior* to
 August 17th 2018. If you re-install or upgrade to a newer version of the
-On-Premise Depot, you will be required to also merge your database shards into
+on-premises depot, you will be required to also merge your database shards into
 the `public` Postgres database schema. Please follow the steps below.
 
 ### Shard Migration Pre-requisites
 
 1. The password to your Postgres database. By default, this is located at
    `/hab/svc/builder-datastore/config/pwfile`
-1. A fresh backup of the two databases present in the On-Premise Depot,
+1. A fresh backup of the two databases present in the on-premises depot,
    `builder_sessionsrv` and `builder_originsrv`. You can create such a backup
    with `pg_dump`:
 
@@ -118,16 +130,16 @@ the `public` Postgres database schema. Please follow the steps below.
 
 ## Merging PostgreSQL Databases
 
-This section is for installations of On-Premise Depot that were done *after*
+This section is for installations of on-premises depot that were done *after*
 the database shard migration listed above. If upgrade to a newer version of the
-On-Premise Depot, you will be required to also merge databases into
+on-premises depot, you will be required to also merge databases into
 the `builder` Postgres database. Please follow the steps below.
 
 ### Database Merge Pre-requisites
 
 1. The password to your Postgres database. By default, this is located at
    `/hab/svc/builder-datastore/config/pwfile`
-1. A fresh backup of the two databases present in the On-Premise Depot,
+1. A fresh backup of the two databases present in the on-premises depot,
    `builder_sessionsrv` and `builder_originsrv`. You can create such a backup
    with `pg_dump`:
 
