@@ -9,11 +9,9 @@ title = "Troubleshooting"
     weight = 20
 +++
 
-## Common Problems
-
 This section covers several common problems that you might encounter and how to solve them.
 
-### Finding origin keys
+## Finding origin keys
 
 On Linux or macOS:
 
@@ -28,18 +26,18 @@ On Windows:
 ls C:\hab\cache\keys
 ```
 
-### Network access / proxy configuration
+## Network access / proxy configuration
 
 If the initial install fails, check that you have outgoing connectivity, and that you can successfully ping the following:
 
-* `raw.githubusercontent.com`
-* `bldr.habitat.sh`
+- `raw.githubusercontent.com`
+- `bldr.habitat.sh`
 
 If you have outgoing access via a proxy, ensure that HTTPS_PROXY is set correctly in your environment.
 
 You also will need to have the following _inbound_ port open for your instance:
 
-* Port 80
+- Port 80
 
 In the case that you have configured your proxy for the local session while installing but are still receiving connection refusal errors like the one below, you may want to configure your proxy with the `/etc/environment` file or similar.
 
@@ -67,20 +65,20 @@ If you are not able to log in, double check the settings that you have configure
 
 You were able to sign in to the authentication provider, but unable to authenticate with Chef Habitat's OAuth token.
 
-Open the `bldr.env` and verify that:
+1. Open the `bldr.env` and verify the following settings:
 
-* **APP_URL** ends with "/\"
-* **OAUTH_REDIRECT_URL** ends with "/\"
-* **OAUTH_CLIENT_ID** is complete and correct
-* **OAUTH_CLIENT_SECRET** is complete and correct
+    - The `APP_URL` value ends with a forward slash (`/`).
+    - The `OAUTH_REDIRECT_URL` value ends with a forward slash (`/`).
+    - The `OAUTH_CLIENT_ID` setting is complete and correct.
+    - The `OAUTH_CLIENT_SECRET` setting is complete and correct.
 
-Apply changes to the `bldr.env` by running the install script:
+1. Apply changes to the `bldr.env` by running the install script:
 
     ```bash
     bash ./install.sh
     ```
 
-Restart the Chef Habitat services:
+1. Restart the Chef Habitat services:
 
     ```bash
     sudo systemctl restart hab-sup
@@ -116,11 +114,11 @@ If the proxy was configured for the local session during installation, but you a
 
 ### Error "sorry, too many clients already"
 
-If the hab services don't come up as expected, use `journalctl -fu hab-sup` to check the service logs (also see below for turning on Debug Logging).
+If the Habitat services don't come up as expected, use `journalctl -fu hab-sup` to check the service logs (also see below for turning on Debug Logging).
 
 If you see a Postgresql error "sorry, too many clients already", you may need to increase the number of configured connections to the database.
 
-In order to do that, run the following:
+To do that, run the following:
 
 `echo 'max_connections=200' | hab config apply "builder-datastore.default" $(date +%s)`
 

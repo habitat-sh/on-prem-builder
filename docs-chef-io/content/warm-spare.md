@@ -1,5 +1,5 @@
 +++
-title = "Configure disaster recovery"
+title = "Configure Chef Habitat Builder disaster recovery or warm spare"
 
 [menu]
   [menu.habitat]
@@ -15,73 +15,57 @@ Move this elsewhere
 
 # High Availability
 
-Currently, the only supported HA solution is by consuming SaaS backend services (AWS RDS, AWS S3).
+Currently, the only supported HA solution is by using SaaS backend services (AWS RDS, AWS S3).
 There is no other fully on-prem supported solution for providing highly available Builder services.
 
 --->
 
-In the event that you need to quickly recover from an outage or that you have some planned upgrades
-or maintenance work, you can leverage a warm spare / disaster recovery installation methodology.
+How create a disaster recover or warm spare configuration
 
-The following architecture diagram depicts the data synchronization process that can be used to
-increase the availability of the Builder API and backend for disaster recovery and warm spare
-scenarios.
+To quickly recover from an outage or perform planned upgrades or maintenance, you can use a warm spare or disaster recovery installation.
+
+The following architecture diagram shows the data synchronization process that increases the availability of the Builder API and backend for disaster recovery and warm spare scenarios.
 
 ![onprem architecture](../images/builder_architecture.png)
 
-## Synchronization Components
+## Synchronize components
 
-To enable the DR / warm spare deployment methodology, you will need to provision an equal number of
-frontend/backend systems as there are in your primary location. These will serve as your DR / Warm
-Spare environment and, if to be used for DR, should exist in a separate Availability Zone with
-separate storage.
+To enable the disaster recovery or warm spare deployment, you need to provision an equal number of frontend and backend systems as your primary location. These systems will serve as your disaster recovery or warm spare environment. For disaster recovery, they should exist in a separate availability zone with separate storage.
 
-The data that Builder stores is luckily fairly lightweight and thus the backup and DR or warm spare
-strategy is pretty straightforward. On-Prem Builder has two types of data that should be backed up
-case of a disaster or workload transfer to the warm spare:
+The data that Builder stores is lightweight, so the backup and disaster recovery or warm spare strategy is straightforward. Habitat Builder has two types of data that you should back up in case of a disaster or workload transfer to a warm spare:
 
-1. PostgreSQL package and user metadata
-1. Habitat Artifacts (.harts)
+- PostgreSQL package and user metadata
+- Habitat artifacts (.harts)
 
-All data should be backed by highly available storage subsystems and either replicated or backed up
-as indicated in the following sections.
+Back up or replicate all data using highly available storage subsystems as described in the following sections.
 
-Ideally, you should coordinate the backup of the entire Builder on-prem cluster to happen together.
-However, the type of data that Builder stores (metadata and artifacts) permits some flexibility in
-the timing of your backup operations. In the worst case, if a package's metadata is missing from
-PostgreSQL, you can repopulate it by re-uploading the package with the --force flag, for example:
-`hab pkg upload <path to hartfile> -u <on-prem_url> --force`.
+Coordinate the entire Builder on-prem cluster backup to happen together.
+However, the type of data that Builder stores (metadata and artifacts) allows some flexibility in the timing of your backup operations. In the worst case, if a package's metadata is missing from PostgreSQL, you can repopulate it by re-uploading the package with the `--force` flag. For example: `hab pkg upload <PATH_TO_HART_FILE> -u <ON_PREM_URL> --force`.
 
 ### PostgreSQL
 
-If using AWS RDS, you should be taking periodic snapshots of the RDS instance. For disaster recovery,
-you can choose to use a Multi-AZ RDS Deployment.
+If you are using AWS RDS, take periodic snapshots of the RDS instance.
+For disaster recovery, you can use a Multi-AZ RDS deployment.
 
-For non-RDS deployments, backing up the Postgres data is detailed [here](./postgres.md#postgresql-data-backups)
+For non-RDS deployments, back up the PostgreSQL data as described in the [Builder PostgreSQL configuration](./postgres.md#postgresql-data-backups) documentation.
 
-The backups should be periodically restored into the DR / warm spare via a scheduled automated process
-such as a crontab script. The restore can be run remotely from the same host that was used to create
-the backup. The Builder database is relatively small, likely only tens of megabytes.
+You should periodically restore the backups into the disaster recovery or warm spare environment using a scheduled automated process, such as a crontab script. You can run the restore remotely from the same host that created the backup. The Builder database is relatively small, likely only tens of megabytes.
 
-### Habitat Artifacts
+### Habitat artifacts
 
 Habitat artifacts are stored in one of two locations:
 
 - MinIO
 - S3 bucket
 
-In the event that your backend is using MinIO for Artifact storage/retrieval, it should be backed by
-highly available storage. Backing up MinIO data is detailed [here](./minio.md#managing-builder-on-prem-artifacts).
-If choosing a warm spare deployment in the same availability zone/datacenter and the filesystem is
-a network attached filesystem, it can also be attached to the warm spare. However, make sure that
-only one Builder cluster is ever accepting live traffic when sharing the same filesystem. For Disaster
-Recovery, the filesystem should be replicated to the alternate availability zone/datacenter.
+If your backend uses MinIO for artifact storage and retrieval, it should be backed by highly available storage.
+Back up MinIO data as described [Habitat Builder MinIO](./minio.md#managing-builder-on-prem-artifacts) documentation.
+If you choose a warm spare deployment in the same availability zone or data center and the filesystem is a network-attached filesystem, you can also attach it to the warm spare.
+However, make sure that only one Builder cluster is accepting live traffic when sharing the same filesystem.
+For disaster recovery, replicate the filesystem to the alternate availability zone or data center.
 
-If Artifacts are stored directly in an S3 bucket, the same bucket can be used for a warm spare in the
-same availability zone/datacenter. In the case of disaster recovery, the S3 bucket should be replicated
-to the alternate availability zone/datacenter. In the case of AWS S3, this replication is already
-built into the service.
+If artifacts are stored directly in an S3 bucket, you can use the same bucket for a warm spare in the same availability zone or data center.
+For disaster recovery, replicate the S3 bucket to the alternate availability zone or data center.
+For AWS S3, this replication is already built into the service.
 
-In the case that you are not re-attaching the MinIO filesytem to the warm spare, the backups should
-be periodically restored into the DR / warm spare via a scheduled automated process such as a crontab
-script.
+If you are not re-attaching the MinIO filesystem to the warm spare, periodically restore the backups into the disaster recovery or warm spare environment using a scheduled automated process, such as a crontab script.

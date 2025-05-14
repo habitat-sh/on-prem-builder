@@ -107,7 +107,7 @@ In order to install the on-prem Chef Habitat Builder in an airgapped (no direct 
 
 1. Archive `$DOWNLOAD_DIR`, transfer and extract on the Linux system where Builder will be deployed in the Airgapped environment
 
-> Note: The following tasks are intended to be completed on the Airgapped system where Builder will be deployed, in advance of the [Installation](https://github.com/habitat-sh/on-prem-builder/blob/master/README.md#Installation).
+> Note: The following tasks are intended to be completed on the Airgapped system where Builder will be deployed, in advance of the [Installation](https://github.com/habitat-sh/on-prem-builder/blob/main/README.md#Installation).
 
 1. From the archive, install the `hab` binary somewhere in $PATH and ensure it has execute permissions:
 
@@ -146,7 +146,7 @@ In order to install the on-prem Chef Habitat Builder in an airgapped (no direct 
 
 ## Installation
 
-> Note: If the on-prem Builder system is in an Airgapped (non-Internet connected) environment, you must first complete the [prerequisite](https://github.com/habitat-sh/on-prem-builder/blob/master/README.md#prerequisite-tasks-for-an-airgapped-installation-required-if-applicable) tasks detailed earlier.
+> Note: If the on-prem Builder system is in an Airgapped (non-Internet connected) environment, you must first complete the [prerequisite](https://github.com/habitat-sh/on-prem-builder/blob/main/README.md#prerequisite-tasks-for-an-airgapped-installation-required-if-applicable) tasks detailed earlier.
 
 1. `./install.sh`
 

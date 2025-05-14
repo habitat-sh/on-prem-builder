@@ -9,11 +9,12 @@ title = "Deploy Chef Habitat Builder on-prem with Chef Automate"
     weight = 20
 +++
 
-The Chef Automate Applications Dashboard provides observability into your Chef Habitat Builder on-prem installation. For information and installation guidance, see [Setting up the Applications Dashboard](https://docs.chef.io/automate/applications_setup/).
+The Chef Automate Applications Dashboard allows you to monitor your Chef Habitat Builder on-prem installation.
+For information and installation guidance, see [Setting up the Applications Dashboard](https://docs.chef.io/automate/applications_setup/).
 
-## Chef Habitat On-Prem + Chef Automate
+## Deploy Chef Habitat on-prem with Chef Automate
 
-There are five steps to deploy Chef Habitat on-prem with Chef Automate's authentication.
+There are five steps to deploy Chef Habitat on-prem with Chef Automate's authentication:
 
 1. Patch the Chef Automate configuration to recognize Chef Habitat
 1. Set up the Chef Habitat Builder on-prem `bldr.env` to use Chef Automate's authentication
@@ -21,7 +22,7 @@ There are five steps to deploy Chef Habitat on-prem with Chef Automate's authent
 1. Install Chef Habitat Builder on-prem
 1. Copy Automate's certificate to the `/hab/cache/ssl` directory
 
-### Step One: Patch Chef Automate's Configuration
+### Patch Chef Automate's configuration
 
 To authenticate with Chef Automate, create a patch with the Chef Automate command line:
 
@@ -73,14 +74,12 @@ To authenticate with Chef Automate, create a patch with the Chef Automate comman
 
 1. Exit Chef Automate
 
-### Step Two: Set up `bldr.env`
+### Configure the `bldr.env` file
 
 1. SSH to your Chef Habitat Builder on-prem instance:
 
     ```bash
-    ssh <builder hostname>
-    #or
-    ssh <ipaddress>
+    ssh <BUILDER_HOSTNAME_OR_IP_ADDRESS>
     ```
 
 1. Clone the Chef Habitat Builder on-prem repository:
@@ -95,19 +94,20 @@ To authenticate with Chef Automate, create a patch with the Chef Automate comman
     cd on-prem-builder
     ```
 
-1. Create a `bldr.env` file:
+1. Create a `bldr.env` file or copy the existing sample file:
 
     ```bash
     touch bldr.env
     ```
 
-    Or, if you need more explanations about the contents of the `bldr.env` file, copy the existing sample file:
+    Or, if you need more explanations about the contents of the `bldr.env` file, :
 
     ```bash
     cp bldr.env.sample bldr.env
     ```
 
-1. Edit `bldr.env`:
+1. Edit the `bldr.env` file:
+
     * SSL must be enabled in Builder in order to authenticate against Automate, use `APP_SSL_ENABLED=true` and a `APP_URL` beginning with `https`.
     * Set `OAUTH_PROVIDER` to `chef-automate`.
     * Set the values of `OAUTH_USERINFO_URL`, `OAUTH_AUTHORIZE_URL`, and `OAUTH_TOKEN_URL` to the example values provided in the `sample.bldr.env` file substituting `<your.automate.domain>` with your Automate server or domain name.
@@ -199,8 +199,9 @@ Rename the custom Builder certificates cert file as `ssl-certificate.crt` and th
 
 ## Related Resources
 
-* [Chef Automate (ALPHA)](https://automate.chef.io/docs/configuration/#alpha-setting-up-automate-as-an-oauth-provider-for-habitat-builder)
+- [Chef Automate (ALPHA)](https://docs.chef.io/automate/configuration/#alpha-setting-up-automate-as-an-oauth-provider-for-habitat-builder)
 
 ## Next Steps
 
-[Bootstrap Core Origin](./bootstrap-core.md)
+After you've 
+[Bootstrap the core origin](./bootstrap-core.md)

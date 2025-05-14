@@ -9,8 +9,9 @@ title = "Frontend scaling"
     weight = 20
 +++
 
+With any tiered or HA deployment of the builder services you'll likely want to horizontally scale your frontend nodes. The most common deployment pattern for this use case is a pool of frontend nodes fronted by a load balancer.
 
-With any tiered or HA deployment of the builder services you'll likely want to horizontally scale your frontend nodes. The most common deployment pattern for this usecase is a pool of frontend nodes fronted by a load-balancer.
+## Deploy new frontend nodes
 
 ## Deploy new Front-ends
 
@@ -40,17 +41,17 @@ The on-prem-builder install.sh script now supports scaling front-end nodes as a 
 * TCP 9638 - Habitat configuration gossip
 * UDP 9638 - Habitat configuration gossip
 * TCP 9636 - Builder API HTTP
-* TCP 5432 - postgresql
-* TCP 9000 - minio
+* TCP 5432 - PostgreSQL
+* TCP 9000 - MinIO
 * TCP 11211 - memcached
 
 ### Create and update bldr.env
 
-The `bldr.env` file for your single on-prem builder node contains most of the information required to bootstrap a new frontend and will be used during the installation process. However, some configuration will need to change.
+The `bldr.env` file for your single on-prem Habitat Builder node contains most of the information required to bootstrap a new frontend and is used during the installation process. However, some configuration will need to change.
 
-Update the values of `OAUTH_REDIRECT_URL`, `OAUTH_CLIENT_ID` and `OAUTH_CLIENT_SECRET` as per the on-premise OAuth2 provider.
+Update the values of `OAUTH_REDIRECT_URL`, `OAUTH_CLIENT_ID` and `OAUTH_CLIENT_SECRET` as per the on-premises OAuth2 provider.
 
-In the case that your on-prem-builder cluster is backed by cloud services and you are running multiple frontend instances `OAUTH_REDIRECT_URL` should be pointed to your load-balancer.
+If your on-prem Habitat Builder cluster is backed by cloud services and you are running multiple frontend instances, set `OAUTH_REDIRECT_URL` to your load balancer URL.
 
 In the case that you are _not_ backing your cluster with cloud services you will need to update the values of `POSTGRES_HOST`, and `MINIO_ENDPOINT`.
 

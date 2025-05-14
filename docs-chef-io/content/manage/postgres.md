@@ -9,14 +9,9 @@ title = "Manage your PostgreSQL Installation"
     weight = 20
 +++
 
+## Manage Builder On-Prem PostgreSQL Data
 
-# Builder on-prem + PostgreSQL
-
-Managing your PostgreSQL Installation
-
-## Managing Builder On-Prem PostgreSQL Data
-
-The data that Builder stores is luckily fairly lightweight and thus the backup and DR strategy is pretty straightforward. On-Prem Builder has two types of data that should be backed up case of a disaster:
+The data that Builder stores is luckily fairly lightweight and thus the backup and DR strategy is pretty straightforward. On-prem Builder has two types of data that should be backed up case of a disaster:
 
 1. PostgreSQL package and user metadata
 1. [MinIO Habitat artifacts](./minio.md#minio-artifact-backups)
