@@ -25,8 +25,7 @@ init_datastore() {
   mkdir -p /hab/user/builder-datastore/config
   cat <<-EOT >/hab/user/builder-datastore/config/user.toml
 		max_locks_per_transaction = 128
-		dynamic_shared_memory_type = 'none'
-		
+
 		[superuser]
 		name = 'hab'
 		password = 'hab'
@@ -98,17 +97,17 @@ configure() {
   cat <<-EOT >/hab/user/builder-api/config/user.toml
 		log_level="error,tokio_core=error,tokio_reactor=error,zmq=error,hyper=error"
 		jobsrv_enabled = false
-		
+
 		[http]
 		handler_count = 10
-		
+
 		[api]
 		features_enabled = "$FEATURES_ENABLED"
 		targets = ["x86_64-linux", "x86_64-linux-kernel2", "x86_64-windows"]
-		
+
 		[depot]
 		jobsrv_enabled = false
-		
+
 		[oauth]
 		provider = "$OAUTH_PROVIDER"
 		userinfo_url = "$OAUTH_USERINFO_URL"
@@ -116,22 +115,22 @@ configure() {
 		redirect_url = "$OAUTH_REDIRECT_URL"
 		client_id = "$OAUTH_CLIENT_ID"
 		client_secret = "$OAUTH_CLIENT_SECRET"
-		
+
 		[s3]
 		backend = "$S3_BACKEND"
 		key_id = "$MINIO_ACCESS_KEY"
 		secret_key = "$MINIO_SECRET_KEY"
 		endpoint = "$MINIO_ENDPOINT"
 		bucket_name = "$MINIO_BUCKET"
-		
+
 		[artifactory]
 		api_url = "$ARTIFACTORY_API_URL"
 		api_key = "$ARTIFACTORY_API_KEY"
 		repo = "$ARTIFACTORY_REPO"
-		
+
 		[memcache]
 		ttl = 15
-		
+
 		[datastore]
 		user = "$PGUSER"
 		password = "$PGPASSWORD"
@@ -153,14 +152,14 @@ configure() {
 		enable_builder = false
 		app_url = "${APP_URL}"
 		load_balanced = ${LOAD_BALANCED}
-		
+
 		[oauth]
 		provider = "$OAUTH_PROVIDER"
 		client_id = "$OAUTH_CLIENT_ID"
 		authorize_url = "$OAUTH_AUTHORIZE_URL"
 		redirect_url = "$OAUTH_REDIRECT_URL"
 		signup_url = "$OAUTH_SIGNUP_URL"
-		
+
 		[nginx]
 		max_body_size = "2048m"
 		proxy_send_timeout = 180
@@ -172,13 +171,13 @@ configure() {
 		limit_req_zone_known   = "\$http_x_forwarded_for zone=known:10m rate=30r/s"
 		limit_req_known        = "burst=90 nodelay"
 		$ALLOW_OAUTH_ORIGIN
-		
+
 		[http]
 		keepalive_timeout = "180s"
-		
+
 		[server]
 		listen_tls = $APP_SSL_ENABLED
-		
+
 		[analytics]
 		enabled = $ANALYTICS_ENABLED
 		company_id = "$ANALYTICS_COMPANY_ID"
@@ -196,11 +195,11 @@ start_api_proxy() {
 }
 
 start_datastore() {
-  sudo hab svc load "${BLDR_ORIGIN}/builder-datastore" --channel "${BLDR_CHANNEL}" --force
+  sudo hab svc load "${BLDR_DATASTORE_ORIGIN:=$BLDR_ORIGIN}/builder-datastore" --channel "${BLDR_DATASTORE_CHANNEL:=$BLDR_CHANNEL}" --force
 }
 
 start_minio() {
-  sudo hab svc load "${BLDR_ORIGIN}/builder-minio" --channel "${BLDR_MINIO_CHANNEL:=$BLDR_CHANNEL}" --force
+  sudo hab svc load "${BLDR_MINIO_ORIGIN:=$BLDR_ORIGIN}/builder-minio" --channel "${BLDR_MINIO_CHANNEL:=$BLDR_CHANNEL}" --force
 }
 
 start_memcached() {
@@ -364,19 +363,19 @@ Help() {
   cat <<-EOF
 		Habitat Builder Service Provisioning Script
 		The default action, when no argument are passed, is to provision a node with Frontend and Backend services.
-		
+
 		Syntax: $0 <SUBCOMMAND>
-		
+
 		options:
-		
+
 		  -h, --help            Print this Help.
-		
+
 		  --install-frontend    Provision a Frontend/API only.
-		
+
 		  --install-postgresql  Provision the datastore only.
-		
+
 		  --install-minio       Provision the minio server only.
-		
+
 	EOF
 }
 
