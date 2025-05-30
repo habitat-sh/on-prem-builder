@@ -4,8 +4,8 @@ title = "Troubleshooting"
 [menu]
   [menu.habitat]
     title = "Troubleshooting"
-    identifier = "habitat/builder/on-prem/troubleshooting"
-    parent = "habitat/builder/on-prem"
+    identifier = "habitat/on-prem-builder/troubleshooting"
+    parent = "habitat/on-prem-builder"
     weight = 20
 +++
 
@@ -219,4 +219,4 @@ Check to make sure you've created the `core` origin and then try again, if you h
 
 ## Support
 
-You can post questions or issues on the [Habitat Forum](https://discourse.chef.io/), on our [Slack channel](https://habitat-sh.slack.com), or file issues directly at the [Github repo](https://github.com/habitat-sh/on-prem-builder/issues).
+You can post questions or issues on the [Habitat Forum](https://discourse.chef.io/), on our [Slack channel](https://community.chef.io/slack), or file issues directly at the [Github repo](https://github.com/habitat-sh/on-prem-builder/issues).

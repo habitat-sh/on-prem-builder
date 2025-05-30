@@ -4,8 +4,8 @@ title = "Authenticating Builder with OAuth services."
 [menu]
   [menu.habitat]
     title = "O-Auth"
-    identifier = "habitat/builder/on-prem/o-auth"
-    parent = "habitat/builder/on-prem"
+    identifier = "habitat/on-prem-builder/o-auth"
+    parent = "habitat/on-prem-builder"
     weight = 20
 +++
 

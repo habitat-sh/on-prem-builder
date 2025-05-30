@@ -9,22 +9,28 @@ title = "Bootstrap Core Packages"
     weight = 20
 +++
 
+When you first deploy Chef Habitat Builder, it doesn't have any packages pre-installed.
+This page documents how to bootstrap Builder with packages from [Chef's public Habitat Builder.](https://bldr.habitat.sh).
 
-## Generate a Personal Access Token
+## Generate a personal access token
 
-Generate a Personal Access Token for bootstrapping the `core` packages, as well as for performing authenticated operations using the `hab` client.
+You'll need a personal access token in your on-prem Habitat Builder instance to bootstrap the `core` packages and authenticate with the `hab` client.
 
-Select your Gravatar icon on the top right corner of the Chef Habitat Builder on-prem web page, and then select **Profile**. This will take you to a page where you can generate your access token. Make sure to save it securely.
+If you don't already have one, generate a personal access token:
 
-## Add a License Key
+1. In the top right corner your on-prem Habitat Builder site, select your Gravatar icon and then select **Profile**.
 
-You can enter your license key just below the Personal Access Token text field in order for your account to access official chef maintained packages.
+1. This takes you to a page where you can generate your access token. Make sure to save it securely.
 
-## Enable Native Package Support
+## Add a license key
+
+You can enter your license key just below the **Personal Access Token** field so you can access official Chef-maintained packages.
+
+## Enable native package support
 
 A couple of the new LTS supported packages include `native` packages. In order for an on-prem builder instance to host LTS packages, that builder instance must be configured to allow native package support. This is done by enabling the `nativepackages` feature and specifying `core` as an allowed native package origin. To do this, an on-prem builder's `/hab/user/builder-api/config/user.toml` file should be edited so that the `[api]` section looks as follows:
 
-```
+```toml
 [api]
 features_enabled = "nativepackages"
 targets = ["x86_64-linux", "x86_64-linux-kernel2", "x86_64-windows"]

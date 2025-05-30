@@ -4,8 +4,8 @@ title = "Habitat Builder logs"
 [menu]
   [menu.habitat]
     title = "Logs"
-    identifier = "habitat/builder/on-prem/logs"
-    parent = "habitat/builder/on-prem"
+    identifier = "habitat/on-prem-builder/logs"
+    parent = "habitat/on-prem-builder"
     weight = 20
 +++
 

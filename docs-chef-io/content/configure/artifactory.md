@@ -4,8 +4,8 @@ title = "Chef Habitat Builder on-prem and Artifactory"
 [menu]
   [menu.habitat]
     title = "Artifactory"
-    identifier = "habitat/builder/on-prem/artifactory"
-    parent = "habitat/builder/on-prem"
+    identifier = "habitat/on-prem-builder/artifactory"
+    parent = "habitat/on-prem-builder"
     weight = 20
 +++
 
@@ -16,7 +16,7 @@ Before you begin, you will need the following:
 
 - The URL to the Artifactory instance.
 - An API key to authenticate to the instance.
-- A repo for the Habitat artifacts.
+- A repository for the Habitat artifacts.
 
 Once you have the above:
 
@@ -24,7 +24,7 @@ Once you have the above:
 
 1. Install Habitat Builder on-prem normally using the `install.sh` script.
 
-1. Optional: Log into Habitat Builder and create an origin, then upload some packages and check your Artifactory instance to ensure that they are present in the repo you specified.
+1. Optional: Log into Habitat Builder and create an origin, then upload some packages and check your Artifactory instance to ensure that they are present in the repository you specified.
 
 If you run into any issues, see the support section below.
 

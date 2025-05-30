@@ -4,8 +4,8 @@ title = "Manage your PostgreSQL Installation"
 [menu]
   [menu.habitat]
     title = "PostgreSQL"
-    identifier = "habitat/builder/on-prem/PostgreSQL"
-    parent = "habitat/builder/on-prem"
+    identifier = "habitat/on-prem-builder/PostgreSQL"
+    parent = "habitat/on-prem-builder"
     weight = 20
 +++
 

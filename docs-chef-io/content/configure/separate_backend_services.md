@@ -1,11 +1,11 @@
 +++
-title = "Separate backend services (minio/postgresql)"
+title = "Separate the Habitat Builder backend services"
 
 [menu]
   [menu.habitat]
     title = "Separating backend services"
-    identifier = "habitat/builder/on-prem/Separating backend services"
-    parent = "habitat/builder/on-prem"
+    identifier = "habitat/on-prem-builder/Separating backend services"
+    parent = "habitat/on-prem-builder"
     weight = 20
 +++
 

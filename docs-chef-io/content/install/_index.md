@@ -4,8 +4,8 @@ title = "Chef Habitat Builder on-prem install overview"
 [menu]
   [menu.habitat]
     title = "Overview"
-    identifier = "habitat/builder/on-prem/install/overview"
-    parent = "habitat/builder/on-prem"
+    identifier = "habitat/on-prem-builder/install/overview"
+    parent = "habitat/on-prem-builder"
     weight = 10
 +++
 

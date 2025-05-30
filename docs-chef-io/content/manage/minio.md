@@ -5,8 +5,8 @@ gh_repo = "on-prem-builder"
 [menu]
   [menu.habitat]
     title = "MinIO"
-    identifier = "habitat/builder/on-prem/minio"
-    parent = "habitat/builder/on-prem"
+    identifier = "habitat/on-prem-builder/minio"
+    parent = "habitat/on-prem-builder"
     weight = 10
 +++
 

@@ -4,8 +4,8 @@ title = "Deploy Chef Habitat Builder on-prem with Chef Automate"
 [menu]
   [menu.habitat]
     title = "Chef Automate"
-    identifier = "habitat/builder/on-prem/Automate"
-    parent = "habitat/builder/on-prem"
+    identifier = "habitat/on-prem-builder/Automate"
+    parent = "habitat/on-prem-builder"
     weight = 20
 +++
 

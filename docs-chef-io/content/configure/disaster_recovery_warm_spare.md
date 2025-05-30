@@ -4,8 +4,8 @@ title = "Configure Chef Habitat Builder disaster recovery or warm spare"
 [menu]
   [menu.habitat]
     title = "Disaster recovery"
-    identifier = "habitat/builder/on-prem/disaster recovery"
-    parent = "habitat/builder/on-prem"
+    identifier = "habitat/on-prem-builder/disaster recovery"
+    parent = "habitat/on-prem-builder"
     weight = 20
 +++
 
