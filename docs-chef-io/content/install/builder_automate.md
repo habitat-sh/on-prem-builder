@@ -9,18 +9,18 @@ title = "Deploy Chef Habitat Builder on-prem with Chef Automate"
     weight = 20
 +++
 
-The Chef Automate Applications Dashboard allows you to monitor your Chef Habitat Builder on-prem installation.
+The Chef Automate Applications dashboard allows you to monitor your Chef Habitat Builder on-prem installation.
 For information and installation guidance, see [Setting up the Applications Dashboard](https://docs.chef.io/automate/applications_setup/).
 
 ## Deploy Chef Habitat on-prem with Chef Automate
 
 There are five steps to deploy Chef Habitat on-prem with Chef Automate's authentication:
 
-1. Patch the Chef Automate configuration to recognize Chef Habitat
-1. Set up the Chef Habitat Builder on-prem `bldr.env` to use Chef Automate's authentication
+1. Patch the Chef Automate configuration to recognize Chef Habitat.
+1. Set up the Chef Habitat Builder on-prem `bldr.env` to use Chef Automate's authentication.
 1. Copy your custom builder certificate files (`.crt` and `.key`) to the same location as the `./install.sh` script.
-1. Install Chef Habitat Builder on-prem
-1. Copy Automate's certificate to the `/hab/cache/ssl` directory
+1. Install Chef Habitat Builder on-prem.
+1. Copy Automate's certificate to the `/hab/cache/ssl` directory.
 
 ### Patch Chef Automate's configuration
 
@@ -48,14 +48,14 @@ To authenticate with Chef Automate, create a patch with the Chef Automate comman
 
     ```toml
     [session.v1.sys.service]
-    bldr_signin_url = "https://chef-builder.test/"
+    bldr_signin_url = "https://chef-builder.example.com/"
     # OAUTH_CLIENT_ID
     bldr_client_id = "0123456789abcdef0123"
     # OAUTH_CLIENT_SECRET
     bldr_client_secret = "0123456789abcdef0123456789abcdef01234567"
     ```
 
-    Note that the `OAUTH_CLIENT_ID` and `OAUTH_CLIENT_SECRET` values above match the default values in the bldr.env.sample file which you will edit in the next step. You may chnge these values but they must match the `OAUTH_CLIENT_ID` and `OAUTH_CLIENT_SECRET` in your on prem builder's `bldr.env` file.
+    Note that the `OAUTH_CLIENT_ID` and `OAUTH_CLIENT_SECRET` values above match the default values in the bldr.env.sample file which you will edit in the next step. You can change these values, but they must match the `OAUTH_CLIENT_ID` and `OAUTH_CLIENT_SECRET` in your on-prem Habitat Builder's `bldr.env` file.
 
 1. Apply the `patch-automate.toml` to the Chef Automate configuration from the command line:
 
@@ -94,13 +94,7 @@ To authenticate with Chef Automate, create a patch with the Chef Automate comman
     cd on-prem-builder
     ```
 
-1. Create a `bldr.env` file or copy the existing sample file:
-
-    ```bash
-    touch bldr.env
-    ```
-
-    Or, if you need more explanations about the contents of the `bldr.env` file, :
+1. Create a copy of the `bldr.env` file:
 
     ```bash
     cp bldr.env.sample bldr.env
@@ -108,37 +102,64 @@ To authenticate with Chef Automate, create a patch with the Chef Automate comman
 
 1. Edit the `bldr.env` file:
 
-    * SSL must be enabled in Builder in order to authenticate against Automate, use `APP_SSL_ENABLED=true` and a `APP_URL` beginning with `https`.
-    * Set `OAUTH_PROVIDER` to `chef-automate`.
-    * Set the values of `OAUTH_USERINFO_URL`, `OAUTH_AUTHORIZE_URL`, and `OAUTH_TOKEN_URL` to the example values provided in the `sample.bldr.env` file substituting `<your.automate.domain>` with your Automate server or domain name.
-    * Always be closing. Close the Builder addresses provided in `APP_URL` and `OAUTH_REDIRECT_URL` with a forward slash, `/`.
-      * `https://chef-builder.test` will NOT work.
-      * `https://chef-builder.test/` will work.
+    - Set `APP_SSL_ENABLED` to `true` to enable SSL in Habitat Builder to authenticate against Automate:
 
-### Step Three: Put the Builder Certs with the Install Script
+      ```sh
+      export APP_SSL_ENABLED=true
+      ```
 
-Rename the custom Builder certificates cert file as `ssl-certificate.crt` and the key file as `ssl-certificate.key`. Habitat recognizes only these names and will not recognize any other names. Copy the `ssl-certificate.crt` and `ssl-certificate.key` files to the same directory as the `./install.sh` script.
+    - Set `APP_URL` to the URL of your Builder deployment. It must begin with `https` to enable SSL and close with a forward slash (`/`):
 
-1. Locate the SSL certificate and key pair.
-1. Copy the key pair to the same directory as the install script, which is `/on-prem-builder`, if the repository was not renamed.
+      ```sh
+      export APP_URL=https://bldr.example.com/
+      ```
+
+    - Set `OAUTH_PROVIDER` to `chef-automate`.
+
+    - Set the values of `OAUTH_USERINFO_URL`, `OAUTH_AUTHORIZE_URL`, and `OAUTH_TOKEN_URL` to the example values provided in the `sample.bldr.env` file. Replace `<your.automate.domain>` with your Chef Automate server or domain name.
+
+      For example:
+
+      ```sh
+      export OAUTH_USERINFO_URL=https://automate.example.com/session/userinfo
+      export OAUTH_AUTHORIZE_URL=https://automate.example.com/session/new
+      export OAUTH_TOKEN_URL=https://automate.example.com/session/token
+      ```
+
+    - Set `OAUTH_REDIRECT_URL` to your on-prem Habitat Builder URL. It must begin with `https` to enable SSL and close with a forward slash (`/`):
+
+      ```sh
+      export OAUTH_REDIRECT_URL=https://bldr.example.com/
+      ```
+
+### Copy the Builder certificates with the install script
+
+1. Rename the custom Builder certificate file `ssl-certificate.crt` and the key file `ssl-certificate.key`.
+   Habitat recognizes only these filenames.
+1. Copy the `ssl-certificate.crt` and `ssl-certificate.key` files to the same directory as the `./install.sh` script. This is `/on-prem-builder` if you didn't rename the repository.
 1. Make the keys accessible to Habitat during the installation.
-1. If you're testing this workflow, make your own key pair and copy them to `/on-prem-builder`.
 
-  ```bash
-  sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/ssl-certificate.key -out /etc/ssl/certs/ssl-certificate.crt
-  sudo cp /etc/ssl/private/ssl-certificate.key .
-  sudo cp /etc/ssl/certs/ssl-certificate.crt .
-  sudo chown vagrant:vagrant ssl-certificate.*
-  ```
+    {{< note >}}
 
-1. You can confirm that the keys were copied:
+    If you're testing this workflow, you can make your own key pair and copy them to `/on-prem-builder`:
+
+    ```bash
+    sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/ssl-certificate.key -out /etc/ssl/certs/ssl-certificate.crt
+    sudo cp /etc/ssl/private/ssl-certificate.key .
+    sudo cp /etc/ssl/certs/ssl-certificate.crt .
+    sudo chown vagrant:vagrant ssl-certificate.*
+    ```
+
+    {{< /note >}}
+
+1. Optional: Confirm that the keys were copied:
 
     ```bash
     cat ./ssl-certificate.key
     cat ./ssl-certificate.crt
     ```
 
-### Step Four: Install Builder
+### Install Chef Habitat Builder
 
 1. Run the install script. This installs both Chef Habitat Builder on-prem and the Chef Habitat datastore:
 
@@ -147,13 +168,13 @@ Rename the custom Builder certificates cert file as `ssl-certificate.crt` and th
     ```
 
 1. Accept the licenses.
-1. All services should report back as `up`. It make take a few minutes to come up.
+1. Get the status of the Habitat services:
 
     ```bash
     sudo hab svc status
     ```
 
-    Should return something similar to:
+    It may take a few minutes to get a response, but all services should report back as `up`. For example:
 
     ```shell
     package                                        type        desired  state  elapsed (s)  pid    group
@@ -164,44 +185,42 @@ Rename the custom Builder certificates cert file as `ssl-certificate.crt` and th
     habitat/builder-minio/7764/20181006010221      standalone  up       up     597          28277  builder-minio.default
     ```
 
-### Step Five: Copy Automate's Certificate to Builder
+### Copy Chef Automate's certificate to Habitat Builder
 
-1. View and copy the Chef Automate certificate. Change the server name to your Chef Automate installation FQDN:
+1. View and copy the Chef Automate certificate.
 
     ```bash
-    openssl s_client -showcerts -servername chef-automate.test -connect chef-automate.test:443 < /dev/null | openssl x509
+    openssl s_client -showcerts -servername <SERVER_NAME> -connect <HOST>:<PORT> < /dev/null | openssl x509
     ```
 
-    Copy the output to an accessible file.
+    Replace:
+
+    - `<SERVER_NAME>` with the FQDN of your Chef Automate installation. For example: `automate.example.com`.
+    - `<HOST>:<PORT>` with the host and port of your Chef Automate installation. For example: `automate.example.com:443`.
+
+1. Copy the output to an accessible file.
 
     ```shell
     # Copy the contents including the begin and end certificate
     # -----BEGIN CERTIFICATE-----
-    # Certificate content here
+    # <CERTIFICATE_CONTENT>
     #-----END CERTIFICATE-----
     ```
 
-1. Make a file for your cert at `/hab/cache/ssl/`, such as `automate-cert.crt`.
+1. Make a certificate file at `/hab/cache/ssl/`, such as `/hab/cache/ssl/automate-cert.crt`.
 1. Paste the Chef Automate certificate into your file, `/hab/cache/ssl/automate-cert.crt`
-1. Restart builder
+1. Restart Habitat Builder:
 
     ```bash
     sudo systemctl restart hab-sup
     ```
 
-### You're Done
+You're done. You can now monitor Habitat Builder using Chef Automate's Applications dashboard.
 
-1. Login at
-
-    ```bash
-    https://chef-builder.test
-    ```
-
-## Related Resources
+## Related resources
 
 - [Chef Automate (ALPHA)](https://docs.chef.io/automate/configuration/#alpha-setting-up-automate-as-an-oauth-provider-for-habitat-builder)
 
-## Next Steps
+## Next step
 
-After you've 
-[Bootstrap the core origin](./bootstrap-core.md)
+After you've deployed Habitat Builder, you can [bootstrap the core origin packages](./bootstrap-core.md).
