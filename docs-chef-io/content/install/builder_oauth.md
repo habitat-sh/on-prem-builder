@@ -1,120 +1,127 @@
 +++
-title = "Authenticating Builder with OAuth services."
+title = "Install Habitat Builder with OAuth services"
 
 [menu]
   [menu.habitat]
-    title = "O-Auth"
+    title = "OAuth"
     identifier = "habitat/on-prem-builder/o-auth"
     parent = "habitat/on-prem-builder"
     weight = 20
 +++
 
-## Pre-Requisites
+## Prerequisites
 
-Prior to starting the install, ensure you have reviewed all the items
-in the Requirements section, and have a location for the installation that
-meets all the requirements.
+Before you start the installation, review all items in the Requirements section and make sure your installation location meets those requirements.
 
-Note that the initial install will require _outgoing_ network connectivity.
+The initial install requires outgoing network connectivity.
 
-Your Chef Habitat Builder on-prem instance will need to have the following _inbound_ port open:
+Your Chef Habitat Builder on-prem instance needs the following inbound port open:
 
-* Port 80 (or 443 if you plan to enable SSL)
+- Port 80 (or 443 if you plan to enable SSL)
 
-You may need to work with your enterprise network admin to enable the appropriate firewall rules.
+You might need to work with your enterprise network admin to enable the correct firewall rules.
 
-### OAuth Application
+### Configure an OAuth provider
 
-We currently support Chef Automate v2, Azure AD (OpenId Connect), GitHub, GitLab (OpenId Connect), Okta (OpenId Connect) and Atlassian Bitbucket (cloud) OAuth providers for authentication. You will need to set up an OAuth application for the instance of the Chef Habitat Builder on-prem you are setting up.
+Chef Habitat Builder on-prem supports Chef Automate v2, Azure AD (OpenID Connect), GitHub, GitLab (OpenID Connect), Okta (OpenID Connect), and Atlassian Bitbucket (cloud) OAuth providers for authentication.
+You need to set up an OAuth application for your Chef Habitat Builder on-prem instance.
 
-Refer to the steps that are specific to your OAuth provider to create and configure your OAuth application. The below steps illustrate setting up the OAuth application using Github as the identity provider:
+Before you begin, refer to the for the OAuth provider that you plan to use:
 
-1. Create a new OAuth Application in your OAuth Provider - for example, [GitHub](https://github.com/settings/applications/new)
-1. Set the homepage url value of `APP_URL` to `http://${BUILDER_HOSTNAME_OR_IP}/`, or `https://${BUILDER_HOSTNAME_OR_IP}/` if you plan to enable SSL.
-1. Set the callback url value of `OAUTH_REDIRECT_URL` to `http://${BUILDER_HOSTNAME_OR_IP}/` (The trailing `/` is *important*). Specify `https` instead of `http` if you plan to enable SSL.
-1. Record the the Client Id and Client Secret. These will be used for the `OAUTH_CLIENT_ID` and `OAUTH_CLIENT_SECRET` environment variables in the section below.
+- [Azure Active Directory](https://docs.microsoft.com/azure/active-directory/develop/active-directory-protocols-oauth-code)
+- [GitHub](https://developer.github.com/apps/building-oauth-apps/authorization-options-for-oauth-apps/)
+- [GitLab](https://docs.gitlab.com/ee/integration/oauth_provider.html)
+- [Okta](https://developer.okta.com/authentication-guide/implementing-authentication/auth-code)
+- [Bitbucket](https://confluence.atlassian.com/bitbucket/oauth-on-bitbucket-cloud-238027431.html)
 
-For the configuration below, you will also need to know following *fully qualified* end-points:
+Follow the steps for your OAuth provider to create and configure your OAuth application.
+The following steps show how to set up the OAuth application using GitHub as the identity provider:
 
-* Authorization Endpoint (example: `https://github.com/login/oauth/authorize`)
-* Token Endpoint (example: `https://github.com/login/oauth/access_token`)
-* API Endpoint (example: `https://api.github.com/user`)
+1. Create a new OAuth application in your OAuth provider, for example, [GitHub](https://github.com/settings/applications/new).
 
-For more information, refer to the developer documentation of these services:
+1. Record the following OAuth configuration settings which you will use when define the `bldr.env` config file:
 
-* [Azure Active Directory](https://docs.microsoft.com/azure/active-directory/develop/active-directory-protocols-oauth-code)
-* [GitHub](https://developer.github.com/apps/building-oauth-apps/authorization-options-for-oauth-apps/)
-* [GitLab](https://docs.gitlab.com/ee/integration/oauth_provider.html)
-* [Okta](https://developer.okta.com/authentication-guide/implementing-authentication/auth-code)
-* [BitBucket](https://confluence.atlassian.com/bitbucket/oauth-on-bitbucket-cloud-238027431.html)
+- Authorization endpoint (for example, `https://github.com/login/oauth/authorize`)
+- Token endpoint (for example, `https://github.com/login/oauth/access_token`)
+- API endpoint (for example, `https://api.github.com/user`)
+- Record the client ID and client secret. You'll use these for the `OAUTH_CLIENT_ID` and `OAUTH_CLIENT_SECRET` environment variables.
 
-For further information on OAuth endpoints, see the Internet Engineering Task Force (IETF) RFC 6749, [The OAuth 2.0 Authorization Framework](https://tools.ietf.org/html/rfc6749), page 21.
+For more details on OAuth endpoints, see the Internet Engineering Task Force (IETF) RFC 6749, [The OAuth 2.0 Authorization Framework](https://datatracker.ietf.org/doc/html/rfc6749#section-3.2).
 
-### Preparing your filesystem (Optional)
+### Optional: Prepare your filesystem
 
-Since substantial storage may be required for holding packages, ensure you have an appropriate amount of free space on your filesystem.
+You might need substantial storage for packages, so make sure you have enough free space on your filesystem.
 
-The package artifacts will be stored in your MinIO instance by default, typically at the following location: `/hab/svc/builder-minio/data`
+The package artifacts are stored in your MinIO instance by default, typically at the following location: `/hab/svc/builder-minio/data`. If you need more storage, create a mount at `/hab` and point it to your external storage.
+You don't need to do this if you already have enough free space.
 
-If you need to add additional storage, it is recommended that you create a mount at `/hab` and point it to your external storage. This is not required if you already have sufficient free space.
+If you want to use Artifactory instead of MinIO for object storage, see the [Artifactory documentation](artifactory.md).
 
-*Note*: If you would prefer to use Artifactory instead of MinIO for the object storage, see the [Artifactory](artifactory.md) documentation.
+### Get an SSL certificate
 
-### Procuring SSL certificate (Recommended)
+By default, Chef Habitat Builder on-prem exposes the web UI and API through HTTP.
+This setup is easier for evaluation, but for a secure and permanent installation you should enable SSL on these endpoints.
 
-By default, the Chef Habitat Builder on-prem will expose the web UI and API via http. Though it allows for easier setup and is fine for evaluation purposes, for a secure and more permanent installation it is recommended that you enable SSL on the Chef Habitat Builder endpoints.
+To prepare, get an SSL certificate.
+You can use a self-signed certificate, but if you do, you need to install the certificate in the trusted chain on client machines that use the Chef Habitat Builder UI or APIs.
 
-In order to prepare for this, you should procure a SSL certificate. If needed, you may use a self-signed certificate - however if you do so, you will need to install the certificate in the trusted chain on client machines (ones that will use the Chef Habitat Builder UI or APIs). You may use the `SSL_CERT_FILE` environment variable to also point to the certificate on client machines when invoking the `hab` client, for example:
-
-```bash
-SSL_CERT_FILE=ssl-certificate.crt hab pkg search -u https://localhost <search term>
-```
-
-Below is a sample command to generate a self-signed certificate with OpenSSL:
+The following example command generates a self-signed certificate with OpenSSL:
 
 ```bash
 sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/ssl-certificate.key -out /etc/ssl/certs/ssl-certificate.crt
 ```
 
-*Important*: Make sure that the certificate files are named exactly `ssl-certificate.key` and `ssl-certificate.crt`. If you have procured the certificate from a different source, rename them to the prescribed filenames, and ensure that they are located in the same folder as the `install.sh` script. They will get uploaded to the Chef Habitat supervisor during the install.
+The certificate files must be named `ssl-certificate.key` and `ssl-certificate.crt`. If you get the certificate from another source, rename the files to these names. Place both files in the same folder as the `install.sh` script. The install process uploads them to the Chef Habitat supervisor.
 
-### Prerequisite Tasks for an Airgapped Installation (Required if applicable)
+{{< note >}}
 
-In order to install the on-prem Chef Habitat Builder in an airgapped (no direct Internet access) environment, the following preparatory steps are required.
+You can also use the `SSL_CERT_FILE` environment variable to point to the certificate on client machines when using the `hab` client, for example:
 
-> Note: Unless otherwise noted, the tasks are intended to be completed on a Non-Airgapped environment with Internet connectivity
+```bash
+SSL_CERT_FILE=ssl-certificate.crt hab pkg search -u https://localhost <SEARCH_TERM>
+```
 
-1. Download the [Zip archive](https://github.com/habitat-sh/on-prem-builder/archive/master.zip) of the on-prem-builder repo
+{{< /note >}}
+
+### Prerequisites for airgapped environments
+
+If you're installing Chef Habitat Builder in an airgapped environment, follow the steps below to download and install Chef Habitat and Chef Habitat packages in the airgapped environment.
+
+With an internet-connected computer, follow these steps:
+
+1. Download the [zip archive of the on-prem-builder repository](https://github.com/habitat-sh/on-prem-builder/archive/master.zip):
 
     ```bash
     curl -LO https://github.com/habitat-sh/on-prem-builder/archive/master.zip
     ```
 
-1. Download the Chef Habitat [cli tool](https://packages.chef.io/files/stable/habitat/latest/hab-x86_64-linux.tar.gz)
+1. Download the Chef Habitat [CLI tool](https://packages.chef.io/files/stable/habitat/latest/hab-x86_64-linux.tar.gz):
 
     ```bash
     curl -Lo hab.tar.gz https://packages.chef.io/files/stable/habitat/latest/hab-x86_64-linux.tar.gz
     ```
 
-1. Create the Habitat Builder package bundle from the Builder seed lists and download them
+1. Create the Habitat Builder package bundle from the Builder seed lists and download the packages:
 
-     ```bash
-     sudo hab pkg install habitat/pkg-sync --channel LTS-2024
-     export DOWNLOAD_DIR=/some/base/download/directory
-     hab pkg exec habitat/pkg-sync pkg-sync --channel stable --package-list builder --generate-airgap-list
-     hab pkg download --target x86_64-linux --channel stable --file package_list_x86_64-linux.txt --download-directory ${DOWNLOAD_DIR}/builder_packages
-     ```
+    ```bash
+    sudo hab pkg install habitat/pkg-sync --channel LTS-2024
+    export DOWNLOAD_DIR=/some/base/download/directory
+    hab pkg exec habitat/pkg-sync pkg-sync --channel stable --package-list builder --generate-airgap-list
+    hab pkg download --target x86_64-linux --channel stable --file package_list_x86_64-linux.txt --download-directory ${DOWNLOAD_DIR}/builder_packages
+    ```
 
-1. Archive `$DOWNLOAD_DIR`, transfer and extract on the Linux system where Builder will be deployed in the Airgapped environment
+1. Archive the download directory, then transfer and extract it on the Linux system where you will deploy Builder in the airgapped environment.
 
-> Note: The following tasks are intended to be completed on the Airgapped system where Builder will be deployed, in advance of the [Installation](https://github.com/habitat-sh/on-prem-builder/blob/main/README.md#Installation).
+In the airgapped environment, complete these steps:
 
-1. From the archive, install the `hab` binary somewhere in $PATH and ensure it has execute permissions:
+1. From the archive, install the `hab` binary somewhere in the system $PATH and ensure it has execute permissions:
 
      ```bash
      sudo chmod 755 /usr/bin/hab
-     sudo hab # read the license and accept if in agreement, as the root user
+     sudo hab
      ```
+
+     Read and accept the license.
 
 1. Import the public package signing keys from the downloaded Builder package bundle:
 
@@ -137,45 +144,74 @@ In order to install the on-prem Chef Habitat Builder in an airgapped (no direct 
      sudo hab pkg install --binlink --force /hab/cache/artifacts/core-hab-*hart
      ```
 
-## Setup
+## Configure Chef Habitat Builder
 
-1. Clone this repo (or unzip the zip archive you previously downloaded from the Github release page) at the desired machine where you will stand up the Chef Habitat Builder on-prem
-1. `cd ${SRC_ROOT}`
-1. `cp bldr.env.sample bldr.env`
-1. Edit `bldr.env` with a text editor and replace the values appropriately. Consider helping us to improve Chef Habitat as well by changing the `ANALYTICS_ENABLED` setting to `true` and providing an optional company name.
+Chef Habitat Builder is configured with a `bldr.env` file. Follow these steps to create and edit this file:
 
-## Installation
+1. On the machine where you want to install Chef Habitat Builder, clone the [habitat-sh/on-prem-builder repository](https://github.com/habitat-sh/on-prem-builder/) or download a release from the [GitHub release page](https://github.com/habitat-sh/on-prem-builder/releases).
 
-> Note: If the on-prem Builder system is in an Airgapped (non-Internet connected) environment, you must first complete the [prerequisite](https://github.com/habitat-sh/on-prem-builder/blob/main/README.md#prerequisite-tasks-for-an-airgapped-installation-required-if-applicable) tasks detailed earlier.
+1. In the repository root create a copy of the sample environment file:
 
-1. `./install.sh`
+    ```bash
+    cp bldr.env.sample bldr.env
+    ```
 
-If everything goes well, you should see output similar to the following showing that the Chef Habitat Builder on-prem services are loaded:
+1. Open `bldr.env` in a text editor and update the values as needed.
 
-```shell
-hab-sup(AG): The habitat/builder-datastore service was successfully loaded
-hab-sup(AG): The habitat/builder-minio service was successfully loaded
-hab-sup(AG): The habitat/builder-memcached service was successfully loaded
-hab-sup(AG): The habitat/builder-api service was successfully loaded
-hab-sup(AG): The habitat/builder-api-proxy service was successfully loaded
-```
+    To configure your OAuth provider setting, enter the following:
 
-Do a `hab svc status` to check the status of all the services. They may take a few seconds to all come up.
+    1. Set `APP_URL` to the IP address or URL of your Habitat Builder deployment :`http://<BUILDER_HOSTNAME_OR_IP>/`. Use `https` if you plan to enable SSL: `https://<BUILDER_HOSTNAME_OR_IP>/`.
+    1. Set `OAUTH_REDIRECT_URL` to the callback URL: `http://<BUILDER_HOSTNAME_OR_IP>/`. You must include a trailing `/` with the URL. Specify `https` instead of `http` if you plan to enable SSL.
+    1. Set `OAUTH_CLIENT_ID` and `OAUTH_CLIENT_SECRET` to the OAuth client ID and client secret.
 
-If things don't work as expected (eg, if all the services are not in the `up` state), see the [Troubleshooting](troubleshooting.md) documentation.
+    Optional:
+
+    - To help improve Chef Habitat, you can set `ANALYTICS_ENABLED` to `true` and optionally provide your company name.
+
+## Install Chef Habitat Builder
+
+Follow these steps:
+
+1. Run the install script:
+
+    ```bash
+    ./install.sh
+    ```
+
+    If the installation succeeds, you should see output similar to the following, showing that the Chef Habitat Builder on-prem services are loaded:
+
+    ```shell
+    hab-sup(AG): The habitat/builder-datastore service was successfully loaded
+    hab-sup(AG): The habitat/builder-minio service was successfully loaded
+    hab-sup(AG): The habitat/builder-memcached service was successfully loaded
+    hab-sup(AG): The habitat/builder-api service was successfully loaded
+    hab-sup(AG): The habitat/builder-api-proxy service was successfully loaded
+    ```
+
+1. Optional: Check the status of all services:
+
+    ```bash
+    hab svc status
+    ```
+
+    It may take a few seconds for all services to start.
+    If any services aren't in the `up` state, see the [troubleshooting documentation](troubleshooting.md).
 
 ## MinIO web UI
 
-The Chef Habitat Builder on-prem stores package artifacts in [MinIO](https://github.com/minio/minio). By default, the MinIO instance will be available on port 9000 (or whatever port you specified in your `bldr.env`). Please confirm that the MinIO UI is available, and that you can log in with the credentials that were specified in your `bldr.env` file. There should already be a bucket created in which to host the artifacts.
+Chef Habitat Builder on-prem stores package artifacts in [MinIO](https://github.com/minio/minio).
+By default, the MinIO instance is available on port 9000 or on the port you specified in your `bldr.env` file.
+You can verify that the MinIO UI is available and log in with the credentials from your `bldr.env` file.
+A bucket for storing artifacts should already exist.
 
-## Chef Habitat Builder on-prem Web UI
+## Chef Habitat Builder on-prem web UI
 
-Once the services are running successfully, the Chef Habitat Builder on-prem UI will become available at the configured hostname or IP address.
+After all services are running, the Chef Habitat Builder on-prem UI is available at the configured hostname or IP address.
 
-Navigate to `http://${BUILDER_HOSTNAME_OR_IP}/#/sign-in` to access the Chef Habitat Builder on-prem UI.
+Go to `http://<BUILDER_HOSTNAME_OR_IP>/#/sign-in` to access the Chef Habitat Builder on-prem UI.
 
-At that point you should be able to log in using your configured OAuth provider.
+You can now sign in using your configured OAuth provider.
 
-## Next Steps
+## Next steps
 
-[Bootstrap Core Origin](./bootstrap-core.md)
+- [Bootstrap the core origin](./bootstrap-core.md)
