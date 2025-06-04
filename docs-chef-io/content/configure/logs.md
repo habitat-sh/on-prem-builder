@@ -1,5 +1,5 @@
 +++
-title = "Habitat Builder logs"
+title = "Configure Habitat Builder logging"
 
 [menu]
   [menu.habitat]
@@ -9,23 +9,25 @@ title = "Habitat Builder logs"
     weight = 20
 +++
 
+This page explains how to configure logging for Chef Habitat Builder.
+
 ## Supported log levels
 
-The recognized values for logging are: `error`, `warn`, `info`, `debug`, and `trace`.
-For a more detailed explanation of logging in Chef Habitat, see the [Supervisor Log Configuration Reference](https://www.habitat.sh/docs/reference/#supervisor-log-configuration-reference) and the [Supervisor Log Key](https://www.habitat.sh/docs/reference/#supervisor-log-key) documentation.
+You can set the log level to `error`, `warn`, `info`, `debug`, or `trace`.
+For more details about logging in Chef Habitat, see the [Supervisor log configuration reference](https://www.habitat.sh/docs/reference/#supervisor-log-configuration-reference) and the [Supervisor log key documentation](https://www.habitat.sh/docs/reference/#supervisor-log-key).
 
-## Basic logging
+## Configure the Habitat Builder log level
 
-To turn on and examine the services debug logging in your Habitat installation:
+To enable and review debug logging for services in your Habitat installation, follow these steps:
 
 1. Open the `/hab/user/builder-api/config/user.toml` file.
-1. On the first line, set the value of `log_level`:
+1. Set the value of `log_level` on the first line:
 
     ```toml
     log_level="<LOG_LEVEL>,tokio_core=error,tokio_reactor=error,zmq=error,hyper=error"
     ```
 
-    Replace `<LOG_LEVEL>` with the log level, for example `debug` or `error`.
+    Replace `<LOG_LEVEL>` with the desired log level, such as `debug` or `error`.
 
 1. Save and close the file.
 1. Restart Habitat:
@@ -34,33 +36,39 @@ To turn on and examine the services debug logging in your Habitat installation:
     sudo systemctl restart hab-sup
     ```
 
-1. Use `journalctl -fu hab-sup` to view the logs.
+1. To view the logs, run:
+
+    ```sh
+    journalctl -fu hab-sup
+    ```
 
 ## Configure Rust logging
 
-You can use the `RUST_LOG` environment variable to view detailed logging and configure backtraces in Habitat Builder.
+You can use the `RUST_LOG` environment variable to enable detailed logging and backtraces in Habitat Builder.
 
-To see an individual Habitat command's debug and backtrace, run the following command:
+To see debug output and backtraces for a specific Habitat command, run:
 
-- ```bash
-  # Linux/macOS
-  env RUST_LOG=debug RUST_BACKTRACE=1 <HAB_COMMAND>
-  ```
+```bash
+# Linux/macOS
+env RUST_LOG=debug RUST_BACKTRACE=1 <HAB_COMMAND>
+```
 
-  Replace <HAB_COMMAND> with a Habitat CLI command, for example `hab sup run`.
+Replace `<HAB_COMMAND>` with a Habitat CLI command, such as `hab sup run`.
 
-To configure rust logging in Habitat Builder, follow these steps:
+To set Rust logging for Habitat Builder, follow these steps:
 
 1. Open the `/hab/svc/builder-api/user.toml` file.
-1. Change the second line to the following:
+1. Set the second line to:
 
     ```toml
     RUST_LOG=debug RUST_BACKTRACE=1
     ```
 
-### Log Rotation
+### Log rotation
 
-The `builder-api-proxy` service will log (via Nginx) all access and errors to log files in your service directory. Since these files may get large, you may want to add a log rotation script. Below is a sample logrotate file that you can use as an example for your needs:
+The `builder-api-proxy` service logs all access and errors (through Nginx) to log files in your service directory.
+Because these files can grow large, you may want to set up log rotation.
+The following sample logrotate configuration shows how you can manage these log files:
 
 ```bash
 /hab/svc/builder-api-proxy/logs/host.access.log
