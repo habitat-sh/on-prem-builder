@@ -54,27 +54,37 @@ Because Habitat Builder services need to communicate across your network between
 - TCP 9000 - MinIO
 - TCP 11211 - Memcached
 
-### Create and update bldr.env
+## Create a Builder config file
 
-The `bldr.env` file for your single on-prem builder node contains most of the information you need to bootstrap a new frontend and will be used during installation.
-However, you need to update some configuration.
+The `bldr.env` file for your single on-prem builder node contains most of the information you need to bootstrap a new frontend and is used to configure Builder durin installation.
 
-Update the values of `OAUTH_REDIRECT_URL`, `OAUTH_CLIENT_ID`, and `OAUTH_CLIENT_SECRET` to match your on-premises OAuth2 provider.
+1. On each node that you plan run as a frontend node, clone the [habitat-sh/on-prem-builder repository](https://github.com/habitat-sh/) or download and extract an [on-prem-builder release](https://github.com/habitat-sh/on-prem-builder/releases).
 
-If your on-prem Habitat Builder cluster uses cloud services and you run multiple frontend instances, set `OAUTH_REDIRECT_URL` to your load balancer.
+1. Create the `bldr.env` file by duplicating the sample file in the on-prem-builder repository:
 
-If you don't use cloud services, update the values of `POSTGRES_HOST` and `MINIO_ENDPOINT`.
+    ```sh
+    cp bldr.env.sample bldr.env
+    ```
 
-You also need to edit (or create, if it isn't already present) `HAB_BLDR_PEER_ARG` to include all frontend and backend nodes hosting builder services.
-Use the following format:
+1. On the `bldr.env` file update the following settings:
 
-```shell
---peer host1 --peer host2 --peer host3
-```
+   - Update the values of `OAUTH_REDIRECT_URL`, `OAUTH_CLIENT_ID`, and `OAUTH_CLIENT_SECRET` to match your on-premises OAuth2 provider.
 
-### Install frontend
+   - If your on-prem Habitat Builder cluster uses cloud services and you run multiple frontend instances, set `OAUTH_REDIRECT_URL` to your load balancer.
 
-To install a new frontend node, run the frontend install script from each new frontend node:
+   - If you don't use cloud services, update the values of `POSTGRES_HOST` and `MINIO_ENDPOINT`.
+
+   - Add all frontend and backend nodes hosting builder services to `HAB_BLDR_PEER_ARG` in the following format:
+
+      ```shell
+      HAB_BLDR_PEER_ARG="--peer <HOST> --peer <HOST> --peer <HOST>"
+      ```
+
+      Replace `<HOST>` with a node IP address or hostname.
+
+### Install a frontend node
+
+Install the Habitat Builder frontend services, by running the frontend install script on each new node:
 
 ```shell
 ./install.sh --install-frontend
