@@ -103,12 +103,13 @@ type PackageDetails struct {
 }
 
 // parseArgs parses and validates command-line arguments
-func parseArgs() (identsToPromote, origin, bldrURL, channel, auth string, generateListOnly bool, packageList PackageList, help bool) {
+func parseArgs() (identsToPromote, origin, bldrURL, channel, privateToken, publicToken string, generateListOnly bool, packageList PackageList, help bool) {
 	flag.StringVar(&identsToPromote, "idents-to-promote", "", "File with newline separated package identifiers that will be demoted from all non-unstable channels and promoted to the specified channel")
 	flag.StringVar(&origin, "origin", "core", "Origin to sync")
 	flag.StringVar(&bldrURL, "bldr-url", "", "Base URL of your on-prem builder")
 	flag.StringVar(&channel, "channel", "stable", "Refresh channel to sync")
-	flag.StringVar(&auth, "auth", "", "Authorization Token for on-prem builder")
+	flag.StringVar(&privateToken, "private-builder-token", "", "Authorization Token for on-prem builder")
+	flag.StringVar(&publicToken, "public-builder-token", "", "Authorization Token for public builder at https://bldr.habitat.sh")
 	flag.BoolVar(&generateListOnly, "generate-airgap-list", false, "Output list of package identifiers needed to download to a file in the current directory. If specified, --bldr-url is not required and a sync will not be performed.")
 	flag.Var(&packageList, "package-list", "Only sync packages in list (none, builder, habitat)")
 	flag.BoolVar(&help, "help", false, "Show help message")
@@ -118,8 +119,15 @@ func parseArgs() (identsToPromote, origin, bldrURL, channel, auth string, genera
 }
 
 // fetchJSON makes an HTTP GET request to the specified URL and decodes the JSON response
-func fetchJSON(url string, target interface{}) error {
-	resp, err := http.Get(url)
+func fetchJSON(url, token string, target interface{}) error {
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return err
+	}
+	if token != "" {
+		req.Header.Set("Authorization", "Bearer "+token)
+	}
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return err
 	}
@@ -133,7 +141,7 @@ func fetchJSON(url string, target interface{}) error {
 }
 
 // fetchPackages fetches packages for a given origin from the builder service
-func fetchPackages(origin, bldrURL, channel string) ([]string, error) {
+func fetchPackages(origin, bldrURL, channel, token string) ([]string, error) {
 	rangeSize := 50
 	var result []string
 	fmt.Printf("\nFinding packages for origin %s in channel %s from %s\n", origin, channel, bldrURL)
@@ -141,7 +149,7 @@ func fetchPackages(origin, bldrURL, channel string) ([]string, error) {
 		fmt.Printf("\rFetching range %d-%d...", rangeIndex, rangeIndex+rangeSize)
 		var response *PackageListResponse
 		url := fmt.Sprintf("%s/v1/depot/channels/%s/%s/pkgs?range=%d", bldrURL, origin, channel, rangeIndex)
-		err := fetchJSON(url, &response)
+		err := fetchJSON(url, token, &response)
 		if err != nil {
 			return nil, fmt.Errorf("\nfailed to fetch package data from %s: %s", url, err.Error())
 		} else {
@@ -159,10 +167,10 @@ func fetchPackages(origin, bldrURL, channel string) ([]string, error) {
 	return result, nil
 }
 
-func fetchDetail(bldrURL, ident string) (*PackageDetails, error) {
+func fetchDetail(bldrURL, ident, token string) (*PackageDetails, error) {
 	var response *PackageDetails
 	url := fmt.Sprintf("%s/v1/depot/pkgs/%s", bldrURL, ident)
-	err := fetchJSON(url, &response)
+	err := fetchJSON(url, token, &response)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch package detail for %s: %s", ident, err.Error())
 	} else {
@@ -170,12 +178,12 @@ func fetchDetail(bldrURL, ident string) (*PackageDetails, error) {
 	}
 }
 
-func fetchLatestPackages(origin, channel, target string, localPackages []string) ([]string, error) {
+func fetchLatestPackages(origin, channel, target string, localPackages []string, publicToken string) ([]string, error) {
 	var response *PackageListResponse
 	var result []string
 	fmt.Printf("\nFetching latest %s packages for origin %s in channel %s from public bldr...\n", target, origin, channel)
 	url := fmt.Sprintf("https://bldr.habitat.sh/v1/depot/channels/%s/%s/pkgs/_latest?target=%s", origin, channel, target)
-	err := fetchJSON(url, &response)
+	err := fetchJSON(url, publicToken, &response)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to fetch latest packages from %s: %s", url, err.Error())
 	} else {
@@ -186,7 +194,7 @@ func fetchLatestPackages(origin, channel, target string, localPackages []string)
 			fmt.Printf("\rFetching detail for %d of %d packages", pkgCount, len(response.Data))
 			ident := fmt.Sprintf("%s/%s/%s/%s", pkg.Origin, pkg.Name, pkg.Version, pkg.Release)
 			if !slices.Contains(localPackages, ident) {
-				detail, err := fetchDetail("https://bldr.habitat.sh", ident)
+				detail, err := fetchDetail("https://bldr.habitat.sh", ident, publicToken)
 				if err != nil {
 					fmt.Println("")
 					return nil, err
@@ -232,14 +240,14 @@ func executeCommand(command string, args ...string) error {
 	return nil
 }
 
-func sync(packageList PackageList, origin, channel, bldrURL, auth string, localPackages []string, generateListOnly bool) error {
+func sync(packageList PackageList, origin, channel, bldrURL, privateToken, publicToken string, localPackages []string, generateListOnly bool) error {
 	for _, target := range []string{"x86_64-linux", "x86_64-windows"} {
 		var latestPackages []string
 		var err error
 
 		// build a list of all packages that need to be downloaded
 		if packageList.Kind == PackageListNone {
-			latestPackages, err = fetchLatestPackages(origin, channel, target, localPackages)
+			latestPackages, err = fetchLatestPackages(origin, channel, target, localPackages, publicToken)
 			if err != nil {
 				return err
 			}
@@ -274,13 +282,13 @@ func sync(packageList PackageList, origin, channel, bldrURL, auth string, localP
 			}
 			defer os.RemoveAll(dir)
 			fmt.Printf("\nDownloading %s packages from http://bldr.habitat.sh to %s", target, dir)
-			err = executeCommand("hab", "pkg", "download", "--download-directory", dir, "--target", target, "--channel", channel, "--file", file.Name())
+			err = executeCommand("hab", "pkg", "download", "-u", "https://bldr.habitat.sh", "-z", publicToken, "--download-directory", dir, "--target", target, "--channel", channel, "--file", file.Name())
 			if err != nil {
 				return err
 			}
 
 			fmt.Printf("\nUploading %s packages to %s", target, bldrURL)
-			err = executeCommand("hab", "pkg", "bulkupload", "--url", bldrURL, "--channel", channel, "--auth", auth, "--auto-create-origins", dir)
+			err = executeCommand("hab", "pkg", "bulkupload", "--url", bldrURL, "--channel", channel, "--auth", privateToken, "--auto-create-origins", dir)
 			if err != nil {
 				return err
 			}
@@ -291,15 +299,15 @@ func sync(packageList PackageList, origin, channel, bldrURL, auth string, localP
 	return nil
 }
 
-func preflightCheck(origin, channel, bldrURL, auth string) ([]string, []string, error) {
+func preflightCheck(origin, channel, bldrURL, privateToken, publicToken string) ([]string, []string, error) {
 	// Get complete list of all packages in channel on sass builder
-	saasPackages, err := fetchPackages(origin, "https://bldr.habitat.sh", channel)
+	saasPackages, err := fetchPackages(origin, "https://bldr.habitat.sh", channel, publicToken)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	// Get complete list of all packages in channel on customer builder
-	localPackages, err := fetchPackages(origin, bldrURL, channel)
+	localPackages, err := fetchPackages(origin, bldrURL, channel, privateToken)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -316,7 +324,7 @@ func preflightCheck(origin, channel, bldrURL, auth string) ([]string, []string, 
 	return localPackages, foreignPackages, nil
 }
 
-func moveToChannel(identsToPromote, channel, bldrURL, auth string) error {
+func moveToChannel(identsToPromote, channel, bldrURL, privateToken string) error {
 	file, err := os.Open(identsToPromote)
 	if err != nil {
 		return fmt.Errorf("\nfailed to open file %s: %s", identsToPromote, err.Error())
@@ -326,7 +334,7 @@ func moveToChannel(identsToPromote, channel, bldrURL, auth string) error {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		pkg := scanner.Text()
-		detail, err := fetchDetail(bldrURL, pkg)
+		detail, err := fetchDetail(bldrURL, pkg, privateToken)
 		if err != nil {
 			continue
 		}
@@ -334,12 +342,12 @@ func moveToChannel(identsToPromote, channel, bldrURL, auth string) error {
 			if ch == "unstable" || ch == "channel" {
 				continue
 			}
-			err = executeCommand("hab", "pkg", "demote", "-u", bldrURL, "-z", auth, pkg, ch, detail.Target)
+			err = executeCommand("hab", "pkg", "demote", "-u", bldrURL, "-z", privateToken, pkg, ch, detail.Target)
 			if err != nil {
 				return err
 			}
 		}
-		err = executeCommand("hab", "pkg", "promote", "-u", bldrURL, "-z", auth, pkg, channel, detail.Target)
+		err = executeCommand("hab", "pkg", "promote", "-u", bldrURL, "-z", privateToken, pkg, channel, detail.Target)
 		if err != nil {
 			return err
 		}
@@ -355,7 +363,7 @@ func main() {
 	// Dont need errors prefixed with date and time
 	log.SetFlags(0)
 
-	identsToPromote, origin, bldrURL, channel, auth, generateListOnly, packageList, help := parseArgs()
+	identsToPromote, origin, bldrURL, channel, privateToken, publicToken, generateListOnly, packageList, help := parseArgs()
 	if help || (bldrURL == "" && !generateListOnly) {
 		fmt.Printf("Usage: %s [OPTIONS]\n", os.Args[0])
 		fmt.Println("Options:")
@@ -365,7 +373,7 @@ func main() {
 
 	var err error
 	if len(identsToPromote) > 0 {
-		err = moveToChannel(identsToPromote, channel, bldrURL, auth)
+		err = moveToChannel(identsToPromote, channel, bldrURL, privateToken)
 		if err != nil {
 			log.Fatalln(err.Error())
 		}
@@ -375,7 +383,7 @@ func main() {
 
 	if !generateListOnly && packageList.Kind == PackageListNone {
 		fmt.Printf("Starting preflight check for local %s packages not promoted to %s on bldr.habitat.sh...\n", channel, channel)
-		localPackages, foreignPackages, err = preflightCheck(origin, channel, bldrURL, auth)
+		localPackages, foreignPackages, err = preflightCheck(origin, channel, bldrURL, privateToken, publicToken)
 		if err != nil {
 			log.Fatalln(err.Error())
 		}
@@ -393,11 +401,11 @@ func main() {
 			} else {
 				for _, pkg := range foreignPackages {
 					fmt.Println("Demoting", pkg)
-					detail, err := fetchDetail(bldrURL, pkg)
+					detail, err := fetchDetail(bldrURL, pkg, privateToken)
 					if err != nil {
 						log.Fatalln(err.Error())
 					}
-					err = executeCommand("hab", "pkg", "demote", "-u", bldrURL, "-z", auth, pkg, channel, detail.Target)
+					err = executeCommand("hab", "pkg", "demote", "-u", bldrURL, "-z", privateToken, pkg, channel, detail.Target)
 					if err != nil {
 						log.Fatalln(err.Error())
 					}
@@ -409,7 +417,7 @@ func main() {
 		}
 	}
 
-	err = sync(packageList, origin, channel, bldrURL, auth, localPackages, generateListOnly)
+	err = sync(packageList, origin, channel, bldrURL, privateToken, publicToken, localPackages, generateListOnly)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
