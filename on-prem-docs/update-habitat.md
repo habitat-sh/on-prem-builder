@@ -21,7 +21,7 @@ The following snippet illustrates how to refresh the on-prem Builder with a full
 
     ```bash
     sudo hab pkg install habitat/pkg-sync --channel LTS-2024
-    hab pkg exec habitat/pkg-sync pkg-sync --bldr-url https://your-builder.tld --channel stable --auth <your_public_Builder_instance_token> --package-list habitat
+    hab pkg exec habitat/pkg-sync pkg-sync --bldr-url https://your-builder.tld --channel stable --package-list habitat --private-builder-token <your_private_Builder_instance_token> --public-builder-token  <your_public_Builder_instance_token>
     ```
 
 ### Airgapped Environments
@@ -34,9 +34,11 @@ The following section illustrates the steps required to refresh an airgapped on-
 
     ```bash
     sudo hab pkg install habitat/pkg-sync --channel LTS-2024
-    hab pkg exec habitat/pkg-sync pkg-sync --generate-airgap-list --channel stable --package-list habitat
-    hab pkg download --target x86_64-linux --channel stable --file package_list_x86_64-linux.txt --download-directory habitat_packages
-    hab pkg download --target x86_64-windows --channel stable --file package_list_x86_64-windows.txt --download-directory habitat_packages
+    hab pkg exec habitat/pkg-sync pkg-sync --generate-airgap-list --channel stable --package-list habitat --public-builder-token  <your_public_Builder_instance_token>
+
+    hab pkg download -u https://bldr.habitat.sh -z <your_public_Builder_instance_token> --target x86_64-linux --channel stable --file package_list_x86_64-linux.txt --download-directory habitat_packages
+
+    hab pkg download -u https://bldr.habitat.sh -z <your_public_Builder_instance_token> --target x86_64-windows --channel stable --file package_list_x86_64-windows.txt --download-directory habitat_packages
     ```
 
     Archive the contents of `habitat_packages`. Copy and extract to the builder instance
@@ -44,6 +46,6 @@ The following section illustrates the steps required to refresh an airgapped on-
 1. Phase 2: bulkupload locally on the builder instance
 
     ```bash
-    export HAB_AUTH_TOKEN=<your_on-prem_Builder_instance_token>
+    export HAB_AUTH_TOKEN=<your_private_Builder_instance_token>
     hab pkg bulkupload --url https://your-builder.tld --channel stable --auto-create-origins habitat_packages/
     ```
