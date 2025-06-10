@@ -60,6 +60,6 @@ Promote packages that are in the LTS-2024 channel on the SAAS builder to that sa
 # Generate a list of all the latest LTS-2024 package identifiers
 hab pkg exec habitat/pkg-sync pkg-sync --channel LTS-2024 --origin core --generate-airgap-list --public-builder-token <your_public_Builder_instance_token>
 # Provide that list to --idents-to-promote so that any of those packages that exist on an on-prem instance are demoted from all non-unstable channels and promoted to LTS-2024
-hab pkg exec habitat/pkg-sync pkg-sync --bldr-url https://your-builder.tld --channel LTS-2024 --public-builder-token <your_public_Builder_instance_token> --idents-to-promote package_list_x86_64-linux.txt
-hab pkg exec habitat/pkg-sync pkg-sync --bldr-url https://your-builder.tld --channel LTS-2024 --public-builder-token <your_public_Builder_instance_token> --idents-to-promote package_list_x86_64-windows.txt
+hab pkg exec habitat/pkg-sync pkg-sync --bldr-url https://your-builder.tld --channel LTS-2024 --private-builder-token <your_private_Builder_instance_token> --idents-to-promote package_list_x86_64-linux.txt
+hab pkg exec habitat/pkg-sync pkg-sync --bldr-url https://your-builder.tld --channel LTS-2024 --private-builder-token <your_private_Builder_instance_token> --idents-to-promote package_list_x86_64-windows.txt
 ```
