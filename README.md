@@ -78,7 +78,3 @@ The documentation for Builder on-prem is located in the [on-prem-docs](on-prem-d
 1. [High Availability / Disaster Recovery](on-prem-docs/warm-spare.md)
 1. [Scaling Frontends](on-prem-docs/scaling.md)
 1. [SSL Certificate Rotation](on-prem-docs/ssl-cert-rotation.md)
-
-#### Data Migration to Chef Automate deployed Builder
-
-1. [Data migration](on-prem-docs/migration.md)
