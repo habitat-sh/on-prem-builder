@@ -9,18 +9,20 @@ title = "Upgrade Chef Habitat Builder on-prem"
     weight = 20
 +++
 
-Chef Habitat Builder on-prem services don't auto-upgrade. When you wish to upgrade the services, there is a simple uninstall script you can use to stop and unload the services, and remove the services.
+Chef Habitat Builder on-prem services don't upgrade automatically.
+To upgrade the services, use the uninstall script to stop, unload, and remove them.
 
 To upgrade Chef Habitat Builder on-prem, follow these steps:
 
-1. Uninstall all Habitat Builder services:
+1. Clone the [`habitat-sh/on-prem-builder`](https://github.com/habitat-sh/on-prem-builder) repository on the computer running Habitat Builder on-prem.
+
+1. Uninstall all Habitat Builder services by running the [uninstall script](https://github.com/habitat-sh/on-prem-builder/blob/main/uninstall.sh):
 
     ```shell
-    cd ${SRC_ROOT}
     sudo ./uninstall.sh
     ```
 
-1. Once the services are uninstalled, re-install them by running the `./install.sh` script:
+1. After the services are uninstalled, reinstall them by running the [`install.sh` script](https://github.com/habitat-sh/on-prem-builder/blob/main/install.sh):
 
     ```shell
     ./install.sh
@@ -28,6 +30,6 @@ To upgrade Chef Habitat Builder on-prem, follow these steps:
 
 {{< note >}}
 
-Running the uninstall script doesn't remove any user data, so you can freely uninstall and re-install the services.
+Running the uninstall script doesn't remove any user data, so you can uninstall and reinstall the services without losing data.
 
 {{< /note >}}
