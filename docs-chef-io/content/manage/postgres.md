@@ -1,5 +1,5 @@
 +++
-title = "Manage your PostgreSQL Installation"
+title = "Manage Habitat Builder data stored by PostgreSQL"
 
 [menu]
   [menu.habitat]
@@ -9,52 +9,113 @@ title = "Manage your PostgreSQL Installation"
     weight = 20
 +++
 
-## Manage Builder On-Prem PostgreSQL Data
+Habitat Builder's data is lightweight, so backup and disaster recovery strategies are straightforward.
+On-prem Builder has two types of data you should back up in case of a disaster:
 
-The data that Builder stores is luckily fairly lightweight and thus the backup and DR strategy is pretty straightforward. On-prem Builder has two types of data that should be backed up case of a disaster:
+- PostgreSQL package and user metadata
+- [MinIO Habitat artifacts](./minio.md#minio-artifact-backups)
 
-1. PostgreSQL package and user metadata
-1. [MinIO Habitat artifacts](./minio.md#minio-artifact-backups)
+Ideally, coordinate the backup of the entire Builder on-prem cluster at the same time.
+However, because Habitat Builder stores only metadata and artifacts, you have some flexibility in the timing of your backup operations.
+If a package's metadata is missing from PostgreSQL, you can repopulate it by re-uploading the package with the `--force` flag, for example:
 
-Ideally, you should coordinate the backup of the entire Builder on-prem cluster to happen together. However, the type of data that Builder stores (metadata and artifacts) permits some flexibility in the timing of your backup operations. In the worst case, if a package's metadata is missing from PostgreSQL, you can repopulate it by re-uploading the package with the `--force` flag, for example: `hab pkg upload <path to hartfile> -u <on-prem_url> --force`.
+```shell
+hab pkg upload <PATH_TO_HART_FILE> -u <ON_PREM_URL> --force
+```
 
-### PostgreSQL Data Backups
+## Back up the PostgreSQL database
 
-Backing up Builder's PostgreSQL database is the same as for any PostgreSQL database. The process is a [pg_dump](https://www.postgresql.org/docs/11/app-pgdump.html). If you have a backup strategy for other production instances of PostgreSQL, then apply your backup pattern to the `builder` database. To backup your `builder` database manually, follow these steps:
+Backing up Builder's PostgreSQL database is the same as backing up any PostgreSQL database.
+The process uses [pg_dump](https://www.postgresql.org/docs/11/app-pgdump.html).
+If you already have a backup strategy for other production PostgreSQL instances, apply that pattern to the `builder` database.
+To back up your `builder` database manually, follow these steps:
 
-1. Shut down the API to ensure no active transactions are occurring. (Optional but preferred)
-        `hab svc stop habitat/builder-api`
-1. Switch to user `hab`
-        `sudo su - hab`
-1. Find your PostgreSQL password
-        `sudo cat /hab/svc/builder-api/config/config.toml`
-1. Export as envvar
-        `export PGPASSWORD=<pw>`
-1. Run pgdump
-        `/hab/pkgs/core/postgresql/<version>/<release>/bin/pg_dump --file=builder.dump --format=custom --host=<ip_of_pg_host> --dbname=builder`
-1. Start the api and verify
-        `sudo hab svc start habitat/builder-api`
+1. Optional but recommended: Shut down the API to make sure there are no active transactions:
 
-Once the backup finishes,  your will find it as the `builder.dump` file on your filesystem. Move and store this file according to your local policies. We recommend storing it remotely--either physically or virtually--so it will be useable in a worst-case scenario. For most, storing the dump file in an AWS bucket or Azure storage is enough, but you should follow the same strategy for all database backups.
+   ```shell
+   hab svc stop habitat/builder-api
+   ```
 
-### Restoring PostgreSQL Data
+1. Switch to the `hab` user:
 
-Restoring a `builder` database is exactly like restoring any other database--which is to say, there is no magical solution. If you already have a restoration strategy in place at your organization, follow that to restore your `builder` database.  To restore your  data `builder` database manually, follow these steps:
+   ```shell
+   sudo su - hab
+   ```
 
-1. Switch to user `hab`
-        `sudo su - hab`
-1. Find your PostgreSQL password
-        `sudo cat /hab/svc/builder-api/config/config.toml`
-1. Export as envvar
-        `export PGPASSWORD=<pw>`
-1. Create the new builder database *
-        `/hab/pkgs/core/postgresql/<version>/<release>/bin/createdb -w -h <url_of_pg_host> -p <configured_pg_port> -U hab builder`
-1. Verify connectivity to the new database instance
-        `/hab/pkgs/core/postgresql/<version>/<release>/bin/psql --host=<url_of_pg_host> --dbname=builder`
-1. Restore the dump into the new DB
-        `/hab/pkgs/core/postgresql/<version>/<release>/bin/pg_restore --host=<url_of_pg_host> --dbname=builder builder.dump`
-1. Start the on-prem Builder services
+1. Find your PostgreSQL password:
 
-    > Note: In some cases your version of PostgreSQL might not have a `createdb` binary in which case you'll want to connect to database to run the create db command.
+   ```shell
+   sudo cat /hab/svc/builder-api/config/config.toml
+   ```
 
-Your database data should be restored and ready for use!
+1. Export the password as an environment variable:
+
+   ```shell
+   export PGPASSWORD=<PASSWORD>
+   ```
+
+1. Create a backup of the database:
+
+   ```shell
+   /hab/pkgs/core/postgresql/<VERSION>/<RELEASE>/bin/pg_dump --file=builder.dump --format=custom --host=<IP_OF_PG_HOST> --dbname=builder
+   ```
+
+1. Start the API and verify it's running:
+
+   ```shell
+   sudo hab svc start habitat/builder-api
+   ```
+
+After the backup finishes, you'll find the `builder.dump` file on your filesystem.
+Move and store this file according to your organization's policies.
+Store the backup in a remote location---either physically or virtually---so you can access it in a disaster scenario.
+For example, you can use an AWS bucket or Azure storage.
+Use the same backup strategy you use for your other databases.
+
+## Restore the PostgreSQL database
+
+Restoring a `builder` database is the same as restoring any other PostgreSQL database.
+If you already have a restoration strategy, use it to restore your `builder` database.
+To restore your `builder` database manually, follow these steps:
+
+1. Switch to the `hab` user:
+
+   ```shell
+   sudo su - hab
+   ```
+
+1. Find your PostgreSQL password:
+
+   ```shell
+   sudo cat /hab/svc/builder-api/config/config.toml
+   ```
+
+1. Export the password as an environment variable:
+
+   ```shell
+   export PGPASSWORD=<PASSWORD>
+   ```
+
+1. Create a new database called `builder` (if needed):
+
+   ```shell
+   /hab/pkgs/core/postgresql/<VERSION>/<RELEASE>/bin/createdb -w -h <URL_OF_PG_HOST> -p <CONFIGURED_PG_PORT> -U hab builder
+   ```
+
+   If your version of PostgreSQL doesn't have the `createdb` binary, connect to the database and run the create database command manually.
+
+1. Verify connectivity to the new database instance:
+
+   ```shell
+   /hab/pkgs/core/postgresql/<VERSION>/<RELEASE>/bin/psql --host=<URL_OF_PG_HOST> --dbname=builder
+   ```
+
+1. Restore the contents of the `builder.dump` backup file into the `builder` database:
+
+   ```shell
+   /hab/pkgs/core/postgresql/<VERSION>/<RELEASE>/bin/pg_restore --host=<URL_OF_PG_HOST> --dbname=builder builder.dump
+   ```
+
+1. Start the on-prem Habitat Builder services.
+
+Your database data should now be restored and ready for use!
