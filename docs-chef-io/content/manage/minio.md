@@ -1,5 +1,5 @@
 +++
-title = "Managing your MinIO artifact store"
+title = "Manage your MinIO artifact store"
 gh_repo = "on-prem-builder"
 
 [menu]
@@ -11,32 +11,47 @@ gh_repo = "on-prem-builder"
 +++
 
 [MinIO](https://min.io/) is an open source object storage server.
-Chef Habitat Builder on-prem uses MinIO to store Habitat artifacts (.harts).
+Chef Habitat Builder on-prem uses MinIO to store Habitat artifact (`.hart`) files.
 
-## Managing Builder On-Prem Artifacts
+## Habitat Builder data overview
 
-The data that Builder stores is fairly lightweight and thus the backup and DR or Warm Spare strategy is pretty straightforward. On-prem Builder has two types of data that should be backed up case of a disaster:
+Habitat Builder's data is lightweight, so backup and disaster recovery strategies are straightforward.
+Builder has two types of data you should back up in case of a disaster:
 
-1. [PostgreSQL package and user metadata](./postgres.md#postgresql-data-backups)
-1. MinIO Habitat artifacts (.harts)
+- [Habitat package and user metadata stored with PostgreSQL](./postgres.md#postgresql-data-backups).
+- Habitat artifacts (`.hart`) files stored by MinIO.
 
 Chef Habitat Builder on-prem supports only MinIO artifact repositories.
 
-Ideally, you should coordinate the backup of the entire Builder on-prem cluster to happen together. However, the type of data that Builder stores (metadata and artifacts) permits some flexibility in the timing of your backup operations.
+Ideally you should run the entire Builder on-prem cluster backup at the same time.
+However, because Builder stores only metadata and artifacts, you have some flexibility in the timing of your backup operations.
 
-### MinIO Artifact Backups
+## Backup Habitat artifacts stored by MinIO
 
-The process of artifact backups is quite a bit more environmentally subjective than Postgres if only because we support more than one artifact storage backend. For the sake of these docs we will focus on MinIO backups.
+Backing up MinIO data is similar to performing a filesystem backup.
+Because MinIO stores files on the filesystem (unless you're using a non-standard configuration), you can use any filesystem backup strategy, such as disk snapshots, data mirroring, or `rsync`.
+MinIO also provides the [MinIO client](https://docs.min.io/docs/minio-client-quickstart-guide.html), which offers many features, including the ability to mirror a bucket to another location on the filesystem or to a remote S3 bucket.
 
-Backing up MinIO is also a bit subjective but more or less amounts to a filesystem backup. Because MinIO stores its files on the filesystem (unless you're using a non-standard configuration) any filesystem backup strategy you want to use should be fine whether taking disk snapshots of some kind or data  mirroring, and rsync. MinIO however also has the [minio client](https://docs.min.io/docs/minio-client-quickstart-guide.html) which provides a whole boatload of useful features and specifically allows the user to mirror a bucket to an alternative location on the filesystem or even a remote S3 bucket! Ideally you should _never_ directly/manually manipulate the files within MinIO's buckets while it could be performing IO. Which means you should _always_ use the MinIO client mentioned above to manipulate MinIO data.
+Don't directly or manually manipulate files within MinIO's buckets while MinIO could be performing I/O.
+Always use the MinIO client to manage MinIO data.
 
-A simple backup strategy might look like this:
+Because backup operations can vary depending on your environment, you may need to adjust these steps.
+Use the following backup example as a starting point:
 
-1. Shut down the API to ensure no active transactions are occurring. (Optional but preferred)
-        `hab svc stop habitat/builder-api`
-1. Mirror MinIO data to an AWS S3 bucket. **
-        `mc mirror <local/minio/object/dir> <AWS_/S3_bucket>`
-** Another option here is to mirror to a different part of the filesystem, perhaps one that's NFS mounted or the like and then taking snapshots of it:
-        `mc mirror <local/minio/object/dir> <new/local/path>
+1. Shut down the API to make sure there are no active transactions (optional but recommended):
 
-As mentioned before since this operation could be dramatically different for different environments Minio backup cannot be 100% prescriptive. But This should give you some ideas to explore.
+   ```shell
+   hab svc stop habitat/builder-api
+   ```
+
+1. Mirror MinIO data to an AWS S3 bucket:
+
+   ```shell
+   mc mirror <LOCAL/MINIO/OBJECT/DIR> <AWS_S3_bucket>
+   ```
+
+   Or, mirror to a different part of the filesystem, such as an NFS mount, and then take snapshots:
+
+   ```shell
+   mc mirror <LOCAL/MINIO/OBJECT/DIR> <NEW/LOCAL/PATH>
+   ```
