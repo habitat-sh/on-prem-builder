@@ -63,23 +63,3 @@ hab pkg exec habitat/pkg-sync pkg-sync --channel LTS-2024 --origin core --genera
 hab pkg exec habitat/pkg-sync pkg-sync --bldr-url https://your-builder.tld --channel LTS-2024 --private-builder-token <your_private_Builder_instance_token> --idents-to-promote package_list_x86_64-linux.txt
 hab pkg exec habitat/pkg-sync pkg-sync --bldr-url https://your-builder.tld --channel LTS-2024 --private-builder-token <your_private_Builder_instance_token> --idents-to-promote package_list_x86_64-windows.txt
 ```
-# license-key
-
-A feature in the Builder web UI that lets users associate a license key with their profile. Once submitted, the UI validates the key, displays its expiration date, and enables downloading of restricted packages.
-
-Users can also delete an existing key to revoke package access until a new key is provided.
-
-## Usage
-
-1. **Open Profile**  
-   Click your avatar in the top-right and choose **Profile**.
-
-2. **Find License Key Section**  
-   Scroll down to **License Key**.
-
-3. **Submit License**  
-   Paste your key into the input field and click **Submit**.  
-   On success, you’ll see “License valid till `<expiration_date>`” and the **Delete** button will activate.
-
-4. **Delete License**  
-   Click **Delete** to remove your key and revoke restricted-package access.
