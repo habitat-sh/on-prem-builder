@@ -3,16 +3,3 @@ IMPORTANT NOTICE
 Please review the README at the following location before proceeding!
 
 https://github.com/habitat-sh/on-prem-builder
-
-The following migrations may be required:
-
-For installations prior to June 15, 2018:
-* Package migration from file system to Minio store
-
-For installations prior to August 17, 2018
-* Database migration to merge shards
-
-For installations prior to September 24th, 2018
-* Database merge to a single 'builder' database
-
-Further details can be found in the README.
