@@ -95,26 +95,3 @@ To bootstrap an airgapped on-prem Builder with stable core packages, follow thes
    export HAB_AUTH_TOKEN=<ON_PREM_BUILDER_INSTANCE_TOKEN>
    hab pkg bulkupload --url https://<ON_PREM_BUILDER_DOMAIN> --channel stable --auto-create-origins builder_bootstrap/
    ```
-
-## Configure your workstation
-
-To configure your workstation to connect to your deployment of Chef Habitat Builder, set the following environment variables:
-
-1. Set `HAB_BLDR_URL` to the URL of your Chef Habitat Builder deployment.
-   For example:
-
-   ```bash
-   export HAB_BLDR_URL=https://bldr.example.com/bldr/v1/
-   ```
-
-1. Set `HAB_AUTH_TOKEN` to your authentication token:
-
-    ```shell
-    export HAB_AUTH_TOKEN=<ON_PREM_BUILDER_INSTANCE_TOKEN>
-    ```
-
-1. If your Chef Habitat Builder deployment uses SSL with a self-signed or untrusted certificate, set `SSL_CERT_FILE` to the correct certificate when connecting to your Habitat Builder.
-
-    ```shell
-    export SSL_CERT_FILE=path/to/ssl-certificate.crt
-    ```
