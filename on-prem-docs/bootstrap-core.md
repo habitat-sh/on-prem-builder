@@ -8,9 +8,7 @@ Select your Gravatar icon on the top right corner of the Chef Habitat Builder on
 
 ## Add a License Key
 
-A feature in the Builder web UI that lets users associate a license key with their profile. Once submitted, the UI validates the key, displays its expiration date, and enables downloading of restricted packages.
-
-Users can also delete an existing key to revoke package access until a new key is provided.
+You can enter your license key just below the Personal Access Token text field in order for your account to access official chef maintained packages.
 
 ### Usage
 

@@ -63,3 +63,5 @@ hab pkg exec habitat/pkg-sync pkg-sync --channel LTS-2024 --origin core --genera
 hab pkg exec habitat/pkg-sync pkg-sync --bldr-url https://your-builder.tld --channel LTS-2024 --private-builder-token <your_private_Builder_instance_token> --idents-to-promote package_list_x86_64-linux.txt
 hab pkg exec habitat/pkg-sync pkg-sync --bldr-url https://your-builder.tld --channel LTS-2024 --private-builder-token <your_private_Builder_instance_token> --idents-to-promote package_list_x86_64-windows.txt
 ```
+
+Note that the public builder tokens used in the examples below must be associated with a valid license key. See [these instructions](on-prem-docs/bootstrap-core.md#add-a-license-key) on entering a license key.
