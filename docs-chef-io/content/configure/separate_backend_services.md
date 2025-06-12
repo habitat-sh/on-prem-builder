@@ -9,72 +9,111 @@ title = "Separate the Habitat Builder backend services"
     weight = 20
 +++
 
-The on-prem [Habitat Builder `install.sh` script](https://github.com/habitat-sh/on-prem-builder/blob/main/install.sh) allows you to separate the backend components (the datastore and MinIO server) onto different nodes.
-You can setup PostgreSQL service on one node and MinIO on another.
-Both can be configured to communicate with other nodes running the frontend services.
+Chef Habitat Builder uses MinIO to store Habitat artifact (`.hart`) files and PostgreSQL to store package and user metadata.
 
-## Configure Habitat Builder
+You can configure Habitat Builder to run the backend components---MinIO and PostgreSQL---on separate nodes.
 
-The `bldr.env` file contains all of the information required to setup MinIO and PostgreSQL and will be used during the installation process.
+## Configure node ports
 
-1. If your node has already had an older instance of on-prem Builder components on it, run the [`uninstall.sh` script](https://github.com/habitat-sh/on-prem-builder/blob/main/uninstall.sh) on your node to clean up your environment:
+Because Habitat Builder services need to communicate across your network between the frontend and backend nodes, you need to open the following ports to these nodes to ensure your on-prem Habitat Builder works correctly:
 
-  ```bash
-  ./uninstall.sh
-  ```
+- TCP 9638 - Habitat configuration gossip
+- UDP 9638 - Habitat configuration gossip
+- TCP 9636 - Builder API HTTP
+- TCP 5432 - PostgreSQL
+- TCP 9000 - MinIO
+- TCP 11211 - Memcached
 
-1. Create a copy of the [`bldr.env.sample` file](https://github.com/habitat-sh/on-prem-builder/blob/main/bldr.env.sample) and save it to `bldr.env`:
+## Deploy MinIO on a separate node
 
-    ```bash
-    cp bldr.env.sample bldr.env
-    ```
+Habitat Builder is configured using the `bldr.env` file, which contains all the information you need to set up MinIO and PostgreSQL. Follow these steps to configure the `bldr.env` file:
 
-1. Modify the `bldr.env` file with the following settings:
+1. If you don't already have it on your node, clone the [habitat-sh/on-prem-builder repository](https://github.com/habitat-sh/on-prem-builder/) or download and extract one of the [on-prem-builder releases](https://github.com/habitat-sh/on-prem-builder/releases).
 
-   1. Make sure that `S3_ENABLED` and `ARTIFACTORY_ENABLED` are set to `false`.
+1. If your node previously ran on-prem Habitat Builder components, run the [`uninstall.sh` script](https://github.com/habitat-sh/on-prem-builder/blob/main/uninstall.sh) to clean up your environment:
 
-      MinIO server can't be used if you are using S3 or Artifactory directly.
+   ```bash
+   ./uninstall.sh
+   ```
+
+1. Copy the [`bldr.env.sample` file](https://github.com/habitat-sh/on-prem-builder/blob/main/bldr.env.sample) and save it as `bldr.env`:
+
+   ```bash
+   cp bldr.env.sample bldr.env
+   ```
+
+1. Edit the `bldr.env` file with these settings:
+
+   1. Set `S3_ENABLED` and `ARTIFACTORY_ENABLED` to `false`.
+
+      You can't use the MinIO server if you're using S3 or Artifactory directly.
+
+   1. List all frontend and backend nodes running Habitat Builder services using `HAB_BLDR_PEER_ARG` and the `--peer` option using the following format:
+
+      ```shell
+      HAB_BLDR_PEER_ARG="--peer <HOST> --peer <HOST> --peer <HOST>"
+      ```
+
+      Replace `<HOST>` with a node IP address or hostname.
+
+1. Install MinIO by running the install script:
+
+   ```bash
+   ./install.sh --install-minio
+   ```
+
+1. Now that your Minio server is up and running on its own node, connect your frontend Habitat Builder nodes to the MinIO node.
+
+   On your frontend nodes, set the `MINIO_ENDPOINT` in the `bldr.env` file to the node where the MinIO server is running.
+
+## Deploy PostgreSQL on a separate node
+
+Habitat Builder is configured using the `bldr.env` file, which contains all the information you need to set up MinIO and PostgreSQL. Follow these steps to configure the `bldr.env` file:
+
+1. If you don't already have it on your node, clone the [habitat-sh/on-prem-builder repository](https://github.com/habitat-sh/on-prem-builder/) or download and extract one of the [on-prem-builder releases](https://github.com/habitat-sh/on-prem-builder/releases).
+
+1. If your node previously ran on-prem Habitat Builder components, run the [`uninstall.sh` script](https://github.com/habitat-sh/on-prem-builder/blob/main/uninstall.sh) to clean up your environment:
+
+   ```bash
+   ./uninstall.sh
+   ```
+
+1. Copy the [`bldr.env.sample` file](https://github.com/habitat-sh/on-prem-builder/blob/main/bldr.env.sample) and save it as `bldr.env`:
+
+   ```bash
+   cp bldr.env.sample bldr.env
+   ```
+
+1. Edit the `bldr.env` file with these settings:
 
    1. Set `PG_EXT_ENABLED` to `false`.
 
-      The datastore node can't have an externally hosted PostgreSQL. For example on AWS RDS or Azure Database for PostgreSQL.
+      The datastore node can't use an externally hosted PostgreSQL, such as AWS RDS or Azure Database for PostgreSQL.
+      For details about opening the required ports, see the [scaling documentation](./scaling.md#deploying-new-front-ends).
 
-      See [scaling documentation](./scaling.md#deploying-new-front-ends) for detailed information regarding opening the ports.
-
-   1. Set `HAB_BLDR_PEER_ARG` to include all frontend and backend nodes hosting builder services. The format is as follows:
+   1. List all frontend and backend nodes hosting builder services using `HAB_BLDR_PEER_ARG` and the `--peer` option using the following format:
 
       ```shell
-      --peer <host1> --peer <host2> --peer <host3>
+      HAB_BLDR_PEER_ARG="--peer <HOST> --peer <HOST> --peer <HOST>"
       ```
 
-## Separate MinIO Server
+      Replace `<HOST>` with a node IP address or hostname.
 
-MinIO is an open source object storage server.
-Chef Habitat Builder on-prem uses MinIO to store Habitat artifact files (`.harts`).
+1. Install PostgreSQL by running the install script:
 
-1. On the new node that will run the MinIO service, install MinIO by running the MinIO install script:
+   ```bash
+   ./install.sh --install-postgresql
+   ```
 
-    ```bash
-    ./install.sh --install-minio
-    ```
+1. Connect the frontend Builder nodes to the PostgreSQL datastore node.
 
-1. Connect to the MinIO server node by setting the `MINIO_ENDPOINT` in the `bldr.env` file to the node where the MinIO server is running.
-
-
-## Separate PostgreSQL
-
-The backend datastore can also be setup to run on a separate node.
-
-1. Install PostgreSQL by running the PostgreSQL install script on the node:
-
-    ```bash
-    ./install.sh --install-postgresql
-    ```
-
-1. Connect to datastore node
-
-The value of `POSTGRES_HOST` in the `bldr.env` file on the frontend nodes must be mapped to the Node where the Datastore service is running in order to connect to it.
+   On your frontend Builder nodes, set `POSTGRES_HOST` in the `bldr.env` file to the node that's running the Habitat Builder PostgreSQL datastore.
 
 ## More information
 
-For setting up and scaling the frontend, see the [Habitat Builder scaling](./scaling.md) documentation.
+For details about setting up and scaling the frontend, see [scaling Habitat Builder's frontend documentation](./scale_frontend_nodes).
+
+For information about managing resources with MinIO and PostgreSQL:
+
+- [Manage your MinIO artifact store](../manage/minio)
+- [Manage Habitat Builder data stored with PostgreSQL](../manage/postgres)
