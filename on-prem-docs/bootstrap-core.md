@@ -10,21 +10,6 @@ Select your Gravatar icon on the top right corner of the Chef Habitat Builder on
 
 You can enter your license key just below the Personal Access Token text field in order for your account to access official chef maintained packages.
 
-### Usage
-
-1. **Open Profile**  
-   Click your avatar in the top-right and choose **Profile**.
-
-2. **Find License Key Section**  
-   Scroll down to **License Key**.
-
-3. **Submit License**  
-   Paste your key into the input field and click **Submit**.  
-   On success, you’ll see “License valid till `<expiration_date>`” and the **Delete** button will activate.
-
-4. **Delete License**  
-   Click **Delete** to remove your key and revoke restricted-package access.
-
 ## Enable Native Package Support
 
 A couple of the new LTS supported packages include `native` packages. In order for an on-prem builder instance to host LTS packages, that builder instance must be configured to allow native package support. This is done by enabling the `nativepackages` feature and specifying `core` as an allowed native package origin. To do this, an on-prem builder's `/hab/user/builder-api/config/user.toml` file should be edited so that the `[api]` section looks as follows:

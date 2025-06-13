@@ -22,6 +22,8 @@ sudo hab pkg install habitat/pkg-sync --channel LTS-2024
 
 Examples:
 
+Note that the public builder tokens used in the examples below must be associated with a valid license key. See [these instructions](../on-prem-docs/bootstrap-core.md#add-a-license-key) on entering a license key.
+
 Sync all the latest core LTS-2024 packages that you do not already have from the public builder and upload them to your on-prem builder instance.
 
 ```
