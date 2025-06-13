@@ -22,29 +22,31 @@ sudo hab pkg install habitat/pkg-sync --channel LTS-2024
 
 Examples:
 
+Note that the public builder tokens used in the examples below must be associated with a valid license key. See [these instructions](../on-prem-docs/bootstrap-core.md#add-a-license-key) on entering a license key.
+
 Sync all the latest core LTS-2024 packages that you do not already have from the public builder and upload them to your on-prem builder instance.
 
 ```
-hab pkg exec habitat/pkg-sync pkg-sync --bldr-url https://your-builder.tld --origin core --channel LTS-2024 --auth <your_public_Builder_instance_token>
+hab pkg exec habitat/pkg-sync pkg-sync --bldr-url https://your-builder.tld --origin core --channel LTS-2024 --public-builder-token <your_public_Builder_instance_token> --private-builder-token <your_private_Builder_instance_token>
 ```
 
 Sync all the latest stable habitat release packages from the public builder and upload them to your on-prem builder instance.
 
 ```
-hab pkg exec habitat/pkg-sync pkg-sync --bldr-url https://your-builder.tld --channel stable --auth <your_public_Builder_instance_token> --package-list habitat
+hab pkg exec habitat/pkg-sync pkg-sync --bldr-url https://your-builder.tld --channel stable --package-list habitat --public-builder-token <your_public_Builder_instance_token> --private-builder-token <your_private_Builder_instance_token>
 ```
 
 Generate a list of all stable packages in the core origin.
 
 ```
-hab pkg exec habitat/pkg-sync pkg-sync --generate-airgap-list --origin core --channel stable
+hab pkg exec habitat/pkg-sync pkg-sync --generate-airgap-list --origin core --channel stable --public-builder-token <your_public_Builder_instance_token>
 ```
 
 These lists can be used with `hab pkg download` to download the hart files from builder:
 
 ```
-hab pkg download --target x86_64-linux --channel stable --file package_list_x86_64-linux.txt --download-directory builder_bootstrap
-hab pkg download --target x86_64-windows --channel stable --file package_list_x86_64-windows.txt --download-directory builder_bootstrap
+hab pkg download -u https://bldr.habitat.sh -z <your_public_Builder_instance_token> --target x86_64-linux --channel stable --file package_list_x86_64-linux.txt --download-directory builder_bootstrap
+hab pkg download -u https://bldr.habitat.sh -z <your_public_Builder_instance_token> --target x86_64-windows --channel stable --file package_list_x86_64-windows.txt --download-directory builder_bootstrap
 ```
 
 You could then copy the `--download-directory` contents to an airgapped builder and use `hab pkg bulkupload` to upload them:
@@ -58,8 +60,10 @@ Promote packages that are in the LTS-2024 channel on the SAAS builder to that sa
 
 ```
 # Generate a list of all the latest LTS-2024 package identifiers
-hab pkg exec habitat/pkg-sync pkg-sync --channel LTS-2024 --origin core --generate-airgap-list
+hab pkg exec habitat/pkg-sync pkg-sync --channel LTS-2024 --origin core --generate-airgap-list --public-builder-token <your_public_Builder_instance_token>
 # Provide that list to --idents-to-promote so that any of those packages that exist on an on-prem instance are demoted from all non-unstable channels and promoted to LTS-2024
-hab pkg exec habitat/pkg-sync pkg-sync --bldr-url https://your-builder.tld --channel LTS-2024 --auth <your_public_Builder_instance_token> --idents-to-promote package_list_x86_64-linux.txt
-hab pkg exec habitat/pkg-sync pkg-sync --bldr-url https://your-builder.tld --channel LTS-2024 --auth <your_public_Builder_instance_token> --idents-to-promote package_list_x86_64-windows.txt
+hab pkg exec habitat/pkg-sync pkg-sync --bldr-url https://your-builder.tld --channel LTS-2024 --private-builder-token <your_private_Builder_instance_token> --idents-to-promote package_list_x86_64-linux.txt
+hab pkg exec habitat/pkg-sync pkg-sync --bldr-url https://your-builder.tld --channel LTS-2024 --private-builder-token <your_private_Builder_instance_token> --idents-to-promote package_list_x86_64-windows.txt
 ```
+
+Note that the public builder tokens used in the examples below must be associated with a valid license key. See [these instructions](on-prem-docs/bootstrap-core.md#add-a-license-key) on entering a license key.
