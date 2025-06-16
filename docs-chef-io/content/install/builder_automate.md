@@ -221,6 +221,9 @@ You're done. You can now monitor Habitat Builder using Chef Automate's Applicati
 
 - [Chef Automate (ALPHA)](https://docs.chef.io/automate/configuration/#alpha-setting-up-automate-as-an-oauth-provider-for-habitat-builder)
 
-## Next step
+## Next steps
 
-After you've deployed Habitat Builder, you can [bootstrap the core origin packages](./bootstrap-core.md).
+After you've deployed Habitat Builder:
+
+- [Configure your workstation to connect to your Habitat Builder deployment](./workstation).
+- [Bootstrap the core origin packages](./bootstrap-core.md).

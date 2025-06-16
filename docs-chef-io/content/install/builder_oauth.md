@@ -214,4 +214,7 @@ You can now sign in using your configured OAuth provider.
 
 ## Next steps
 
-- [Bootstrap the core origin](./bootstrap-core.md)
+After you've deployed Habitat Builder:
+
+- [Configure your workstation to connect to your Habitat Builder deployment](./workstation).
+- [Bootstrap the core origin packages](./bootstrap-core.md).
