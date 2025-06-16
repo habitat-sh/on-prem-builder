@@ -9,8 +9,12 @@ title = "Deploy Chef Habitat Builder on-prem with Chef Automate"
     weight = 20
 +++
 
-The Chef Automate Applications dashboard allows you to monitor your Chef Habitat Builder on-prem installation.
+You can use Chef Automate as an OAuth provider and use the Automate Applications dashboard to monitor your Chef Habitat Builder installation.
 For information and installation guidance, see [Setting up the Applications Dashboard](https://docs.chef.io/automate/applications_setup/).
+
+## Before you begin
+
+Review [Habitat Builder's system requirements](./system_requirements.md).
 
 ## Deploy Chef Habitat on-prem with Chef Automate
 

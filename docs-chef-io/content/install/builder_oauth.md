@@ -1,5 +1,5 @@
 +++
-title = "Install Habitat Builder with OAuth services"
+title = "Install Chef Habitat Builder with OAuth services"
 
 [menu]
   [menu.habitat]
@@ -9,17 +9,11 @@ title = "Install Habitat Builder with OAuth services"
     weight = 20
 +++
 
-## Prerequisites
+This page documents how to deploy Chef Habitat Builder with a 3rd-party OAuth provider.
 
-Before you start the installation, review all items in the Requirements section and make sure your installation location meets those requirements.
+## Before you begin
 
-The initial install requires outgoing network connectivity.
-
-Your Chef Habitat Builder on-prem instance needs the following inbound port open:
-
-- Port 80 (or 443 if you plan to enable SSL)
-
-You might need to work with your enterprise network admin to enable the correct firewall rules.
+Review [Habitat Builder's system requirements](./system_requirements.md).
 
 ### Configure an OAuth provider
 
