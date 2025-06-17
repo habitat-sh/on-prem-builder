@@ -1,12 +1,12 @@
 +++
-title = "Separate the Habitat Builder backend services"
+title = "Separate Habitat Builder's backend services onto separate nodes"
 
 [menu]
   [menu.habitat]
-    title = "Separating backend services"
-    identifier = "habitat/on-prem-builder/Separating backend services"
-    parent = "habitat/on-prem-builder"
-    weight = 20
+    title = "Separate backend services"
+    identifier = "habitat/on-prem-builder/configure/Separating backend services"
+    parent = "habitat/on-prem-builder/configure"
+    weight = 60
 +++
 
 Chef Habitat Builder uses MinIO to store Habitat artifact (`.hart`) files and PostgreSQL to store package and user metadata.
@@ -111,7 +111,7 @@ Habitat Builder is configured using the `bldr.env` file, which contains all the 
 
 ## More information
 
-For details about setting up and scaling the frontend, see [scaling Habitat Builder's frontend documentation](./scale_frontend_nodes).
+For details about setting up and scaling the frontend, see [scaling Habitat Builder's frontend documentation](/habitat/on_prem_builder/configure/scale_frontend_nodes/).
 
 For information about managing resources with MinIO and PostgreSQL:
 

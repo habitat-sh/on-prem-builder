@@ -3,17 +3,17 @@ title = "Install Chef Habitat Builder with OAuth services"
 
 [menu]
   [menu.habitat]
-    title = "OAuth"
-    identifier = "habitat/on-prem-builder/o-auth"
-    parent = "habitat/on-prem-builder"
-    weight = 20
+    title = "Install Builder using OAuth provider to authenticate"
+    identifier = "habitat/on-prem-builder/install/o-auth"
+    parent = "habitat/on-prem-builder/install"
+    weight = 40
 +++
 
-This page documents how to deploy Chef Habitat Builder with a 3rd-party OAuth provider.
+This page documents how to deploy Chef Habitat Builder with a 3rd-party OAuth provider that provides authentication services.
 
 ## Before you begin
 
-Review [Habitat Builder's system requirements](./system_requirements.md).
+Before you begin, review [Habitat Builder's system requirements](../system_requirements).
 
 ### Configure an OAuth provider
 
@@ -35,10 +35,10 @@ The following steps show how to set up the OAuth application using GitHub as the
 
 1. Record the following OAuth configuration settings which you will use when define the `bldr.env` config file:
 
-- Authorization endpoint (for example, `https://github.com/login/oauth/authorize`)
-- Token endpoint (for example, `https://github.com/login/oauth/access_token`)
-- API endpoint (for example, `https://api.github.com/user`)
-- Record the client ID and client secret. You'll use these for the `OAUTH_CLIENT_ID` and `OAUTH_CLIENT_SECRET` environment variables.
+    - Authorization endpoint (for example, `https://github.com/login/oauth/authorize`)
+    - Token endpoint (for example, `https://github.com/login/oauth/access_token`)
+    - API endpoint (for example, `https://api.github.com/user`)
+    - Record the client ID and client secret. You'll use these for the `OAUTH_CLIENT_ID` and `OAUTH_CLIENT_SECRET` environment variables.
 
 For more details on OAuth endpoints, see the Internet Engineering Task Force (IETF) RFC 6749, [The OAuth 2.0 Authorization Framework](https://datatracker.ietf.org/doc/html/rfc6749#section-3.2).
 
@@ -49,7 +49,7 @@ You might need substantial storage for packages, so make sure you have enough fr
 The package artifacts are stored in your MinIO instance by default, typically at the following location: `/hab/svc/builder-minio/data`. If you need more storage, create a mount at `/hab` and point it to your external storage.
 You don't need to do this if you already have enough free space.
 
-If you want to use Artifactory instead of MinIO for object storage, see the [Artifactory documentation](artifactory.md).
+If you want to use Artifactory instead of MinIO for object storage, see the [Artifactory documentation](/habitat/on_prem_builder/configure/artifactory).
 
 ### Get an SSL certificate
 
@@ -99,9 +99,19 @@ With an internet-connected computer, follow these steps:
 
     ```bash
     sudo hab pkg install habitat/pkg-sync --channel LTS-2024
-    export DOWNLOAD_DIR=/some/base/download/directory
-    hab pkg exec habitat/pkg-sync pkg-sync --channel stable --package-list builder --generate-airgap-list
-    hab pkg download --target x86_64-linux --channel stable --file package_list_x86_64-linux.txt --download-directory ${DOWNLOAD_DIR}/builder_packages
+
+    export DOWNLOAD_DIR=/path/to/download/directory
+
+    hab pkg exec habitat/pkg-sync pkg-sync \
+      --channel stable \
+      --package-list builder \
+      --generate-airgap-list
+
+    hab pkg download \
+      --target x86_64-linux \
+      --channel stable \
+      --file package_list_x86_64-linux.txt \
+      --download-directory ${DOWNLOAD_DIR}/builder_packages
     ```
 
 1. Archive the download directory, then transfer and extract it on the Linux system where you will deploy Builder in the airgapped environment.
@@ -110,33 +120,36 @@ In the airgapped environment, complete these steps:
 
 1. From the archive, install the `hab` binary somewhere in the system $PATH and ensure it has execute permissions:
 
-     ```bash
-     sudo chmod 755 /usr/bin/hab
-     sudo hab
-     ```
+    ```bash
+    sudo chmod 755 /usr/bin/hab
+    sudo hab
+    ```
 
-     Read and accept the license.
+    Read and accept the license.
 
 1. Import the public package signing keys from the downloaded Builder package bundle:
 
-     ```bash
-     export UNZIP_DIR=/some/base/unzip/directory
-     for file in $(ls ${UNZIP_DIR}/builder_packages/keys/*pub); do cat $file | sudo hab origin key import; done
-     ```
+    ```bash
+    export UNZIP_DIR=/some/base/unzip/directory
+
+    for file in $(ls ${UNZIP_DIR}/builder_packages/keys/*pub); do
+      cat $file | sudo hab origin key import
+    done
+    ```
 
 1. Create a Habitat artifact cache directory, place the Builder `*.hart` packages into that directory and then pre-install the Builder Services:
 
-     ```bash
-     sudo mkdir -p /hab/cache/artifacts
-     sudo mv ${UNZIP_DIR}/builder_packages/artifacts/*hart /hab/cache/artifacts
-     sudo hab pkg install /hab/cache/artifacts/habitat-builder*hart
-     ```
+    ```bash
+    sudo mkdir -p /hab/cache/artifacts
+    sudo mv ${UNZIP_DIR}/builder_packages/artifacts/*hart /hab/cache/artifacts
+    sudo hab pkg install /hab/cache/artifacts/habitat-builder*hart
+    ```
 
 1. Pre-install the Habitat Supervisor and its dependencies:
 
-     ```bash
-     sudo hab pkg install --binlink --force /hab/cache/artifacts/core-hab-*hart
-     ```
+    ```bash
+    sudo hab pkg install --binlink --force /hab/cache/artifacts/core-hab-*hart
+    ```
 
 ## Configure Chef Habitat Builder
 
@@ -189,7 +202,7 @@ Follow these steps:
     ```
 
     It may take a few seconds for all services to start.
-    If any services aren't in the `up` state, see the [troubleshooting documentation](troubleshooting.md).
+    If any services aren't in the `up` state, see the [troubleshooting documentation](troubleshooting).
 
 ## MinIO web UI
 
@@ -210,5 +223,5 @@ You can now sign in using your configured OAuth provider.
 
 After you've deployed Habitat Builder:
 
-- [Configure your workstation to connect to your Habitat Builder deployment](./workstation).
-- [Bootstrap the core origin packages](./bootstrap-core.md).
+- [Configure your workstation to connect to your Habitat Builder deployment](../workstation).
+- [Bootstrap the core origin packages](/habitat/on_prem_builder/packages/bootstrap_core_packages).

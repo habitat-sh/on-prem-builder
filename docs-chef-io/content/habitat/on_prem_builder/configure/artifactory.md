@@ -3,10 +3,10 @@ title = "Use Artifactory as a Habitat package artifact store"
 
 [menu]
   [menu.habitat]
-    title = "Artifactory"
-    identifier = "habitat/on-prem-builder/artifactory"
-    parent = "habitat/on-prem-builder"
-    weight = 20
+    title = "Use Artifactory as a package artifact store"
+    identifier = "habitat/on-prem-builder/configure/artifactory"
+    parent = "habitat/on-prem-builder/configure"
+    weight = 30
 +++
 
 You can use an existing Artifactory instance as your object store instead of MinIO.

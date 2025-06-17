@@ -1,12 +1,12 @@
 +++
-title = "Scale frontend nodes"
+title = "Scale frontend Habitat Builder nodes"
 
 [menu]
   [menu.habitat]
-    title = "Frontend scaling"
-    identifier = "habitat/on-prem Habitat Builder/frontend scaling"
-    parent = "habitat/on-prem Habitat Builder"
-    weight = 20
+    title = "Scale Builder frontend"
+    identifier = "habitat/on-prem-builder/configure/frontend scaling"
+    parent = "habitat/on-prem-builder/configure"
+    weight = 50
 +++
 
 With any tiered or high-availability deployment of Habitat Builder services, you'll likely want to scale your frontend nodes horizontally.

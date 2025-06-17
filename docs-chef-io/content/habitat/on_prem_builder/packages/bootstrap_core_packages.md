@@ -4,8 +4,8 @@ title = "Bootstrap core Habitat packages"
 [menu]
   [menu.habitat]
     title = "Bootstrap core packages"
-    identifier = "habitat/builder/on-prem/Bootstrap Core Packages"
-    parent = "habitat/builder/on-prem"
+    identifier = "habitat/on-prem-builder/packages/Bootstrap Core Packages"
+    parent = "habitat/on-prem-builder/packages"
     weight = 20
 +++
 

@@ -1,10 +1,11 @@
 +++
-title = "Update Habitat Builder's SSL certificates"
+title = "Rotate Habitat Builder's SSL certificates"
 
 [menu.habitat]
-  title = "Update SSL certs"
+  title = "Rotate SSL certs"
   identifier = "habitat/on-prem-builder/manage/SSL certs"
   parent = "habitat/on-prem-builder/manage"
+  weight = 40
 +++
 
 Chef Habitat Builder's web frontend runs on NGINX using the `habitat/builder-api-proxy` service.
@@ -38,4 +39,4 @@ There's really a few simple commands to run in order to rotate your key.
 
     This puts the updated files into the appropriate path and restarts NGINX so that it's using your new certificate and key.
 
-You should now be able to verify through your browser or with the `openssl s_client -connect` command that your builder server has an updated certificate.
+You should now be able to verify through your browser or with the `openssl s_client -connect` command that Habitat Builder has an updated certificate.

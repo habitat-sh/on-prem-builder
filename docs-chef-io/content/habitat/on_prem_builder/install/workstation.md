@@ -1,12 +1,12 @@
 +++
-title = "Configure your workstation to connect to your Chef Habitat Builder deployment"
+title = "Connect your workstation to your Chef Habitat Builder deployment"
 
 [menu]
   [menu.habitat]
-    title = "Separating backend services"
-    identifier = "habitat/on-prem-builder/workstation"
-    parent = "habitat/on-prem-builder"
-    weight = 20
+    title = "Connect your workstation to Builder"
+    identifier = "habitat/on-prem-builder/install/workstation"
+    parent = "habitat/on-prem-builder/install"
+    weight = 50
 
 +++
 

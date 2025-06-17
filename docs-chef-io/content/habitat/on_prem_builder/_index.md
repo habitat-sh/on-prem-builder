@@ -1,15 +1,20 @@
 +++
-title = "Chef Habitat Builder on-prem"
+title = "About on-prem Chef Habitat Builder"
+
+[cascade]
+  [cascade.params]
+    gh_repo = "on-prem-builder"
+    product = ["habitat"]
 
 [menu]
   [menu.habitat]
-    title = "Builder on-prem"
+    title = "About on-prem Builder"
     identifier = "habitat/on-prem-builder/overview"
     parent = "habitat/on-prem-builder"
     weight = 10
 +++
 
-You can deploy Chef Habitat Builder in an on-prem environment, which allows you to privately host Chef Habitat packages and associated artifacts such as keys.
+You can deploy Chef Habitat Builder in an on-prem environment which allows you to privately host Chef Habitat packages and associated artifacts such as keys.
 You can direct Chef Habitat clients (such as the `hab` cli, Supervisors, and Studios) to your Builder on-prem deployment, which allows you to develop, execute, and manage packages without depending on the public Chef Habitat services.
 
 ## Audience

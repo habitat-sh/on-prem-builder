@@ -4,8 +4,8 @@ title = "Habitat Builder system requirements"
 [menu]
   [menu.habitat]
     title = "System requirements"
-    identifier = "habitat/on-prem-builder/install/system requirements"
-    parent = "habitat/on-prem-builder"
+    identifier = "habitat/on-prem-builder/install/install/system requirements"
+    parent = "habitat/on-prem-builder/install"
     weight = 20
 +++
 
@@ -13,7 +13,7 @@ See the following sections for Chef Habitat Builder's requirements.
 
 ## Requirements
 
-- Deploy Habitat Builder on a [Linux distribution supported by Habitat](https://docs.chef.io/habitat/install_habitat/#chef-habitat-for-linux).
+- Deploy Habitat Builder on a [Linux distribution supported by Habitat](/habitat/install_habitat/#chef-habitat-for-linux).
 - The Linux OS must support the `systemd` process manager.
 - You can deploy on bare metal, a VM, or a container image.
 - Match CPU and RAM to your deployment purpose:
@@ -38,4 +38,4 @@ Follow these guidelines for filesystem storage:
 - Chef Habitat Builder needs substantial storage space for packages. Make sure your filesystem has enough free space.
 - By default, Chef Habitat Builder stores package artifacts in a MinIO instance, typically at `/hab/svc/builder-minio/data`.
 - If you need more storage, create a mount at `/hab` and point it to your external storage. This isn't required if you already have enough free space.
-- To use Artifactory instead of MinIO for object storage, see the [Habitat Builder on-prem and Artifactory](./artifactory/) documentation.
+- To use Artifactory instead of MinIO for object storage, see the [Habitat Builder on-prem and Artifactory](/habitat/on_prem_builder/configure/artifactory/) documentation.

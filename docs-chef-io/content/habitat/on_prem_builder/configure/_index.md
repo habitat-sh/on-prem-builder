@@ -3,16 +3,16 @@ title = "Chef Habitat Builder on-prem"
 
 [menu]
   [menu.habitat]
-    title = "Builder on-prem"
-    identifier = "habitat/on-prem-builder/overview"
-    parent = "habitat/on-prem-builder"
+    title = "Overview"
+    identifier = "habitat/on-prem-builder/configure/overview"
+    parent = "habitat/on-prem-builder/configure"
     weight = 10
 +++
 
 See the following guides to configure Chef Habitat Builder:
 
 - [Configure Artifactory as an object store](artifactory).
-- [Configure disaster recovery or warm spare](disaster_recovery_warm_spare).
+- [Configure disaster recovery or warm spare deployment](disaster_recovery_warm_spare).
 - [Configure Habitat Builder logs](logs).
 - [Scale frontend Habitat Builder nodes](scale_frontend_nodes).
 - [Separate backend services onto separate nodes](separate_backend_services).

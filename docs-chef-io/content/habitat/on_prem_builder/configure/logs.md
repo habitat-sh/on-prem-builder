@@ -1,20 +1,20 @@
 +++
-title = "Configure Habitat Builder logging"
+title = "Configure Habitat Builder logs"
 
 [menu]
   [menu.habitat]
-    title = "Logs"
-    identifier = "habitat/on-prem-builder/logs"
-    parent = "habitat/on-prem-builder"
-    weight = 20
+    title = "Configure Builder logs"
+    identifier = "habitat/on-prem-builder/configure/logs"
+    parent = "habitat/on-prem-builder/configure"
+    weight = 40
 +++
 
-This page explains how to configure logging for Chef Habitat Builder.
+This page explains how to configure Chef Habitat Builder logs.
 
 ## Supported log levels
 
 You can set the log level to `error`, `warn`, `info`, `debug`, or `trace`.
-For more details about logging in Chef Habitat, see the [Supervisor log configuration reference](https://www.habitat.sh/docs/reference/#supervisor-log-configuration-reference) and the [Supervisor log key documentation](https://www.habitat.sh/docs/reference/#supervisor-log-key).
+For more details about logging in Chef Habitat, see the [Supervisor log configuration reference](/habitat/sup_log_configuration/) and the [Supervisor log key documentation](/habitat/sup_log_keys/).
 
 ## Configure the Habitat Builder log level
 

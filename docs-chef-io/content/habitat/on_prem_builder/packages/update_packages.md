@@ -1,12 +1,12 @@
 +++
-title = "Update Habitat packages"
+title = "Update packages on Habitat Builder"
 
 [menu]
   [menu.habitat]
-    title = "Update Habitat packages"
-    identifier = "habitat/on-prem-builder/manage/update"
-    parent = "habitat/on-prem-builder/manage"
-    weight = 10
+    title = "Update packages"
+    identifier = "habitat/on-prem-builder/packages/update"
+    parent = "habitat/on-prem-builder/packages"
+    weight = 30
 +++
 
 After a Chef Habitat release, you may want to update Habitat packages on Habitat Builder to the latest versions.

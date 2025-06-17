@@ -4,8 +4,8 @@ title = "Chef Habitat Builder on-prem install overview"
 [menu]
   [menu.habitat]
     title = "Overview"
-    identifier = "habitat/on-prem-builder/install/overview"
-    parent = "habitat/on-prem-builder"
+    identifier = "habitat/on-prem-builder/install/install/overview"
+    parent = "habitat/on-prem-builder/install"
     weight = 10
 +++
 
@@ -19,8 +19,8 @@ Before you begin, review the [Habitat Builder system requirements](system_requir
 
 To deploy Habitat Builder on-prem, use one of the following guides:
 
-- [Install Builder on-prem authenticating with Chef Automate](builder-automate.md)
-- [Install Builder on-prem authenticating with another OAuth service](builder-oauth.md)
+- [Install Habitat Builder on-prem authenticating with Chef Automate](builder-automate)
+- [Install Habitat Builder on-prem authenticating with another OAuth service](builder-oauth)
 
 ## Workstation configuration
 

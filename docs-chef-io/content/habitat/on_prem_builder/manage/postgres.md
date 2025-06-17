@@ -4,16 +4,20 @@ title = "Manage Habitat Builder data stored by PostgreSQL"
 [menu]
   [menu.habitat]
     title = "PostgreSQL"
-    identifier = "habitat/on-prem-builder/PostgreSQL"
-    parent = "habitat/on-prem-builder"
-    weight = 20
+    identifier = "habitat/on-prem-builder/manage/PostgreSQL"
+    parent = "habitat/on-prem-builder/manage"
+    weight = 30
 +++
+
+This page describes how to back up Habitat Builder user and package data that's managed by PostgreSQL.
+
+## Habitat Builder data overview
 
 Habitat Builder's data is lightweight, so backup and disaster recovery strategies are straightforward.
 On-prem Builder has two types of data you should back up in case of a disaster:
 
 - PostgreSQL package and user metadata
-- [MinIO Habitat artifacts](./minio.md#minio-artifact-backups)
+- [MinIO Habitat artifacts](../minio#minio-artifact-backups)
 
 Ideally, coordinate the backup of the entire Builder on-prem cluster at the same time.
 However, because Habitat Builder stores only metadata and artifacts, you have some flexibility in the timing of your backup operations.

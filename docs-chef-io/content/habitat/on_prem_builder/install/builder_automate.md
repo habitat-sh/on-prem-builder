@@ -1,20 +1,20 @@
 +++
-title = "Deploy Chef Habitat Builder on-prem with Chef Automate"
+title = "Install Chef Habitat Builder on-prem with Chef Automate"
 
 [menu]
   [menu.habitat]
-    title = "Chef Automate"
-    identifier = "habitat/on-prem-builder/Automate"
-    parent = "habitat/on-prem-builder"
-    weight = 20
+    title = "Install Builder using Chef Automate to authenticate"
+    identifier = "habitat/on-prem-builder/install/Automate"
+    parent = "habitat/on-prem-builder/install"
+    weight = 30
 +++
 
 You can use Chef Automate as an OAuth provider and use the Automate Applications dashboard to monitor your Chef Habitat Builder installation.
-For information and installation guidance, see [Setting up the Applications Dashboard](https://docs.chef.io/automate/applications_setup/).
+For information and installation guidance, see [Setting up the Applications Dashboard](/automate/applications_setup/).
 
 ## Before you begin
 
-Review [Habitat Builder's system requirements](./system_requirements.md).
+Review [Habitat Builder's system requirements](../system_requirements).
 
 ## Deploy Chef Habitat on-prem with Chef Automate
 
@@ -223,11 +223,11 @@ You're done. You can now monitor Habitat Builder using Chef Automate's Applicati
 
 ## Related resources
 
-- [Chef Automate (ALPHA)](https://docs.chef.io/automate/configuration/#alpha-setting-up-automate-as-an-oauth-provider-for-habitat-builder)
+- [Chef Automate (ALPHA)](/automate/configuration/#alpha-setting-up-automate-as-an-oauth-provider-for-habitat-builder)
 
 ## Next steps
 
 After you've deployed Habitat Builder:
 
-- [Configure your workstation to connect to your Habitat Builder deployment](./workstation).
-- [Bootstrap the core origin packages](./bootstrap-core.md).
+- [Configure your workstation to connect to your Habitat Builder deployment](../workstation).
+- [Bootstrap the core origin packages](../bootstrap-core).

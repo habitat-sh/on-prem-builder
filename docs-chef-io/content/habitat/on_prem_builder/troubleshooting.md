@@ -1,12 +1,12 @@
 +++
-title = "Troubleshooting"
+title = "Troubleshooting Chef Habitat Builder on-prem"
 
 [menu]
   [menu.habitat]
     title = "Troubleshooting"
     identifier = "habitat/on-prem-builder/troubleshooting"
     parent = "habitat/on-prem-builder"
-    weight = 20
+    weight = 500
 +++
 
 This section covers several common problems that you might encounter and how to solve them.
