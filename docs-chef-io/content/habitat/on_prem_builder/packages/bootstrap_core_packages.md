@@ -14,7 +14,7 @@ This page explains how to bootstrap Builder with packages from [Chef's public Ha
 
 ## Generate a personal access token
 
-You need a personal access token in your on-prem Habitat Builder instance to bootstrap the `core` packages and authenticate with the `hab` client.
+You need a personal access token in your on-prem Habitat Builder deployment to bootstrap the `core` packages and authenticate with the `hab` client.
 
 If you don't already have a token, generate one:
 
@@ -28,7 +28,7 @@ You can enter your license key just below the **Personal Access Token** field so
 ## Enable native package support
 
 Some new LTS-supported packages include `native` packages.
-To host LTS packages, you must configure your on-prem Builder instance to allow native package support.
+To host LTS packages, you must configure your Habitat Builder deployment to allow native package support.
 Enable the `nativepackages` feature and specify `core` as an allowed native package origin.
 Edit your on-prem Builder's `/hab/user/builder-api/config/user.toml` file so the `[api]` section looks like this:
 
@@ -42,9 +42,9 @@ allowed_native_package_origins = ["core"]
 ## Bootstrap Builder in an online environment
 
 Chef Habitat Builder on-prem doesn't include any pre-installed package sets.
-You need to upload packages to populate your Builder instance.
+You need to upload packages to populate Habitat Builder deployment.
 To help bootstrap your on-prem Builder with core packages, you can install the `habitat/pkg-sync` package.
-This package downloads packages from the public [SaaS Builder](https://bldr.habitat.sh) and then uploads them in bulk to your on-prem Builder instance.
+This package downloads packages from the public [SaaS Builder](https://bldr.habitat.sh) and then uploads them in bulk to your Habitat Builder deployment.
 
 To bootstrap on-prem Habitat Builder with a full set of stable core packages, run:
 
@@ -64,7 +64,7 @@ hab pkg exec habitat/pkg-sync pkg-sync \
 You can't transfer packages directly to Habitat Builder in an airgapped environment using `pkg-sync`,
 so instead you have to download packages from the [public Habitat Builder](https://bldr.habitat.sh) and upload them to your airgapped deployment.
 
-Before you begin, you will need your personal access token that you use to communicate with your on-prem Habitat Builder deployment and the URL of your on-prem Habitat Builder instance.
+Before you begin, you will need your personal access token that you use to communicate with your on-prem Habitat Builder deployment and the URL of your on-prem Habitat Builder deployment.
 
 To bootstrap an airgapped on-prem Builder with stable core packages, follow these steps:
 

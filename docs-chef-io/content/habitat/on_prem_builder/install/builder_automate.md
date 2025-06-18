@@ -1,5 +1,5 @@
 +++
-title = "Install Chef Habitat Builder on-prem with Chef Automate"
+title = "Install Chef Habitat Builder on-prem using Chef Automate to authenticate"
 
 [menu]
   [menu.habitat]
@@ -223,7 +223,7 @@ You're done. You can now monitor Habitat Builder using Chef Automate's Applicati
 
 ## Related resources
 
-- [Chef Automate (ALPHA)](/automate/configuration/#alpha-setting-up-automate-as-an-oauth-provider-for-habitat-builder)
+- [Chef Automate](/automate/on_prem_builder/)
 
 ## Next steps
 
