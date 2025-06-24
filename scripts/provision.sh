@@ -20,7 +20,27 @@ user_toml_warn() {
   fi
 }
 
+# In order to upgrade PostgreSQL via the install hook we need to be have both
+# the version of PostgreSQL that we are upgrading from and the one that we are
+# upgrading are available. The plan file of the version being initially
+# installed or upgraded to ensures that the PostgreSQL version is available.
+# However, when upgrading we need to execute hab pkg install for the previous
+# version to ensure that it is available. Running hab pkg install requires root
+# privileges and we cannot sudo inside the install hook because we are running
+# as the hab user because the hab user isn't allowed to elevate its privileges.
+install_previous_postgresql_version() {
+  local -r pg_version_file='/hab/svc/builder-datastore/data/PG_VERSION'
+  if [[ -f $pg_version_file ]]; then
+    local -r installed_pg_ident="core/postgresql$(cat $pg_version_file | sed 's/\.//')"
+    if ! hab pkg install "$installed_pg_ident"; then
+      echo "Failed installing $installed_pg_ident, trying again on stable channel"
+      hab pkg install "$installed_pg_ident" --channel stable
+    fi
+  fi
+}
+
 init_datastore() {
+  install_previous_postgresql_version
   user_toml_warn builder-datastore
   mkdir -p /hab/user/builder-datastore/config
   cat <<-EOT >/hab/user/builder-datastore/config/user.toml
