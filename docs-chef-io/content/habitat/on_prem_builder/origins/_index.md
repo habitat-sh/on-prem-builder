@@ -10,7 +10,7 @@ title = "Chef Habitat origins"
 +++
 
 An origin is a unique namespace in Chef Habitat Builder where you can store, share, and build packages.
-Once created, an origin cannot be renamed, but it can be deleted or transferred.
+Once created, you can'tt rename an origin, but you can delete or transfer it.
 For example, the _core_ origin contains foundational packages managed and versioned by the core Chef Habitat maintainers.
 
 You can create origins in an on-prem Habitat Builder deployment.
@@ -32,10 +32,11 @@ Progress Chef maintains the following origins:
 See the following user guides for managing Chef Habitat origins:
 
 - [Create an origin](create_an_origin)
-- [origin keys](origin_keys)
-- [origin settings](origin_settings)
-- [origin role-based access control](rbac)
+- [Origin keys](origin_keys)
+- [Origin settings](origin_settings)
+- [Origin role-based access control](rbac)
 
 ## More information
 
-- [Habitat packages documentation](../packages/)
+- [Manage packages in on-prem Habitat Builder](../packages/)
+- [Habitat packages](../packages/)

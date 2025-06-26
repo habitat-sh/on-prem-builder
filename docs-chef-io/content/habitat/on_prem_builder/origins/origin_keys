@@ -6,38 +6,38 @@ title = "Habitat origin keys"
     title = "Origin keys"
     identifier = "habitat/on-prem-builder/origins/keys"
     parent = "habitat/on-prem-builder/origins"
-    weight = 10
+    weight = 30
 +++
 
-When you create an origin, Chef Habitat Builder automatically generates _origin keys_.
+When you create an origin, Chef Habitat On-prem Builder automatically generates _origin keys_.
 Origin key cryptography is asymmetric: it has a public origin key that you can distribute freely, and a private origin key that you should distribute only to users belonging to the origin.
 
 Chef Habitat uses origin keys in the following ways:
 
 - When you build an artifact in your local environment, Chef Habitat signs the artifact with a public key.
-- When you upload an artifact to Chef Habitat Builder or Builder on-prem, Chef Habitat verifies that the artifact was signed with its public key.
+- When you upload an artifact to Chef Habitat On-prem Builder, Chef Habitat verifies that the artifact was signed with its public key.
 - When you install an artifact on a Chef Habitat Supervisor, Chef Habitat uses the public origin key to authorize the artifact's installation; Chef Habitat only installs artifacts for which it has the public origin key.
 - When you download an artifact to your local environment, Chef Habitat uses the public origin key to verify the artifact's integrity before it starts the installation.
 
 ## Prerequisites
 
 - [Download and installed the Chef Habitat CLI](/habitat/install_habitat/).
-- [Create a Chef Habitat Builder account](/habitat/builder_account/).
+- [Create a Chef Habitat On-prem Builder account](/habitat/builder_account/).
 - [Generate a personal access token](/habitat/builder_profile/#create-a-personal-access-token).
 - [Create an origin with `hab origin create` or join an origin by invitation](../create_an_origin).
 
 ## Key access
 
-All Chef Habitat Builder users with access to the origin can view the origin public key revisions in the origin key tab (Builder > Origin > Keys) and download the origin public key, but only users with the origin 'administrator' or 'owner' roles can view or download the origin private key, or change the origin key pair.
+All Chef Habitat On-prem Builder users with access to the origin can view the origin public key revisions in the origin key tab (**Builder** > **Origin** > **Keys**) and download the origin public key, but only origin members with the administrator or owner roles can view or download the origin private key, or change the origin key pair.
 
 | Keys Actions | Read-Only | Member | Maintainer | Administrator | Owner |
 |---------|-------|-------|-------|-------|-------|
 | View keys | Y | Y | Y | Y | Y |
 | Add/Update/Delete keys | N | N | N | Y | Y |
 
-## Key format
+## Key filename format
 
-Chef Habitat Builder origin keys use the following format:
+Chef Habitat On-prem Builder origin keys use the following format:
 
 - Public key: `<ORIGIN>-<DATETIME>.pub`
 - Private key or signing key: `<ORIGIN>-<DATETIME>.sig.key`
@@ -49,35 +49,31 @@ testorigin-20190416223046.pub
 testorigin-20190416223046.sig.key
 ```
 
-- "testorigin" is the origin's name
-- "20190416223046" is the date and time of the key's creation, which was 2019-04-16 22:30:46.
-- `.pub` is the file extension for the public key
-- `.sig.key` is the file extension for the private key, which is also called a "signing key"
+- `testorigin` is the origin's name.
+- `20190416223046` is the date and time of the key's creation, which was 2019-04-16 22:30:46.
+- `.pub` is the file extension for the public key.
+- `.sig.key` is the file extension for the private key, which is also called a signing key.
 
 ## Get origin keys
 
-When you create an origin, Chef Habitat Builder automatically generates an origin key pair and saves both keys. To view an origin's keys on Chef Habitat Builder, navigate to the origin and select **Keys**.
+When you create an origin, Chef Habitat On-prem Builder automatically generates an origin key pair and saves both keys. To view an origin's keys on Chef Habitat On-prem Builder, navigate to the origin and select **Keys**.
 Anyone can view and download an origin's public keys, but only origin owners and administrators can view or download an origin private key, or change the origin key pair.
 
 ![Viewing your origin keys](/images/habitat/origin-keys.png)
 
 ### Download origin keys
 
-Download your private or public origin key by selecting the **download** icon from the right end of the key details, under the _Actions_ heading.
-
-![Detail of the download icon](/images/habitat/origin-key-download.png)
+To download your private or public origin key, select {{< icons class="material-symbols-outlined icon-filled" icon="download_2" >}} **Download this key** under the **Actions** heading.
 
 ### Upload origin keys
 
-You can upload origin keys that you generate on the command line to Chef Habitat Builder by selecting either the **Upload a private key** or **Upload a public key** icon, and copy your key into the form that appears.
+To upload a public or private origin key in Chef Habitat On-prem Builder, select either **Upload a private key** or **Upload a public key** and paste your key into the dialog box that appears.
 
-![Example form content for uploading an origin key in Builder](/images/habitat/builder-key-upload.png)
-
-## Managing origin keys with the CLI
+## Manage origin keys with the CLI
 
 Run Chef Habitat CLI commands from your local environment or from within the Chef Habitat Studio.
 
-See the CLI documentation for more information on the [`hab origin key`](/habitat/habitat_cli/#hab-origin-key) commands.
+For more information, see the [`hab origin key` CLI documentation](/habitat/habitat_cli/#hab-origin-key).
 
 ### Find your local origin keys
 
@@ -113,14 +109,14 @@ ls -la /hab/cache/keys
 
 ### Generate origin keys with the CLI
 
-When you create an origin through the site, Chef Habitat Builder automatically generates an origin key pair.
+When you create an origin in Chef Habitat On-prem Builder, Builder automatically generates an origin key pair.
 
 The Chef Habitat CLI creates origin key pairs through two different commands, for two different uses:
 
-- Use [`hab setup`](/habitat/hab_setup/) to generate your first origin key pair as part of setting up the `hab` CLI
-- Use the `hab origin key generate <ORIGIN> ` command to create an key pair for an origin created with the `hab origin create` command
+- Use [`hab setup`](/habitat/hab_setup/) to generate your first origin key pair as part of setting up the `hab` CLI.
+- Use the `hab origin key generate` command to create an key pair for an origin created with the `hab origin create` command
 
-Create origin keys with the `hab` command:
+To create an origin key with the `hab` CLI, run the [`hab origin key generate` command](/habitat/habitat_cli/#hab-origin-key-generate):
 
 ```shell
 hab origin key generate <ORIGIN>
@@ -128,7 +124,7 @@ hab origin key generate <ORIGIN>
 
 ### Download origin keys with the CLI
 
-To get your public origin key using the command line, use:
+To download your public origin key using the command line, use [`hab origin key download` command](/habitat/habitat_cli/#hab-origin-key-download):
 
 ```shell
 hab origin key download <ORIGIN>
@@ -136,13 +132,13 @@ hab origin key download <ORIGIN>
 
 ### Upload origin keys with the CLI
 
-Creating an origin with the `hab origin create` command registers the origin on Chef Habitat Builder without creating an origin key pair. The `hab origin key generate` command creates the key pair and saves them in your local environment, but it does not upload either origin key to Chef Habitat Builder.
+Creating an origin with the `hab origin create` command registers the origin on Chef Habitat On-prem Builder without creating an origin key pair. The `hab origin key generate` command creates the key pair and saves them in your local environment, but it does not upload either origin key to Chef Habitat On-prem Builder.
 
-- Only "administrators" and "owners" can upload new keys to an origin.
-- Builder requires the public origin key to upload artifacts for that origin, so you'll need to upload it.
-- Builder requires the private origin key to enable new artifact builds from packages with plans linked to that origin.
+- Only origin members with the administrator and owner roles can upload new keys to an origin.
+- Habitat On-prem Builder requires the public origin key to upload artifacts for that origin, so you'll need to upload it.
+- Habitat On-prem Builder requires the private origin key to enable new artifact builds from packages with plans linked to that origin.
 
-Upload origin keys with the `hab` command:
+Upload origin keys with the [`hab origin key upload` command](/habitat/habitat_cli/#hab-origin-key-upload):
 
 ```shell
 hab origin key upload <ORIGIN>
@@ -162,10 +158,10 @@ hab origin key upload  --secfile <PATH_TO_PRIVATE_KEY> --pubfile <PATH_TO_PUBLIC
 
 ### Import origin keys with the CLI
 
-Use `hab origin key import` to read the key from a standard input stream into Chef Habitat Builder:
+Use [`hab origin key import`](/habitat/habitat_cli/#hab-origin-key-import) to read the key from a standard input stream into Chef Habitat On-prem Builder:
 
 ```shell
-hab origin key import <enter or paste key>
+hab origin key import <KEY_STRING>
 hab origin key import <PATH_TO_KEY>
 curl <URL_THAT_RETURNS_KEY> | hab origin key import
 ```
