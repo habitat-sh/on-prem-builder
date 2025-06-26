@@ -6,47 +6,49 @@ title = "Create an origin"
     title = "Create an origin"
     identifier = "habitat/on-prem-builder/origins/overview"
     parent = "habitat/on-prem-builder/origins"
-    weight = 10
+    weight = 20
 +++
 
-You can create origins in an on-prem Habitat Builder deployment.
+You can create origins in a private Habitat Builder deployment using either the Habitat Builder UI or the `hab` CLI.
 [Chef's public Habitat Builder](https://bldr.habitat.sh) doesn't support creating new origins.
 
 ## Create an origin in Chef Habitat Builder
 
-To create an origin in Chef Habitat Builder, follow these steps:
+To create an origin in your Chef Habitat Builder deployment, follow these steps:
 
 1. In Habitat Builder, select **My Origins** in the left navigation menu.
 
-1. On the **My Origins** page, select **Create origin** which opens the **Create New Origin** form.
+1. On the **My Origins** page, select **Create origin** to open the **Create New Origin** form.
 
-1. Enter a unique name that you want to associate with your packages.  Chef Habitat will only let you create an origin with a unique name. Some examples that you'll see in Chef Habitat Builder are team names, user names, and abstract concepts.
+1. Enter a unique name for your origin. Chef Habitat requires origin names to be unique. Examples of origin names include team names, user names, or abstract concepts.
 
-1. Choose a privacy setting to set as the default for new packages. You can override this setting when uploading individual packages from the CLI or by connecting a plan file that declares a package as private.
+1. Choose a default privacy setting for new packages. You can override this setting when uploading individual packages from the CLI or by connecting a plan file that declares a package as private.
 
    The difference between public and private packages is:
 
-   - Anyone can find and use public packages.
-   - Only users with origin membership can find and use private packages.
+   - Public packages are visible to and usable by anyone.
+   - Private packages are visible to and usable only by users with origin membership.
 
-1. Select **Save and Continue**
+1. Select **Save and Continue**.
 
-    Habitat Builder does the following:
+   Habitat Builder performs the following actions:
 
-    - Creates your origin.
-    - Creates an [origin key pair](../origin_keys).
-    - Redirects Chef Habitat Builder to the origin page.
+   - Creates your origin.
+   - Creates an [origin key pair](../origin_keys).
+   - Redirects you to the origin page.
 
    ![Origin successfully created](/images/habitat/create-origin-done.png)
 
 ## Create an origin with the Chef Habitat CLI
 
-To create an origin with the hab CLI, use the [`hab origin create`](/habitat/habitat_cli/#hab-origin-create) command. For example:
+Before you create an origin, make sure your [workstation is configured](../../install/workstation) to connect to your private Habitat Builder deployment.
+
+To create an origin with the `hab` CLI, use the [`hab origin create`](/habitat/habitat_cli/#hab-origin-create) command. For example:
 
 - ```bash
   hab origin create <ORIGIN>
   ```
 
-  Habitat creates an origin on the Chef Habitat Builder site.
+This command creates an origin on the Chef Habitat Builder site.
 
-To create key pair for your origin, see the [origin keys](../origin-keys) documentation.
+To create a key pair for your origin, see the [origin keys](../origin_keys) documentation.
