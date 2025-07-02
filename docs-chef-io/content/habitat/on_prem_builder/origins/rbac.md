@@ -16,14 +16,46 @@ When you join an origin, Chef Habitat Builder assigns you the _read-only_ role, 
 ## Prerequisites
 
 - [Download and install the Chef Habitat CLI](/habitat/install_habitat/)
-- [Create a Chef Habitat Builder account]()
-- [Generate a personal access token]()
+- A Chef Habitat On-Prem Builder account
+- A personal access token for On-Prem Builder
 - [Create an origin](../create_an_origin) or accept an invitation to an existing origin
 - [Get origin keys](../origin_keys)
 
 ## Origin roles
 
 Chef Habitat Builder has the following origin roles and permissions:
+
+Read-Only
+
+- Can view packages, channels, origin membership, invitations, member roles, settings, and integrations.
+- Can't upload, promote, or modify packages, channels, keys, settings, or integrations.
+- Can't manage origin membership, roles, or secrets.
+
+Member
+
+- Inherits all Read-Only permissions.
+- Can upload packages to the unstable channel and trigger build jobs in unstable.
+- Can't promote packages or modify channels, keys, settings, or integrations.
+- Can't manage origin membership, roles, or secrets.
+
+Maintainer
+
+- Inherits all Member permissions.
+- Can promote packages, add/update/delete channels, and manage integrations.
+- Can't manage origin keys, membership roles, or secrets.
+
+Administrator
+
+- Inherits all Maintainer permissions.
+- Can manage origin keys, membership roles, and secrets.
+- Can't transfer or delete the origin.
+
+Owner
+
+- Has full permissions, including the ability to transfer or delete the origin.
+- Can perform all actions available to Administrators and more.
+
+Also, see the following table of role permissions:
 
 | Action                           | Read-Only | Member | Maintainer | Administrator | Owner |
 | -------------------------------- | --------- | ------ | ---------- | ------------- | ----- |

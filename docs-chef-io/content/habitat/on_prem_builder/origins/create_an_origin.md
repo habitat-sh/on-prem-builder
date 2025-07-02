@@ -4,7 +4,7 @@ title = "Create an origin"
 [menu]
   [menu.habitat]
     title = "Create an origin"
-    identifier = "habitat/on-prem-builder/origins/overview"
+    identifier = "habitat/on-prem-builder/origins/create"
     parent = "habitat/on-prem-builder/origins"
     weight = 20
 +++
