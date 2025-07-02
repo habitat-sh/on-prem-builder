@@ -31,9 +31,6 @@ Chef Habitat Builder has the following origin roles and permissions:
 | View packages                    | Y         | Y      | Y          | Y             | Y     |
 | Upload packages to `unstable`    | N         | Y      | Y          | Y             | Y     |
 | Promote packages from `unstable` | N         | N      | Y          | Y             | Y     |
-| **Build Jobs**                   |           |        |            |               |       |
-| View build jobs                  | Y         | Y      | Y          | Y             | Y     |
-| Trigger `unstable` build job     | N         | Y      | Y          | Y             | Y     |
 | **Channels**                     |           |        |            |               |       |
 | View channels                    | Y         | Y      | Y          | Y             | Y     |
 | Add/Update/Delete channels       | N         | N      | Y          | Y             | Y     |
