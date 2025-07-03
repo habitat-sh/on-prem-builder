@@ -1,6 +1,16 @@
-# builder.env
++++
+title = "Example builder.env configuration file"
 
-An example Chef Habitat Builder configuration file.
+[menu]
+  [menu.habitat]
+    title = "Example builder.env config file"
+    identifier = "habitat/on-prem-builder/configure/builder.env"
+    parent = "habitat/on-prem-builder/configure"
+    weight = 20
++++
+
+This is an example of the Chef Habitat On-Prem Builder `builder.env` configuration file.
+Also, see the [`builder.env.sample` file](https://github.com/habitat-sh/on-prem-builder/blob/main/bldr.env.sample) in the on-prem-builder repository.
 
 ```shell
 #!/bin/bash
@@ -10,14 +20,14 @@ An example Chef Habitat Builder configuration file.
 export POSTGRES_HOST=localhost
 export POSTGRES_PORT=5432
 
-# The endpoint, key and secret for your Minio instance (see README)
+# The endpoint, key and secret for your MinIO instance (see README)
 # Change these before the first install if needed
 export MINIO_ENDPOINT=http://localhost:9000
 export MINIO_BUCKET=habitat-builder-artifact-store.local
 export MINIO_ACCESS_KEY=depot
 export MINIO_SECRET_KEY=password
 
-# If you'd like to use Artifactory instead of Minio, uncomment
+# If you'd like to use Artifactory instead of MinIO, uncomment
 # and set the following variables appropriately.
 # IMPORTANT: See the README for more info
 # export ARTIFACTORY_ENABLED=true
