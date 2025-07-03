@@ -23,7 +23,7 @@ If you don't already have a token, generate one:
 
 ## Add a license key
 
-You can enter your license key just below the **Personal Access Token** field so you can access official Chef-maintained packages.
+In [Chef Habitat SaaS Builder](https://bldr.habitat.sh), you must have a Progress Chef license key in your [Builder profile](/habitat/builder_profile/) so you can access official Chef-maintained packages.
 
 ## Enable native package support
 
