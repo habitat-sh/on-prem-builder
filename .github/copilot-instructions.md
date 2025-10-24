@@ -108,9 +108,14 @@ When prompted to create a PR for changes:
    gh pr create --title "<JIRA-ID>: <descriptive title>" --body "<PR_DESCRIPTION>" --head <JIRA-ID>
    ```
 
-5. **Add Label**: Add the required test label to the PR
+5. **Add Labels**: Add the required labels to the PR
    ```bash
-   gh pr edit <JIRA-ID> --add-label "runtest:all:stable"
+   gh pr edit <JIRA-ID> --add-label "runtest:all:stable,ai-assisted"
+   ```
+
+6. **Create AI-Assisted Label** (if it doesn't exist): Create the ai-assisted label
+   ```bash
+   gh label create "ai-assisted" --color "9A4DFF" --description "Work completed with AI assistance following Progress AI policies" --force
    ```
 
 ### PR Description Format
@@ -137,6 +142,9 @@ The PR description must be formatted using HTML tags and should include:
   <li>Coverage maintained above 80%</li>
   <li>All existing tests pass</li>
 </ul>
+
+<h2>AI Assistance</h2>
+<p>This work was completed with AI assistance following Progress AI policies</p>
 
 <h2>Checklist</h2>
 <ul>
@@ -191,8 +199,9 @@ When implementing a task, follow this comprehensive workflow:
 2. **Commit Changes**: Commit with descriptive messages
 3. **Push Branch**: Push to remote repository
 4. **Create PR**: Use GitHub CLI to create pull request
-5. **Add Labels**: Add "runtest:all:stable" label
-6. **Final Summary**: Provide complete summary of all changes made
+5. **Add Labels**: Add "runtest:all:stable" and "ai-assisted" labels
+6. **Update JIRA Ticket**: Use atlassian-mcp-server to update the JIRA ticket with AI assistance field
+7. **Final Summary**: Provide complete summary of all changes made
 
 ## Project-Specific Guidelines
 
@@ -241,6 +250,27 @@ When implementing a task, follow this comprehensive workflow:
 5. **Do not merge** without proper code review process
 6. **Do not ignore** test failures or coverage drops
 
+## JIRA Ticket Updates
+
+### Mandatory JIRA Field Update
+
+After successfully creating a PR, you must update the JIRA ticket to indicate AI assistance was used:
+
+1. **Update AI Assistance Field**: Use the atlassian-mcp-server to update the custom field
+   ```
+   Field: customfield_11170 ("Does this Work Include AI Assisted Code?")
+   Value: "Yes"
+   Format: {"customfield_11170": {"value": "Yes"}}
+   ```
+
+2. **Verify Update**: Confirm the field update was successful by checking the ticket
+
+3. **Critical Requirements**:
+   - This step is **MANDATORY** for all tasks involving Jira tickets
+   - Must be completed after PR creation is successful
+   - Use the exact field format specified above
+   - Verify the update was applied correctly
+
 ## Success Criteria
 
 Before considering any task complete:
@@ -253,6 +283,7 @@ Before considering any task complete:
 - [ ] No security vulnerabilities introduced
 - [ ] Changes are committed with descriptive messages
 - [ ] Pull request is created with proper description and labels
+- [ ] JIRA ticket updated with AI assistance field (if Jira ID provided)
 - [ ] User has confirmed completion of each phase
 
 ## Notes
