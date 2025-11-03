@@ -19,7 +19,7 @@ Before you begin, review the [Habitat Builder system requirements](system_requir
 
 To deploy Habitat On-Prem Builder, use the following guide:
 
-- [Install Habitat On-Prem Builder authenticating with another OAuth service](builder-oauth)
+- [Install Habitat On-Prem Builder authenticating with another OAuth service](builder_oauth)
 
 ## Workstation configuration
 
