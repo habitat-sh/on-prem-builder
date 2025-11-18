@@ -17,17 +17,17 @@ If for any reason, you end up in a state where packages were bulk uploaded and p
 Install this package with:
 
 ```
-sudo hab pkg install habitat/pkg-sync --channel LTS-2024
+sudo hab pkg install habitat/pkg-sync
 ```
 
 Examples:
 
 Note that the public builder tokens used in the examples below must be associated with a valid license key. See [these instructions](../on-prem-docs/bootstrap-core.md#add-a-license-key) on entering a license key.
 
-Sync all the latest core LTS-2024 packages that you do not already have from the public builder and upload them to your on-prem builder instance.
+Sync all the latest core base packages that you do not already have from the public builder and upload them to your on-prem builder instance.
 
 ```
-hab pkg exec habitat/pkg-sync pkg-sync --bldr-url https://your-builder.tld --origin core --channel LTS-2024 --public-builder-token <your_public_Builder_instance_token> --private-builder-token <your_private_Builder_instance_token>
+hab pkg exec habitat/pkg-sync pkg-sync --bldr-url https://your-builder.tld --origin core --channel base --public-builder-token <your_public_Builder_instance_token> --private-builder-token <your_private_Builder_instance_token>
 ```
 
 Sync all the latest stable habitat release packages from the public builder and upload them to your on-prem builder instance.
@@ -56,14 +56,14 @@ export HAB_AUTH_TOKEN=<your_on-prem_Builder_instance_token>
 hab pkg bulkupload --url https://your-builder.tld --channel stable --auto-create-origins builder_bootstrap/
 ```
 
-Promote packages that are in the LTS-2024 channel on the SAAS builder to that same channel on your local on-prem builder instance:
+Promote packages that are in the base channel on the SAAS builder to that same channel on your local on-prem builder instance:
 
 ```
-# Generate a list of all the latest LTS-2024 package identifiers
-hab pkg exec habitat/pkg-sync pkg-sync --channel LTS-2024 --origin core --generate-airgap-list --public-builder-token <your_public_Builder_instance_token>
-# Provide that list to --idents-to-promote so that any of those packages that exist on an on-prem instance are demoted from all non-unstable channels and promoted to LTS-2024
-hab pkg exec habitat/pkg-sync pkg-sync --bldr-url https://your-builder.tld --channel LTS-2024 --private-builder-token <your_private_Builder_instance_token> --idents-to-promote package_list_x86_64-linux.txt
-hab pkg exec habitat/pkg-sync pkg-sync --bldr-url https://your-builder.tld --channel LTS-2024 --private-builder-token <your_private_Builder_instance_token> --idents-to-promote package_list_x86_64-windows.txt
+# Generate a list of all the latest base package identifiers
+hab pkg exec habitat/pkg-sync pkg-sync --channel base --origin core --generate-airgap-list --public-builder-token <your_public_Builder_instance_token>
+# Provide that list to --idents-to-promote so that any of those packages that exist on an on-prem instance are demoted from all non-unstable channels and promoted to base
+hab pkg exec habitat/pkg-sync pkg-sync --bldr-url https://your-builder.tld --channel base --private-builder-token <your_private_Builder_instance_token> --idents-to-promote package_list_x86_64-linux.txt
+hab pkg exec habitat/pkg-sync pkg-sync --bldr-url https://your-builder.tld --channel base --private-builder-token <your_private_Builder_instance_token> --idents-to-promote package_list_x86_64-windows.txt
 ```
 
 Note that the public builder tokens used in the examples below must be associated with a valid license key. See [these instructions](on-prem-docs/bootstrap-core.md#add-a-license-key) on entering a license key.
