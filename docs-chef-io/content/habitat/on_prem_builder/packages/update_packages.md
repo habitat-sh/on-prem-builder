@@ -14,9 +14,8 @@ This document lays out the steps to take in order to perform such an update.
 
 ## Enable native package support
 
-Chef Habitat and other Chef products are moving to long-term support (LTS) channels.
-Some of the new LTS-supported packages include native packages.
-To host LTS packages, you need to configure Habitat On-Prem Builder to allow native package support.
+Some new low level `core` origin packages include `native` packages.
+To host these packages, you need to configure Habitat On-Prem Builder to allow native package support.
 
 To enable native package support, follow this step:
 
@@ -45,7 +44,7 @@ Before you begin, you will need your [personal access token](https://bldr.habita
 1. Install the `habitat/pkg-sync` package.
 
     ```bash
-    sudo hab pkg install habitat/pkg-sync --channel LTS-2024
+    sudo hab pkg install habitat/pkg-sync
     ```
 
 1. Sync packages from the public Habitat Builder to your Habitat On-Prem Builder deployment:
@@ -73,7 +72,7 @@ Follow these steps to refresh an airgapped On-Prem Builder with the latest stabl
 1. On an internet connected machine, install the `habitat/pkg-sync` package:
 
     ```sh
-    sudo hab pkg install habitat/pkg-sync --channel LTS-2024
+    sudo hab pkg install habitat/pkg-sync
     ```
 
 1. Use `pkg-sync` to generate a list of packages and download packages from the public Habitat Builder:

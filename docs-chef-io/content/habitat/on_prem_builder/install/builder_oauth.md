@@ -98,7 +98,7 @@ With an internet-connected computer, follow these steps:
 1. Create the Habitat Builder package bundle from the Builder seed lists and download the packages:
 
     ```bash
-    sudo hab pkg install habitat/pkg-sync --channel LTS-2024
+    sudo hab pkg install habitat/pkg-sync
 
     export DOWNLOAD_DIR=/path/to/download/directory
 

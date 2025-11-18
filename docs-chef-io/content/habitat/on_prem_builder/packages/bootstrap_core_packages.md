@@ -27,8 +27,8 @@ In [Chef Habitat SaaS Builder](https://bldr.habitat.sh), you must have a Progres
 
 ## Enable native package support
 
-Some new LTS-supported packages include `native` packages.
-To host LTS packages, you must configure your Habitat Builder deployment to allow native package support.
+Some new low level `core` origin packages include `native` packages.
+To host these packages, you must configure your Habitat Builder deployment to allow native package support.
 Enable the `nativepackages` feature and specify `core` as an allowed native package origin.
 Edit your On-Prem Builder's `/hab/user/builder-api/config/user.toml` file so the `[api]` section looks like this:
 
@@ -49,7 +49,7 @@ This package downloads packages from the public [SaaS Builder](https://bldr.habi
 To bootstrap Habitat On-Prem Builder with a full set of stable core packages, run:
 
 ```bash
-sudo hab pkg install habitat/pkg-sync --channel LTS-2024
+sudo hab pkg install habitat/pkg-sync
 
 hab pkg exec habitat/pkg-sync pkg-sync \
   --bldr-url <PRIVATE_BUILDER_URL> \
@@ -71,7 +71,7 @@ To bootstrap an airgapped On-Prem Builder with stable core packages, follow thes
 1. Download the `habitat/pkg-sync` package on a machine with internet access:
 
    ```bash
-   sudo hab pkg install habitat/pkg-sync --channel LTS-2024
+   sudo hab pkg install habitat/pkg-sync
    ```
 
 1. Generate a list of packages to download:
