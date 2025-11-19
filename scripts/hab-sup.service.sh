@@ -19,6 +19,12 @@ if [ ! -z "$HAB_BLDR_URL" ]; then
   environment_proxy="${environment_proxy}
 Environment=\"HAB_BLDR_URL=${HAB_BLDR_URL}\""
 fi
+if [ ! -z "$HAB_AUTH_TOKEN" ]; then
+  environment_proxy="${environment_proxy}
+Environment=\"HAB_AUTH_TOKEN=${HAB_AUTH_TOKEN}\""
+else
+  echo "WARNING: HAB_AUTH_TOKEN is not set. Some operations may require authentication." >&2
+fi
 if [ ! -z "$NO_PROXY" ]; then
   environment_proxy="${environment_proxy}
 Environment=\"NO_PROXY=${NO_PROXY}\""
