@@ -378,7 +378,7 @@ sudo hab pkg install <hart file>
 
 ---
 
-## Troubleshooting
+## Troubleshooting 
 
 ### Common Issues & Solutions
 
