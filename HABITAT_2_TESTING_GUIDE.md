@@ -310,18 +310,41 @@ sudo hab origin key generate test
 
 # Build using Habitat 2.0 with base channel
 sudo -E  hab pkg build .
-# MAke a note of the hart file generated at the end of the successful build.
+# Make a note of the hart file generated at the end of the successful build.
 ```
 
-#### 4. Upload to on prem bldr
+#### 4. Create Origin at the On Prem Builder (If not already done)
+
+Custom Builder instances don't auto-create origins. 
+If the origin doesn't already exist, you need to manually create the origin and upload your keys first.
+
+```bash
+# 1. Create the origin on your custom Builder
+sudo -E hab origin create test
+
+# 3. Upload your public origin key
+sudo -E hab origin key upload test
+```
+
+#### 5. Upload to on prem bldr
 
 ```bash
 sudo -E hab pkg upload <HART_FILE>
+# Make a note of the CUSTOM_PKG_IDENT that gets uploaded.
+# By default , the package gets uploaded onto the unstable channel.
 ```
 
 ### On a environment with supervisor running (Production Supervisor Environment with Habitat 2.0)
 
 #### Update the systemd service to connect to on prem builder
+
+Create the hab user:
+
+```bash
+sudo groupadd hab
+sudo useradd -g hab hab
+```
+
 Create the systemd service file:
 
 ```bash
@@ -340,7 +363,7 @@ KillMode=mixed
 KillSignal=SIGINT
 TimeoutStartSec=120
 TimeoutStopSec=60
-Environment=HAB_BLDR_URL=http://ec2-13-235-103-18.ap-south-1.compute.amazonaws.com
+Environment=HAB_BLDR_URL=https://your-builder.example.com
 
 [Install]
 WantedBy=multi-user.target
@@ -375,7 +398,12 @@ sudo hab svc status
 #### Load the package
 
 ```bash
-hab svc load <CUSTOM_PKG_IDENT>
+# Set the Builder URL
+export HAB_BLDR_URL=https://your-builder.example.com
+
+# Load the service
+sudo -E hab svc load <CUSTOM_PKG_IDENT> --channel <CHANNEL_ON_WHICH_THE_PKG_WAS_UPLOADED>
+# sudo -E hab svc load test/test-service --channel unstable
 ```
 
 #### Verification
