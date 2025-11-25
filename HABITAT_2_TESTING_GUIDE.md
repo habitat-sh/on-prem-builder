@@ -109,7 +109,7 @@ sudo hab pkg install habitat/pkg-sync
 ```
 
 ### Step 3: Enable native package support
-The habitat packages are now built with updated dependencies from the `base-2025` channel instead of the `stable` channel. 
+The habitat packages are now built with updated dependencies from the `base` channel instead of the `stable` channel. 
 Some of these package dependencies include `native` packages. 
 In order for an on-prem builder instance to host the latest released habitat packages including these native package dependencies, 
 that builder instance must be configured to allow native package support. 
@@ -290,10 +290,10 @@ sudo hab origin key generate test
 # 4. Set env
 export HAB_ORIGIN=test
 
-#Required for private packages
+# Required for private packages
 export HAB_AUTH_TOKEN=<your private bldr token> 
 
-# 5. Build using Habitat 2.0 with base-2025 channel
+# 5. Build using Habitat 2.0 with base channel
 sudo -E  hab pkg build .
 
 # 6. Upload to on prem bldr
