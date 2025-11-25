@@ -123,11 +123,6 @@ targets = ["x86_64-linux", "aarch64-linux", "x86_64-windows"]
 allowed_native_package_origins = ["core"]
 ```
 
-# Restart builder-api service to apply changes
-```bash
-sudo systemctl daemon-reload
-```
-
 ### Step 4: Sync Base Core Packages
 
 ```bash
@@ -209,8 +204,6 @@ sudo hab svc status
 ```
 ---
 
-**Note:** The doc has not been tested from this point onwards.
-
 ## Scenario 4: Workstation Setup (Including ARM64)
 
 **Objective:** Install habitat on a workstation (Linux ARM, x86_64, or Windows) and run Habitat applications
@@ -231,7 +224,7 @@ Follow the installation steps from **Scenario 3** based on your workstation arch
 
 ```bash
 # Point to your on-prem builder
-export HAB_BLDR_URL=https://your-builder.example.com/bldr/v1/
+export HAB_BLDR_URL=https://your-builder.example.com
 
 # Set authentication token
 export HAB_AUTH_TOKEN=<ON_PREM_BUILDER_TOKEN>
@@ -244,7 +237,7 @@ export SSL_CERT_FILE=/path/to/ssl-certificate.crt
 
 ```bash
 # Test installing a package from your on-prem builder
-hab pkg install core/curl
+sudo -E hab pkg install core/curl
 
 # Verify installation
 hab pkg path core/curl
@@ -258,56 +251,135 @@ hab pkg path core/curl
 
 This scenario tests building custom packages with Habitat 2.0 dependencies:
 
-### On the On Prem Builder Instance
+### On the Workstation
 
-Run the following command on the system with On Prem Builder Setup:
+Run the following command on the Workstation
+
+#### 1. Create a test plan 
 
 ```bash
-# 1. Create a test plan that uses base-2025 dependencies
+# 1. Create a test plan that uses base dependencies
 mkdir test-package
 cd test-package
 
-# 2. Create plan.sh with base-2025 deps
+# 2. Create plan.sh with base deps
 cat > plan.sh << 'EOF'
-pkg_name=test-package
+pkg_name=test-service
 pkg_origin=test
 pkg_version="1.0.0"
-pkg_deps=(core/glibc)
-pkg_build_deps=(core/gcc)
+pkg_maintainer="Test User <test@company.com>"
+pkg_license=('Apache-2.0')
+pkg_description="Test service for Habitat 2.0 - Cross Platform"
+
+# Cross-platform dependency
+pkg_deps=(
+  core/python
+)
+
+# Platform-agnostic service using Python HTTP server
+pkg_svc_run="python -m http.server 8080"
 
 do_build() {
-  echo "Building with Habitat 2.0 base deps"
+  return 0
 }
 
 do_install() {
-  echo "Installing test package"
+  return 0
 }
 EOF
-
-# 3. One time command to generate the public key at ~/.hab/cache/keys
-sudo hab origin key generate test
-
-# 4. Set env
-export HAB_ORIGIN=test
-
-# Required for private packages
-export HAB_AUTH_TOKEN=<your private bldr token> 
-
-# 5. Build using Habitat 2.0 with base channel
-sudo -E  hab pkg build .
-
-# 6. Upload to on prem bldr
-sudo -E hab pkg upload <PKG_IDENT>
 ```
 
-### On the workstation
-
-Run the following command on the Workstation:
+#### 2. Set env
 
 ```bash
-# Download the package inside the workstation
-sudo -E hab pkg install <PKG_IDENT>
+export HAB_ORIGIN=test
+
+# Point to your on-prem builder
+export HAB_BLDR_URL=https://your-builder.example.com
+
+# Set authentication token
+export HAB_AUTH_TOKEN=<ON_PREM_BUILDER_TOKEN>
 ```
+
+#### 3. Build package
+
+```bash
+# One time command to generate the public key at ~/.hab/cache/keys
+sudo hab origin key generate test
+
+
+# Build using Habitat 2.0 with base channel
+sudo -E  hab pkg build .
+# MAke a note of the hart file generated at the end of the successful build.
+```
+
+#### 4. Upload to on prem bldr
+
+```bash
+sudo -E hab pkg upload <HART_FILE>
+```
+
+### On a environment with supervisor running (Production Supervisor Environment with Habitat 2.0)
+
+#### Update the systemd service to connect to on prem builder
+Create the systemd service file:
+
+```bash
+sudo tee /etc/systemd/system/hab-sup.service > /dev/null <<EOF
+[Unit]
+Description=The Habitat Supervisor
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=$(which hab) sup run
+Restart=on-failure
+RestartSec=10
+KillMode=mixed
+KillSignal=SIGINT
+TimeoutStartSec=120
+TimeoutStopSec=60
+Environment=HAB_BLDR_URL=http://ec2-13-235-103-18.ap-south-1.compute.amazonaws.com
+
+[Install]
+WantedBy=multi-user.target
+EOF
+```
+
+Enable and start the service:
+
+```bash
+# Reload systemd configuration
+sudo systemctl daemon-reload
+
+# Enable the service
+sudo systemctl enable hab-sup
+
+# Start the service
+sudo systemctl start hab-sup
+sleep 10
+
+# Verify service is running
+sudo systemctl status hab-sup
+
+# Check supervisor is accessible
+sudo hab svc status
+```
+
+#### Verification
+
+- **Linux**: `sudo systemctl status hab-sup` shows active/running
+- **Windows**: `Get-Service habitat` shows running services
+
+#### Load the package
+
+```bash
+hab svc load <CUSTOM_PKG_IDENT>
+```
+
+#### Verification
+`sudo hab svc status` shows the custom service up and running.
 
 ---
 
