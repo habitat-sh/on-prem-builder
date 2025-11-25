@@ -241,7 +241,7 @@ func executeCommand(command string, args ...string) error {
 }
 
 func sync(packageList PackageList, origin, channel, bldrURL, privateToken, publicToken string, localPackages []string, generateListOnly bool) error {
-	for _, target := range []string{"x86_64-linux", "x86_64-windows"} {
+	for _, target := range []string{"x86_64-linux", "x86_64-windows", "aarch64-linux"} {
 		var latestPackages []string
 		var err error
 
