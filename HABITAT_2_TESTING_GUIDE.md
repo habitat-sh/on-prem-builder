@@ -7,7 +7,7 @@ This guide provides step-by-step instructions for Testing of Habitat 2.0 RC buil
 
 ## Prerequisites
 
-Before starting CFT testing, ensure you have:
+Before starting the testing, ensure you have:
 
 - [ ] Linux x86_64 system (minimum: 2 CPUs, 4GB RAM, 100GB disk)
 - [ ] Valid Progress Chef license key for Habitat 2.0
@@ -121,7 +121,6 @@ To do this, an on-prem builder's `/hab/user/builder-api/config/user.toml` file s
 features_enabled = "nativepackages"
 targets = ["x86_64-linux", "aarch64-linux", "x86_64-windows"]
 allowed_native_package_origins = ["core"]
-EOF
 ```
 
 # Restart builder-api service to apply changes
@@ -251,7 +250,7 @@ hab pkg install core/curl
 hab pkg path core/curl
 ```
 
---
+---
 
 ## Scenario 5: Custom Package Development
 
@@ -285,26 +284,25 @@ do_install() {
 }
 EOF
 
-# 4. One time command to generate the public key at ~/.hab/cache/keys
+# 3. One time command to generate the public key at ~/.hab/cache/keys
 sudo hab origin key generate test
 
-# 5. Set env
+# 4. Set env
 export HAB_ORIGIN=test
 
 #Required for private packages
 export HAB_AUTH_TOKEN=<your private bldr token> 
 
-
-# 3. Build using Habitat 2.0 with base-2025 channel
+# 5. Build using Habitat 2.0 with base-2025 channel
 sudo -E  hab pkg build .
 
-#4 Upload to on prem bldr
+# 6. Upload to on prem bldr
 sudo -E hab pkg upload <PKG_IDENT>
 ```
 
 ### On the workstation
 
-Run the followong command on the Workstation:
+Run the following command on the Workstation:
 
 ```bash
 # Download the package inside the workstation
