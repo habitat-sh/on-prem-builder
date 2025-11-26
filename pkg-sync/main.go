@@ -285,8 +285,8 @@ func sync(packageList PackageList, origin, channel, bldrURL, privateToken, publi
 				if err != nil {
 					return err
 				}
+				defer os.RemoveAll(dir)
 			}
-			defer os.RemoveAll(dir)
 			fmt.Printf("\nDownloading %s packages from http://bldr.habitat.sh to %s", target, dir)
 			err = executeCommand("hab", "pkg", "download", "-u", "https://bldr.habitat.sh", "-z", publicToken, "--download-directory", dir, "--target", target, "--channel", channel, "--file", file.Name())
 			if err != nil {
