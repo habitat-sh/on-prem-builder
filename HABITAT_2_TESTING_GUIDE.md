@@ -31,7 +31,7 @@ Before starting the testing, ensure you have:
 
 ## Scenario 1: Setup Standard On-Prem Builder Instance
 
-**Objective:** Setup a standard hab on-prem instance on linux-x86_64
+**Objective:** Setup a standard Habitat on-prem instance on linux-x86_64
 
 ### System Requirements
 
@@ -94,7 +94,7 @@ sudo hab svc status
 
 ## Scenario 2: Sync Packages from Public Builder
 
-**Objective:** Use sync tool to sync `base` core packages and `hab-2-rc1` chef packages from SAAS to the on-prem instance
+**Objective:** Use sync tool to sync `base` core packages and `hab-2-rc1` chef packages from SaaS to the on-prem instance
 
 ### Step 1: Generate Private Builder Token
 
@@ -198,13 +198,10 @@ hab --version
 ```bash
 hab --version
 # Expected: habitat 2.x.x
-
-sudo hab svc status
-# Verify all services are running with Habitat 2.0
 ```
 ---
 
-## Scenario 4: Workstation Setup (Including ARM64)
+## Scenario 4: Workstation Setup
 
 **Objective:** Install habitat on a workstation (Linux ARM, x86_64, or Windows) and run Habitat applications
 
@@ -322,7 +319,7 @@ If the origin doesn't already exist, you need to manually create the origin and 
 # 1. Create the origin on your custom Builder
 sudo -E hab origin create test
 
-# 3. Upload your public origin key
+# 2. Upload your public origin key
 sudo -E hab origin key upload test
 ```
 
@@ -331,7 +328,7 @@ sudo -E hab origin key upload test
 ```bash
 sudo -E hab pkg upload <HART_FILE>
 # Make a note of the CUSTOM_PKG_IDENT that gets uploaded.
-# By default , the package gets uploaded onto the unstable channel.
+# By default, the package gets uploaded onto the unstable channel.
 ```
 
 ### On a environment with supervisor running (Production Supervisor Environment with Habitat 2.0)
@@ -402,7 +399,7 @@ sudo hab svc status
 export HAB_BLDR_URL=https://your-builder.example.com
 
 # Load the service
-sudo -E hab svc load <CUSTOM_PKG_IDENT> --channel <CHANNEL_ON_WHICH_THE_PKG_WAS_UPLOADED>
+sudo -E hab svc load <CUSTOM_PKG_IDENT> --channel unstable
 # sudo -E hab svc load test/test-service --channel unstable
 ```
 
