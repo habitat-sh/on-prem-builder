@@ -294,9 +294,16 @@ func sync(packageList PackageList, origin, channel, bldrURL, privateToken, publi
 			}
 
 			fmt.Printf("\nUploading %s packages to %s", target, bldrURL)
-			err = executeCommand("hab", "pkg", "bulkupload", "--url", bldrURL, "--channel", channel, "--auth", privateToken, "--auto-create-origins", dir)
+			err = executeCommand("hab", "pkg", "bulkupload", "--url", bldrURL, "--auth", privateToken, "--auto-create-origins", dir)
 			if err != nil {
 				return err
+			}
+
+			for _, pkg := range latestPackages {
+				err = executeCommand("hab", "pkg", "promote", "-u", bldrURL, "-z", privateToken, pkg, channel, target)
+				if err != nil {
+					return err
+				}
 			}
 		} else {
 			fmt.Printf("Generated list of packages needed to download at %s\n", file.Name())
