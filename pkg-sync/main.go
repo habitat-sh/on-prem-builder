@@ -103,13 +103,14 @@ type PackageDetails struct {
 }
 
 // parseArgs parses and validates command-line arguments
-func parseArgs() (identsToPromote, origin, bldrURL, channel, privateToken, publicToken string, generateListOnly bool, packageList PackageList, help bool) {
+func parseArgs() (identsToPromote, origin, bldrURL, channel, privateToken, publicToken, downloadDir string, generateListOnly bool, packageList PackageList, help bool) {
 	flag.StringVar(&identsToPromote, "idents-to-promote", "", "File with newline separated package identifiers that will be demoted from all non-unstable channels and promoted to the specified channel")
 	flag.StringVar(&origin, "origin", "core", "Origin to sync")
 	flag.StringVar(&bldrURL, "bldr-url", "", "Base URL of your on-prem builder")
 	flag.StringVar(&channel, "channel", "stable", "Refresh channel to sync")
 	flag.StringVar(&privateToken, "private-builder-token", "", "Authorization Token for on-prem builder")
 	flag.StringVar(&publicToken, "public-builder-token", "", "Authorization Token for public builder at https://bldr.habitat.sh")
+	flag.StringVar(&downloadDir, "download-directory", "", "Directory to use as download cache. If not specified, a temporary directory will be created and removed after use.")
 	flag.BoolVar(&generateListOnly, "generate-airgap-list", false, "Output list of package identifiers needed to download to a file in the current directory. If specified, --bldr-url is not required and a sync will not be performed.")
 	flag.Var(&packageList, "package-list", "Only sync packages in list (none, builder, habitat)")
 	flag.BoolVar(&help, "help", false, "Show help message")
@@ -240,7 +241,7 @@ func executeCommand(command string, args ...string) error {
 	return nil
 }
 
-func sync(packageList PackageList, origin, channel, bldrURL, privateToken, publicToken string, localPackages []string, generateListOnly bool) error {
+func sync(packageList PackageList, origin, channel, bldrURL, privateToken, publicToken, downloadDir string, localPackages []string, generateListOnly bool) error {
 	for _, target := range []string{"x86_64-linux", "x86_64-windows", "aarch64-linux"} {
 		var latestPackages []string
 		var err error
@@ -276,11 +277,16 @@ func sync(packageList PackageList, origin, channel, bldrURL, privateToken, publi
 		}
 
 		if !generateListOnly {
-			dir, err := os.MkdirTemp("", "download_cache")
-			if err != nil {
-				return err
+			var dir string
+			if downloadDir != "" {
+				dir = downloadDir
+			} else {
+				dir, err = os.MkdirTemp("", "download_cache")
+				if err != nil {
+					return err
+				}
+				defer os.RemoveAll(dir)
 			}
-			defer os.RemoveAll(dir)
 			fmt.Printf("\nDownloading %s packages from http://bldr.habitat.sh to %s", target, dir)
 			err = executeCommand("hab", "pkg", "download", "-u", "https://bldr.habitat.sh", "-z", publicToken, "--download-directory", dir, "--target", target, "--channel", channel, "--file", file.Name())
 			if err != nil {
@@ -288,9 +294,16 @@ func sync(packageList PackageList, origin, channel, bldrURL, privateToken, publi
 			}
 
 			fmt.Printf("\nUploading %s packages to %s", target, bldrURL)
-			err = executeCommand("hab", "pkg", "bulkupload", "--url", bldrURL, "--channel", channel, "--auth", privateToken, "--auto-create-origins", dir)
+			err = executeCommand("hab", "pkg", "bulkupload", "--url", bldrURL, "--auth", privateToken, "--auto-create-origins", dir)
 			if err != nil {
 				return err
+			}
+
+			for _, pkg := range latestPackages {
+				err = executeCommand("hab", "pkg", "promote", "-u", bldrURL, "-z", privateToken, pkg, channel, target)
+				if err != nil {
+					return err
+				}
 			}
 		} else {
 			fmt.Printf("Generated list of packages needed to download at %s\n", file.Name())
@@ -363,7 +376,7 @@ func main() {
 	// Dont need errors prefixed with date and time
 	log.SetFlags(0)
 
-	identsToPromote, origin, bldrURL, channel, privateToken, publicToken, generateListOnly, packageList, help := parseArgs()
+	identsToPromote, origin, bldrURL, channel, privateToken, publicToken, downloadDir, generateListOnly, packageList, help := parseArgs()
 	if help || (bldrURL == "" && !generateListOnly) {
 		fmt.Printf("Usage: %s [OPTIONS]\n", os.Args[0])
 		fmt.Println("Options:")
@@ -417,7 +430,7 @@ func main() {
 		}
 	}
 
-	err = sync(packageList, origin, channel, bldrURL, privateToken, publicToken, localPackages, generateListOnly)
+	err = sync(packageList, origin, channel, bldrURL, privateToken, publicToken, downloadDir, localPackages, generateListOnly)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
