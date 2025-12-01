@@ -313,14 +313,10 @@ sudo -E  hab pkg build .
 #### 4. Create Origin at the On Prem Builder (If not already done)
 
 Custom Builder instances don't auto-create origins. 
-If the origin doesn't already exist, you need to manually create the origin and upload your keys first.
+If the origin doesn't already exist, you need to manually create the origin.
 
 ```bash
-# 1. Create the origin on your custom Builder
 sudo -E hab origin create test
-
-# 2. Upload your public origin key
-sudo -E hab origin key upload test
 ```
 
 #### 5. Upload to on prem bldr
@@ -395,12 +391,8 @@ sudo hab svc status
 #### Load the package
 
 ```bash
-# Set the Builder URL
-export HAB_BLDR_URL=https://your-builder.example.com
-
 # Load the service
-sudo -E hab svc load <CUSTOM_PKG_IDENT> --channel unstable
-# sudo -E hab svc load test/test-service --channel unstable
+sudo -E hab svc load test/test-service --channel unstable --url https://your-builder.example.com
 ```
 
 #### Verification
