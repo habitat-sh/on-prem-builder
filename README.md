@@ -1,13 +1,5 @@
 # Chef Habitat Builder on-prem
 
-**Umbrella Project**: [Chef Habitat](https://github.com/habitat-sh/habitat)
-
-**Project State**: [Active](https://github.com/chef/chef-oss-practices/blob/master/repo-management/repo-states.md#active)
-
-**Issues Response SLA**: 5 business days
-
-**Pull Request Response SLA**: 5 business days
-
 ## Introduction
 
 This repository contains scripts and documentation to install Chef Habitat Builder on-prem services. The Chef Habitat Builder on-prem services allow privately hosting Chef Habitat packages and associated artifacts such as keys on-premise. Chef Habitat clients, such as the `hab` cli, Supervisors and Studios, can be pointed to the Chef Habitat Builder on-prem to allow for development, execution, and management without depending on the public Chef Habitat services.
