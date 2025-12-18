@@ -13,7 +13,7 @@ This page documents how to deploy Chef Habitat On-Prem Builder with a 3rd-party 
 
 ## Before you begin
 
-Before you begin, review [Habitat Builder's system requirements](../system_requirements).
+Before you begin, review [Habitat Builder's system requirements](system_requirements).
 
 ### Configure an OAuth provider
 
@@ -49,7 +49,7 @@ You might need substantial storage for packages, so make sure you have enough fr
 The package artifacts are stored in your MinIO instance by default, typically at the following location: `/hab/svc/builder-minio/data`. If you need more storage, create a mount at `/hab` and point it to your external storage.
 You don't need to do this if you already have enough free space.
 
-If you want to use Artifactory instead of MinIO for object storage, see the [Artifactory documentation](/habitat/on_prem_builder/configure/artifactory).
+If you want to use Artifactory instead of MinIO for object storage, see the [Artifactory documentation](../configure/artifactory.md).
 
 ### Get an SSL certificate
 
@@ -103,13 +103,13 @@ With an internet-connected computer, follow these steps:
     export DOWNLOAD_DIR=/path/to/download/directory
 
     hab pkg exec habitat/pkg-sync pkg-sync \
-      --channel stable \
+      --channel base \
       --package-list builder \
       --generate-airgap-list
 
     hab pkg download \
       --target x86_64-linux \
-      --channel stable \
+      --channel base \
       --file package_list_x86_64-linux.txt \
       --download-directory ${DOWNLOAD_DIR}/builder_packages
     ```
@@ -202,7 +202,7 @@ Follow these steps:
     ```
 
     It may take a few seconds for all services to start.
-    If any services aren't in the `up` state, see the [troubleshooting documentation](troubleshooting).
+    If any services aren't in the `up` state, see the [troubleshooting documentation](../troubleshooting.md).
 
 ## MinIO web UI
 
@@ -223,5 +223,5 @@ You can now sign in using your configured OAuth provider.
 
 After you've deployed Habitat Builder:
 
-- [Configure your workstation to connect to your Habitat Builder deployment](../workstation).
-- [Bootstrap the core origin packages](/habitat/on_prem_builder/packages/bootstrap_core_packages).
+- [Configure your workstation to connect to your Habitat Builder deployment](workstation).
+- [Bootstrap the core origin packages](../packages/bootstrap_core_packages.md).

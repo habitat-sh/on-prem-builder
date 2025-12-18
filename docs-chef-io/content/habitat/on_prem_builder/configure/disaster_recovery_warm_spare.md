@@ -50,7 +50,7 @@ hab pkg upload <PATH_TO_HART_FILE> -u <ON_PREM_URL> --force
 If you use AWS RDS, take periodic snapshots of the RDS instance.
 For disaster recovery, use a Multi-AZ RDS deployment.
 
-For non-RDS deployments, back up PostgreSQL data as described in the [Habitat Builder PostgreSQL documentation](../../manage/postgres).
+For non-RDS deployments, back up PostgreSQL data as described in the [Habitat Builder PostgreSQL documentation](../manage/postgres.md).
 
 Periodically restore backups into the disaster recovery or warm spare environment using a scheduled automated process, such as a cron job.
 You can run the restore remotely from the same host that created the backup.
@@ -64,7 +64,7 @@ Habitat artifacts are stored in one of two locations:
 - S3 bucket
 
 If your backend uses MinIO for artifact storage, make sure it is backed by highly available storage.
-Back up MinIO data as described in the [Habitat Builder MinIO documentation](../../manage/minio).
+Back up MinIO data as described in the [Habitat Builder MinIO documentation](../manage/minio).
 If you use a warm spare in the same availability zone or data center and the filesystem is network-attached, you can attach it to the warm spare.
 However, only one Builder cluster should accept live traffic when sharing the same filesystem.
 For disaster recovery, replicate the filesystem to the alternate availability zone or data center.

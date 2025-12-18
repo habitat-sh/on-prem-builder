@@ -12,7 +12,19 @@ title = "Update packages on Habitat Builder"
 After a Chef Habitat release, you may want to update Habitat packages on Habitat Builder to the latest versions.
 This document lays out the steps to take in order to perform such an update.
 
+## Bootstrap vs Update: Understanding the Difference
+
+**Bootstrapping** is the initial process of populating an empty On-Prem Builder instance with packages from the public Habitat Builder. This is typically done once when you first set up your Builder instance. See the [Bootstrap Core Packages guide](../packages/bootstrap_core_packages.md) for initial setup.
+
+**Updating** is the ongoing process of refreshing your existing On-Prem Builder with the latest package versions from the public/SaaS Habitat Builder. This is done periodically to keep your packages current with the latest releases, security updates, and improvements.
+
+The main differences:
+- **Bootstrap**: Used for initial setup of an empty Builder instance. Downloads essential core packages needed for basic functionality
+- **Update**: Used for ongoing maintenance to refresh packages to newer versions. Can focus on specific package sets (habitat, builder) or all packages in an origin
+
 ## Enable native package support
+
+Native packages are specialized Habitat packages that contain platform-specific binaries or libraries that cannot be easily rebuilt from source in the Habitat studio environment. These packages provide essential system-level components and low-level dependencies that other Habitat packages rely on. Examples include core system libraries, compilers, and other foundational tools that need to maintain their original binary format for compatibility and performance reasons.
 
 Some new low level `core` origin packages include `native` packages.
 To host these packages, you need to configure Habitat On-Prem Builder to allow native package support.
@@ -24,7 +36,7 @@ To enable native package support, follow this step:
   ```toml
   [api]
   features_enabled = "nativepackages"
-  targets = ["x86_64-linux", "x86_64-linux-kernel2", "x86_64-windows"]
+  targets = ["x86_64-linux", "aarch64-linux", "x86_64-windows"]
   allowed_native_package_origins = ["core"]
   ```
 
@@ -32,7 +44,7 @@ To enable native package support, follow this step:
 
 ## Bootstrap Builder with Habitat packages
 
-Use the `habitat/pkg-sync`package to install and sync packages with an Habitat On-Prem Builder deployment.
+Use the `habitat/pkg-sync` package to install and sync packages with an Habitat On-Prem Builder deployment.
 This package downloads packages from the public [SaaS Habitat Builder](https://bldr.habitat.sh) and performs a bulk upload to your Habitat Builder deployment.
 
 ### Bootstrap Builder in an internet-connected environment
@@ -47,12 +59,12 @@ Before you begin, you will need your [personal access token](https://bldr.habita
     sudo hab pkg install habitat/pkg-sync
     ```
 
-1. Sync packages from the public Habitat Builder to your Habitat On-Prem Builder deployment:
+1. Sync packages from the public Habitat Builder to your Habitat On-Prem Builder deployment using the base channel:
 
     ```bash
     hab pkg exec habitat/pkg-sync pkg-sync \
       --bldr-url <ON_PREM_BUILDER_URL> \
-      --channel stable \
+      --channel base \
       --package-list habitat \
       --private-builder-token <PRIVATE_BUILDER_INSTANCE_TOKEN> \
       --public-builder-token  <PUBLIC_BUILDER_INSTANCE_TOKEN>
@@ -67,7 +79,7 @@ Before you begin, you will need your [personal access token](https://bldr.habita
 
 For airgapped Habitat Builder deployments, `pkg-sync` can't transfer packages from the public internet to your instance. In this case, you'll download packages on an internet-connected computer, transfer them to your airgapped Habitat Builder, and bulk upload them.
 
-Follow these steps to refresh an airgapped On-Prem Builder with the latest stable Habitat packages:
+Follow these steps to refresh an airgapped On-Prem Builder with the latest base Habitat packages:
 
 1. On an internet connected machine, install the `habitat/pkg-sync` package:
 
@@ -80,7 +92,7 @@ Follow these steps to refresh an airgapped On-Prem Builder with the latest stabl
     ```bash
     hab pkg exec habitat/pkg-sync pkg-sync \
       --generate-airgap-list \
-      --channel stable \
+      --channel base \
       --package-list habitat \
       --public-builder-token <PUBLIC_BUILDER_TOKEN>
 
@@ -88,7 +100,7 @@ Follow these steps to refresh an airgapped On-Prem Builder with the latest stabl
       -u https://bldr.habitat.sh \
       -z <PUBLIC_BUILDER_TOKEN> \
       --target x86_64-linux \
-      --channel stable \
+      --channel base \
       --file package_list_x86_64-linux.txt \
       --download-directory habitat_packages
 
@@ -96,7 +108,7 @@ Follow these steps to refresh an airgapped On-Prem Builder with the latest stabl
       -u https://bldr.habitat.sh \
       -z <PUBLIC_BUILDER_TOKEN> \
       --target x86_64-windows \
-      --channel stable \
+      --channel base \
       --file package_list_x86_64-windows.txt \
       --download-directory habitat_packages
     ```
@@ -109,7 +121,7 @@ Follow these steps to refresh an airgapped On-Prem Builder with the latest stabl
     export HAB_AUTH_TOKEN=<PRIVATE_BUILDER_TOKEN>
     hab pkg bulkupload \
       --url <PRIVATE_BUILDER_URL> \
-      --channel stable \
+      --channel base \
       --auto-create-origins \
       habitat_packages/
     ```
