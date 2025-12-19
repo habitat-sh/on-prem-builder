@@ -14,7 +14,7 @@ This document lays out the steps to take in order to perform such an update.
 
 ## Bootstrap vs Update: Understanding the Difference
 
-**Bootstrapping** is the initial process of populating an empty On-Prem Builder instance with packages from the public Habitat Builder. This is typically done once when you first set up your Builder instance. See the [Bootstrap Core Packages guide](../packages/bootstrap_core_packages.md) for initial setup.
+**Bootstrapping** is the initial process of populating an empty On-Prem Builder instance with packages from the public Habitat Builder. This is typically done once when you first set up your Builder instance. See the [Bootstrap Core Packages guide](../packages/bootstrap_core_packages) for initial setup.
 
 **Updating** is the ongoing process of refreshing your existing On-Prem Builder with the latest package versions from the public/SaaS Habitat Builder. This is done periodically to keep your packages current with the latest releases, security updates, and improvements.
 
@@ -24,7 +24,10 @@ The main differences:
 
 ## Enable native package support
 
-Native packages are specialized Habitat packages that contain platform-specific binaries or libraries that cannot be easily rebuilt from source in the Habitat studio environment. These packages provide essential system-level components and low-level dependencies that other Habitat packages rely on. Examples include core system libraries, compilers, and other foundational tools that need to maintain their original binary format for compatibility and performance reasons.
+Native packages are specialized Habitat packages that contain platform-specific binaries or libraries that cannot be easily rebuilt from source in the Habitat studio environment. They provide essential system-level components and low-level dependencies that other Habitat packages rely on. Examples include: 
+- Core system libraries
+- Compilers
+- Other foundational tools that need to maintain their original binary format for compatibility and performance reasons.
 
 Some new low level `core` origin packages include `native` packages.
 To host these packages, you need to configure Habitat On-Prem Builder to allow native package support.
@@ -64,7 +67,7 @@ Before you begin, you will need your [personal access token](https://bldr.habita
     ```bash
     hab pkg exec habitat/pkg-sync pkg-sync \
       --bldr-url <ON_PREM_BUILDER_URL> \
-      --channel base \
+      --channel stable \
       --package-list habitat \
       --private-builder-token <PRIVATE_BUILDER_INSTANCE_TOKEN> \
       --public-builder-token  <PUBLIC_BUILDER_INSTANCE_TOKEN>
@@ -79,7 +82,7 @@ Before you begin, you will need your [personal access token](https://bldr.habita
 
 For airgapped Habitat Builder deployments, `pkg-sync` can't transfer packages from the public internet to your instance. In this case, you'll download packages on an internet-connected computer, transfer them to your airgapped Habitat Builder, and bulk upload them.
 
-Follow these steps to refresh an airgapped On-Prem Builder with the latest base Habitat packages:
+Follow these steps to refresh an airgapped On-Prem Builder with the latest stable Habitat packages:
 
 1. On an internet connected machine, install the `habitat/pkg-sync` package:
 
@@ -92,7 +95,7 @@ Follow these steps to refresh an airgapped On-Prem Builder with the latest base 
     ```bash
     hab pkg exec habitat/pkg-sync pkg-sync \
       --generate-airgap-list \
-      --channel base \
+      --channel stable \
       --package-list habitat \
       --public-builder-token <PUBLIC_BUILDER_TOKEN>
 
@@ -100,7 +103,6 @@ Follow these steps to refresh an airgapped On-Prem Builder with the latest base 
       -u https://bldr.habitat.sh \
       -z <PUBLIC_BUILDER_TOKEN> \
       --target x86_64-linux \
-      --channel base \
       --file package_list_x86_64-linux.txt \
       --download-directory habitat_packages
 
@@ -108,8 +110,7 @@ Follow these steps to refresh an airgapped On-Prem Builder with the latest base 
       -u https://bldr.habitat.sh \
       -z <PUBLIC_BUILDER_TOKEN> \
       --target x86_64-windows \
-      --channel base \
-      --file package_list_x86_64-windows.txt \
+\      --file package_list_x86_64-windows.txt \
       --download-directory habitat_packages
     ```
 

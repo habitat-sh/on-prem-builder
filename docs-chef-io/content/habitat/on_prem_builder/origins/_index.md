@@ -38,5 +38,5 @@ See the following user guides for managing Chef Habitat origins:
 
 ## More information
 
-- [Manage packages in Habitat On-Prem Builder](../packages/_index.md)
-- [Habitat packages](../packages/_index.md)
+- [Manage packages in Habitat On-Prem Builder](../packages/_index)
+- [Habitat packages](../packages/_index)

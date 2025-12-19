@@ -89,7 +89,7 @@ Habitat Builder is configured using the `bldr.env` file, which contains all the 
    1. Set `PG_EXT_ENABLED` to `false`.
 
       The datastore node can't use an externally hosted PostgreSQL, such as AWS RDS or Azure Database for PostgreSQL.
-      For details about opening the required ports, see the [scaling documentation](./scale_frontend_nodes.md#install-a-frontend-node).
+      For details about opening the required ports, see the [scaling documentation](./scale_frontend_nodes#install-a-frontend-node).
 
    1. List all frontend and backend nodes hosting builder services using `HAB_BLDR_PEER_ARG` and the `--peer` option using the following format:
 

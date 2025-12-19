@@ -50,7 +50,7 @@ hab pkg upload <PATH_TO_HART_FILE> -u <ON_PREM_URL> --force
 If you use AWS RDS, take periodic snapshots of the RDS instance.
 For disaster recovery, use a Multi-AZ RDS deployment.
 
-For non-RDS deployments, back up PostgreSQL data as described in the [Habitat Builder PostgreSQL documentation](../manage/postgres.md).
+For non-RDS deployments, back up PostgreSQL data as described in the [Habitat Builder PostgreSQL documentation](../manage/postgres).
 
 Periodically restore backups into the disaster recovery or warm spare environment using a scheduled automated process, such as a cron job.
 You can run the restore remotely from the same host that created the backup.
