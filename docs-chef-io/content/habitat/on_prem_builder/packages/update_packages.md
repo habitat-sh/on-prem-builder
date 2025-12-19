@@ -122,7 +122,7 @@ Follow these steps to refresh an airgapped On-Prem Builder with the latest stabl
     export HAB_AUTH_TOKEN=<PRIVATE_BUILDER_TOKEN>
     hab pkg bulkupload \
       --url <PRIVATE_BUILDER_URL> \
-      --channel base \
+      --channel stable \
       --auto-create-origins \
       habitat_packages/
     ```
