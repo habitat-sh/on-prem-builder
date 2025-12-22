@@ -102,7 +102,7 @@ Follow these steps to refresh an airgapped On-Prem Builder with the latest stabl
       --public-builder-token <PUBLIC_BUILDER_TOKEN>
     cd ../
     mkdir core-pkgs
-    cd core/pkgs
+    cd core-pkgs
     hab pkg exec habitat/pkg-sync pkg-sync \
       --generate-airgap-list \
       --channel base \
@@ -164,7 +164,7 @@ Follow these steps to refresh an airgapped On-Prem Builder with the latest stabl
       --private-builder-token <PRIVATE_BUILDER_INSTANCE_TOKEN> \
       --idents-to-promote core-pkgs/package_list_aarch64-linux.txt
     ```
-      
+
 1. Promote the `chef` origin packages to the `stable` channel:
 
     ```bash
