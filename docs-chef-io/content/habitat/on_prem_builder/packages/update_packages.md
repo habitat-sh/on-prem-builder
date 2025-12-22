@@ -62,7 +62,7 @@ Before you begin, you will need your [personal access token](https://bldr.habita
     sudo hab pkg install habitat/pkg-sync
     ```
 
-1. Sync packages from the public Habitat Builder to your Habitat On-Prem Builder deployment using the base channel:
+1. Sync packages from the public Habitat Builder to your Habitat On-Prem Builder deployment:
 
     ```bash
     hab pkg exec habitat/pkg-sync pkg-sync \
@@ -110,7 +110,7 @@ Follow these steps to refresh an airgapped On-Prem Builder with the latest stabl
       -u https://bldr.habitat.sh \
       -z <PUBLIC_BUILDER_TOKEN> \
       --target x86_64-windows \
-\      --file package_list_x86_64-windows.txt \
+      --file package_list_x86_64-windows.txt \
       --download-directory habitat_packages
     ```
 
