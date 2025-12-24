@@ -22,6 +22,10 @@ Optionally, one can specify a `--package-list` with a value of either `habitat` 
 
 Note that when providing a `--package-list`, the above pre-flight check is not performed.
 
+This tool can also be used to generate a list of packages without actually syncing them.
+
+If for any reason, you end up in a state where packages were bulk uploaded and promoted to the wrong channel, one can use the `--idents-to-promote` option and provide a file with newline separated package identifiers that will be demoted from all non-unstable channels and promoted to the specified channel.
+
 ## Usage
 
 Install this package with:

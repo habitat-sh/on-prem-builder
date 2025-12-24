@@ -90,31 +90,50 @@ Follow these steps to refresh an airgapped On-Prem Builder with the latest stabl
     sudo hab pkg install habitat/pkg-sync
     ```
 
-1. Use `pkg-sync` to generate a list of packages and download packages from the public Habitat Builder:
+1. Use `pkg-sync` to generate a list of habitat and core packages:
 
     ```bash
+    mkdir chef-pkgs
+    cd chef-pkgs
     hab pkg exec habitat/pkg-sync pkg-sync \
       --generate-airgap-list \
       --channel stable \
       --package-list habitat \
       --public-builder-token <PUBLIC_BUILDER_TOKEN>
+    cd ../
+    mkdir core-pkgs
+    cd core-pkgs
+    hab pkg exec habitat/pkg-sync pkg-sync \
+      --generate-airgap-list \
+      --channel base \
+      --origin core \
+      --public-builder-token <PUBLIC_BUILDER_TOKEN>
+    ```
+1.  Download habitat packages and their core dependencies from the public Habitat Builder
 
+    ```bash
+    cd ../
     hab pkg download \
       -u https://bldr.habitat.sh \
       -z <PUBLIC_BUILDER_TOKEN> \
       --target x86_64-linux \
-      --file package_list_x86_64-linux.txt \
+      --file chef-pkgs/package_list_x86_64-linux.txt \
       --download-directory habitat_packages
-
     hab pkg download \
       -u https://bldr.habitat.sh \
       -z <PUBLIC_BUILDER_TOKEN> \
       --target x86_64-windows \
-      --file package_list_x86_64-windows.txt \
+      --file chef-pkgs/package_list_x86_64-windows.txt \
+      --download-directory habitat_packages
+    hab pkg download \
+      -u https://bldr.habitat.sh \
+      -z <PUBLIC_BUILDER_TOKEN> \
+      --target aarch64-linux \
+      --file chef-pkgs/package_list_aarch64-linux.txt \
       --download-directory habitat_packages
     ```
 
-1. Create an archive of the `habitat_packages` directory, copy it to a computer in the airgapped environment, and extract the archive.
+1. Create an archive of the `chef-pkgs`, `core-pkgs`, and `habitat_packages` directories, copy it to a computer in the airgapped environment, and extract the archive.
 
 1. Bulk upload the packages to your Habitat Builder deployment:
 
@@ -122,7 +141,46 @@ Follow these steps to refresh an airgapped On-Prem Builder with the latest stabl
     export HAB_AUTH_TOKEN=<PRIVATE_BUILDER_TOKEN>
     hab pkg bulkupload \
       --url <PRIVATE_BUILDER_URL> \
-      --channel stable \
       --auto-create-origins \
       habitat_packages/
+    ```
+
+1. Promote the `core` origin packages to the `base` channel:
+
+    ```bash
+    hab pkg exec habitat/pkg-sync pkg-sync \
+      --bldr-url <PRIVATE_BUILDER_URL> \
+      --channel base \
+      --private-builder-token <PRIVATE_BUILDER_INSTANCE_TOKEN> \
+      --idents-to-promote core-pkgs/package_list_x86_64-linux.txt
+    hab pkg exec habitat/pkg-sync pkg-sync \
+      --bldr-url <PRIVATE_BUILDER_URL> \
+      --channel base \
+      --private-builder-token <PRIVATE_BUILDER_INSTANCE_TOKEN> \
+      --idents-to-promote core-pkgs/package_list_x86_64-windows.txt
+    hab pkg exec habitat/pkg-sync pkg-sync \
+      --bldr-url <PRIVATE_BUILDER_URL> \
+      --channel base \
+      --private-builder-token <PRIVATE_BUILDER_INSTANCE_TOKEN> \
+      --idents-to-promote core-pkgs/package_list_aarch64-linux.txt
+    ```
+
+1. Promote the `chef` origin packages to the `stable` channel:
+
+    ```bash
+    hab pkg exec habitat/pkg-sync pkg-sync \
+      --bldr-url <PRIVATE_BUILDER_URL> \
+      --channel stable \
+      --private-builder-token <PRIVATE_BUILDER_INSTANCE_TOKEN> \
+      --idents-to-promote chef-pkgs/package_list_x86_64-linux.txt
+    hab pkg exec habitat/pkg-sync pkg-sync \
+      --bldr-url <PRIVATE_BUILDER_URL> \
+      --channel stable \
+      --private-builder-token <PRIVATE_BUILDER_INSTANCE_TOKEN> \
+      --idents-to-promote chef-pkgs/package_list_x86_64-windows.txt
+    hab pkg exec habitat/pkg-sync pkg-sync \
+      --bldr-url <PRIVATE_BUILDER_URL> \
+      --channel stable \
+      --private-builder-token <PRIVATE_BUILDER_INSTANCE_TOKEN> \
+      --idents-to-promote chef-pkgs/package_list_aarch64-linux.txt
     ```
