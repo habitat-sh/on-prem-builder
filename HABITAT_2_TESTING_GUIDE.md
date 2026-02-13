@@ -24,7 +24,7 @@ Before starting the testing, ensure you have:
 
 **Channels:**
 - `base` - Core packages for Habitat 2.0
-- `hab-2-rc1` - Chef-specific Habitat 2.0 RC packages
+- `hab-2-rc2` - Chef-specific Habitat 2.0 RC packages
 - `stable` - Habitat 1.x packages (for upgrade testing)
 
 ---
@@ -94,7 +94,7 @@ sudo hab svc status
 
 ## Scenario 2: Sync Packages from Public Builder
 
-**Objective:** Use sync tool to sync `base` core packages and `hab-2-rc1` chef packages from SaaS to the on-prem instance
+**Objective:** Use sync tool to sync `base` core packages and `hab-2-rc2` chef packages from SaaS to the on-prem instance
 
 ### Step 1: Generate Private Builder Token
 
@@ -134,13 +134,13 @@ hab pkg exec habitat/pkg-sync pkg-sync \
   --private-builder-token <PRIVATE_TOKEN>
 ```
 
-### Step 5: Sync hab-2-rc1 Chef Packages
+### Step 5: Sync hab-2-rc2 Chef Packages
 
 ```bash
 hab pkg exec habitat/pkg-sync pkg-sync \
   --bldr-url <ON_PREM_BUILDER_URL> \
   --origin chef \
-  --channel hab-2-rc1 \
+  --channel hab-2-rc2 \
   --public-builder-token <PUBLIC_TOKEN> \
   --private-builder-token <PRIVATE_TOKEN>
 ```
@@ -165,7 +165,7 @@ Check packages in your on-prem builder web UI or via API:
 
 ### Method 1: Current Installation (Habitat 2.0 RC)
 
-Since Habitat 2.0 is not in stable channel yet, install via hab-2-rc1 channel:
+Since Habitat 2.0 is not in stable channel yet, install via hab-2-rc2 channel:
 
 #### Step 1: Install Habitat 1.6.x (Base Installation)
 
@@ -180,7 +180,7 @@ curl https://raw.githubusercontent.com/habitat-sh/habitat/main/components/hab/in
 #### Step 2: Upgrade to Habitat 2.0 RC
 
 ```bash
-sudo hab pkg install chef/hab -bf -c hab-2-rc1 -z <YOUR_PUBLIC_BLDR_AUTH_TOKEN>
+sudo hab pkg install chef/hab -bf -c hab-2-rc2 -z <YOUR_PUBLIC_BLDR_AUTH_TOKEN>
 ```
 
 ### Method 2: Future Installation (When Habitat 2.0 is Stable)
