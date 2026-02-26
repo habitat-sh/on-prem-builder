@@ -4,7 +4,7 @@ title = "Habitat Builder system requirements"
 [menu]
   [menu.habitat]
     title = "System requirements"
-    identifier = "habitat/builder/on-prem/install/install/system requirements"
+    identifier = "habitat/builder/on-prem/install/system requirements"
     parent = "habitat/builder/on-prem/install"
     weight = 20
 +++
