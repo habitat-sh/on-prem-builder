@@ -51,7 +51,7 @@ The documentation for On-Prem Builder is located in the [on-prem-docs](docs-chef
 #### Installation
 
 1. [Getting Started](docs-chef-io/content/habitat/builder/on_prem/install/_index.md)
-1. [Builder + Automate](https://docs.chef.io/automate/on_prem_builder/) *OR* [Builder + OAuth Authentication](docs-chef-io/content/habitat/builder/on_prem/install/builder_oauth.md) (AzureAD/Github/GitLab/Okta/BitBucket)
+1. [Builder + Automate](https://docs.chef.io/automate/on_prem_builder/) *OR* [Builder + OAuth Authentication](docs-chef-io/content/habitat/builder/on_prem/install/builder_oauth.md) (AzureAD/GitHub/GitLab/Okta/Bitbucket)
 1. [Bootstrap Core Packages](docs-chef-io/content/habitat/builder/on_prem/packages/bootstrap_core_packages.md)
 
 #### Reference
@@ -63,7 +63,7 @@ The documentation for On-Prem Builder is located in the [on-prem-docs](docs-chef
 #### Managing Builder On-Prem
 
 1. [Managing the Builder On-Prem Postgres Installation](docs-chef-io/content/habitat/builder/on_prem/manage/postgres.md)
-1. [Managing the Builder On-Prem Minio Installation](docs-chef-io/content/habitat/builder/on_prem/manage/minio.md)
+1. [Managing the Builder On-Prem MinIO Installation](docs-chef-io/content/habitat/builder/on_prem/manage/minio.md)
 1. [Refreshing the Builder On-Prem with New Habitat Release Packages](docs-chef-io/content/habitat/builder/on_prem/packages/update_packages.md)
 1. [Using Artifactory with Builder On-Prem](docs-chef-io/content/habitat/builder/on_prem/configure/artifactory.md)
 1. [High Availability / Disaster Recovery](docs-chef-io/content/habitat/builder/on_prem/configure/disaster_recovery_warm_spare.md)
