@@ -44,32 +44,31 @@ Once installed, the following functionality will be available to users:
 
 ## Documentation
 
-The documentation for Builder on-prem is located in the [on-prem-docs](on-prem-docs/getting-started.md) directory.
+The documentation for On-Prem Builder is located in the [on-prem-docs](docs-chef-io/content/habitat/builder/on_prem/) directory.
 
 ### Index
 
 #### Installation
 
-1. [Getting Started](on-prem-docs/getting-started.md)
-1. [Builder + Automate](on-prem-docs/builder-automate.md) *OR* [Builder + OAuth Authentication](on-prem-docs/builder-oauth.md) (AzureAD/Github/GitLab/Okta/BitBucket)
-1. [Bootstrap Core Packages](on-prem-docs/bootstrap-core.md)
+1. [Getting Started](docs-chef-io/content/habitat/builder/on_prem/install/_index.md)
+1. [Builder + Automate](https://docs.chef.io/automate/on_prem_builder/) *OR* [Builder + OAuth Authentication](docs-chef-io/content/habitat/builder/on_prem/install/builder_oauth.md) (AzureAD/GitHub/GitLab/Okta/Bitbucket)
+1. [Bootstrap Core Packages](docs-chef-io/content/habitat/builder/on_prem/packages/bootstrap_core_packages.md)
 
 #### Reference
 
-1. [Example builder.env](on-prem-docs/builder-example.md)
-2. [Logging](on-prem-docs/logs.md)
-3. [License](on-prem-docs/license.md)
-4. [Troubleshooting](on-prem-docs/troubleshooting.md)
+1. [Example builder.env](docs-chef-io/content/habitat/builder/on_prem/configure/builder_config_example.md)
+2. [Logging](docs-chef-io/content/habitat/builder/on_prem/configure/logs.md)
+3. [Troubleshooting](docs-chef-io/content/habitat/builder/on_prem/troubleshooting.md)
 
 #### Managing Builder On-Prem
 
-1. [Managing the Builder On-Prem Postgres Installation](on-prem-docs/postgres.md)
-1. [Managing the Builder On-Prem Minio Installation](on-prem-docs/minio.md)
-1. [Refreshing the Builder On-Prem with New Habitat Release Packages](on-prem-docs/update-habitat.md)
-1. [Using Artifactory with Builder On-Prem](on-prem-docs/artifactory.md)
-1. [High Availability / Disaster Recovery](on-prem-docs/warm-spare.md)
-1. [Scaling Frontends](on-prem-docs/scaling.md)
-1. [SSL Certificate Rotation](on-prem-docs/ssl-cert-rotation.md)
+1. [Managing the Builder On-Prem Postgres Installation](docs-chef-io/content/habitat/builder/on_prem/manage/postgres.md)
+1. [Managing the Builder On-Prem MinIO Installation](docs-chef-io/content/habitat/builder/on_prem/manage/minio.md)
+1. [Refreshing the Builder On-Prem with New Habitat Release Packages](docs-chef-io/content/habitat/builder/on_prem/packages/update_packages.md)
+1. [Using Artifactory with Builder On-Prem](docs-chef-io/content/habitat/builder/on_prem/configure/artifactory.md)
+1. [High Availability / Disaster Recovery](docs-chef-io/content/habitat/builder/on_prem/configure/disaster_recovery_warm_spare.md)
+1. [Scaling Frontends](docs-chef-io/content/habitat/builder/on_prem/configure/scale_frontend_nodes.md)
+1. [SSL Certificate Rotation](docs-chef-io/content/habitat/builder/on_prem/manage/ssl_cert_rotation.md)
 
 # Copyright
 See [COPYRIGHT.md](./COPYRIGHT.md).
