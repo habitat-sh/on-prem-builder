@@ -42,7 +42,7 @@ Before starting the testing, ensure you have:
 | Disk | 50GB | 100GB+ |
 | OS | Linux x86_64 with systemd | Ubuntu 20.04+ or RHEL 8+ |
 
-**Reference:** [Detailed system requirements](./docs-chef-io/content/habitat/on_prem_builder/install/system_requirements.md)
+**Reference:** [Detailed system requirements](./docs-chef-io/content/habitat/builder/on_prem/install/system_requirements.md)
 
 ### Step 1: Clone Repository
 
@@ -55,7 +55,7 @@ cd on-prem-builder
 
 Before installation, setup a 3rd-party OAuth provider for authentication:
 
-**Reference:** [OAuth setup guide](./docs-chef-io/content/habitat/on_prem_builder/install/builder_oauth.md#before-you-begin)
+**Reference:** [OAuth setup guide](./docs-chef-io/content/habitat/builder/on_prem/install/builder_oauth.md#before-you-begin)
 
 **Supported providers:** GitHub, Azure AD, GitLab, Okta, Bitbucket
 
@@ -67,7 +67,7 @@ cp bldr.env.sample bldr.env
 # Also add your HAB_AUTH_TOKEN for public builder
 ```
 
-📖 **Reference:** [Configuration guide](./docs-chef-io/content/habitat/on_prem_builder/install/builder_oauth.md#configure-chef-habitat-on-prem-builder)
+📖 **Reference:** [Configuration guide](./docs-chef-io/content/habitat/builder/on_prem/install/builder_oauth.md#configure-chef-habitat-on-prem-builder)
 
 ### Step 4: Install
 
@@ -217,7 +217,7 @@ Follow the installation steps from **Scenario 3** based on your workstation arch
 
 ### Step 2: Configure Workstation
 
-📖 **Reference:** [Workstation setup guide](./docs-chef-io/content/habitat/on_prem_builder/install/workstation.md)
+📖 **Reference:** [Workstation setup guide](./docs-chef-io/content/habitat/builder/on_prem/install/workstation.md)
 
 ```bash
 # Point to your on-prem builder

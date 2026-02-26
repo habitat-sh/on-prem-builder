@@ -36,7 +36,7 @@ sudo hab pkg install habitat/pkg-sync
 
 Examples:
 
-Note that the public builder tokens used in the examples below must be associated with a valid license key. See [these instructions](../docs-chef-io/content/habitat/on_prem_builder/packages/bootstrap_core_packages#add-a-license-key) on entering a license key.
+Note that the public builder tokens used in the examples below must be associated with a valid license key. See [these instructions](../docs-chef-io/content/habitat/builder/on_prem/packages/bootstrap_core_packages#add-a-license-key) on entering a license key.
 
 Sync all the latest core packages from the base channel that you do not already have from the public builder and upload them to your on-prem builder instance.
 
@@ -80,4 +80,4 @@ hab pkg exec habitat/pkg-sync pkg-sync --bldr-url https://your-builder.tld --cha
 hab pkg exec habitat/pkg-sync pkg-sync --bldr-url https://your-builder.tld --channel base --private-builder-token <your_private_Builder_instance_token> --idents-to-promote package_list_x86_64-windows.txt
 ```
 
-Note that the public builder tokens used in the examples above must be associated with a valid license key. See [these instructions](../docs-chef-io/content/habitat/on_prem_builder/packages/bootstrap_core_packages#add-a-license-key) on entering a license key.
+Note that the public builder tokens used in the examples above must be associated with a valid license key. See [these instructions](../docs-chef-io/content/habitat/builder/on_prem/packages/bootstrap_core_packages#add-a-license-key) on entering a license key.

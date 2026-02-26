@@ -13,7 +13,7 @@ on-prem-builder/
 ├── docs-chef-io/                     # Hugo-based documentation
 │   ├── config.toml                   # Hugo configuration
 │   ├── go.mod                        # Go module for docs
-│   ├── content/habitat/on_prem_builder/  # Documentation content
+│   ├── content/habitat/builder/on_prem/  # Documentation content
 │   │   ├── _index.md                 # Main documentation index
 │   │   ├── troubleshooting.md        # Troubleshooting guide
 │   │   ├── configure/                # Configuration guides

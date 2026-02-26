@@ -59,7 +59,7 @@ testorigin-20190416223046.sig.key
 When you create an origin, Chef Habitat On-prem Builder automatically generates an origin key pair and saves both keys. To view an origin's keys on Chef Habitat On-prem Builder, navigate to the origin and select **Keys**.
 Anyone can view and download an origin's public keys, but only origin owners and administrators can view or download an origin private key, or change the origin key pair.
 
-![Viewing your origin keys](/images/habitat/origin-keys.png)
+![Viewing your origin keys](/images/habitat/on_prem_builder/origin-keys.png)
 
 ### Download origin keys
 

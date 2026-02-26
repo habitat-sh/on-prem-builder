@@ -38,4 +38,4 @@ Follow these guidelines for filesystem storage:
 - Chef Habitat On-Prem Builder needs substantial storage space for packages. Make sure your filesystem has enough free space.
 - By default, Chef Habitat On-Prem Builder stores package artifacts in a MinIO instance, typically at `/hab/svc/builder-minio/data`.
 - If you need more storage, create a mount at `/hab` and point it to your external storage. This isn't required if you already have enough free space.
-- To use Artifactory instead of MinIO for object storage, see the [Habitat On-Prem Builder and Artifactory](/habitat/on_prem_builder/configure/artifactory/) documentation.
+- To use Artifactory instead of MinIO for object storage, see the [Habitat On-Prem Builder and Artifactory](/habitat/builder/on_prem/configure/artifactory/) documentation.
