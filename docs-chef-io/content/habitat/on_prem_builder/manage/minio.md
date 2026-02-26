@@ -4,8 +4,8 @@ title = "Manage your MinIO artifact store"
 [menu]
   [menu.habitat]
     title = "MinIO"
-    identifier = "habitat/on-prem-builder/manage/minio"
-    parent = "habitat/on-prem-builder/manage"
+    identifier = "habitat/builder/on-prem/manage/minio"
+    parent = "habitat/builder/on-prem/manage"
     weight = 20
 +++
 

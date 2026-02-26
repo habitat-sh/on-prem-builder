@@ -4,8 +4,8 @@ title = "Separate Habitat Builder's backend services onto separate nodes"
 [menu]
   [menu.habitat]
     title = "Separate backend services"
-    identifier = "habitat/on-prem-builder/configure/Separating backend services"
-    parent = "habitat/on-prem-builder/configure"
+    identifier = "habitat/builder/on-prem/configure/Separating backend services"
+    parent = "habitat/builder/on-prem/configure"
     weight = 60
 +++
 

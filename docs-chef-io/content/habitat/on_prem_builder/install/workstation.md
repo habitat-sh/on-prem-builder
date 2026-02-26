@@ -4,8 +4,8 @@ title = "Connect your workstation to your Chef Habitat On-Prem Builder deploymen
 [menu]
   [menu.habitat]
     title = "Connect your workstation to Builder"
-    identifier = "habitat/on-prem-builder/install/workstation"
-    parent = "habitat/on-prem-builder/install"
+    identifier = "habitat/builder/on-prem/install/workstation"
+    parent = "habitat/builder/on-prem/install"
     weight = 50
 
 +++

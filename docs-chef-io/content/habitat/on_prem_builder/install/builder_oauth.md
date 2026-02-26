@@ -4,8 +4,8 @@ title = "Install Chef Habitat On-Prem Builder with OAuth services"
 [menu]
   [menu.habitat]
     title = "Install Builder"
-    identifier = "habitat/on-prem-builder/install/o-auth"
-    parent = "habitat/on-prem-builder/install"
+    identifier = "habitat/builder/on-prem/install/o-auth"
+    parent = "habitat/builder/on-prem/install"
     weight = 40
 +++
 

@@ -4,8 +4,8 @@ title = "Manage Habitat packages in Habitat On-Prem Builder"
 [menu]
   [menu.habitat]
     title = "Overview"
-    identifier = "habitat/on-prem-builder/packages/overview"
-    parent = "habitat/on-prem-builder/packages"
+    identifier = "habitat/builder/on-prem/packages/overview"
+    parent = "habitat/builder/on-prem/packages"
     weight = 10
 +++
 

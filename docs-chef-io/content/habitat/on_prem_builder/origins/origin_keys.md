@@ -4,8 +4,8 @@ title = "Habitat origin keys"
 [menu]
   [menu.habitat]
     title = "Origin keys"
-    identifier = "habitat/on-prem-builder/origins/keys"
-    parent = "habitat/on-prem-builder/origins"
+    identifier = "habitat/builder/on-prem/origins/keys"
+    parent = "habitat/builder/on-prem/origins"
     weight = 30
 +++
 

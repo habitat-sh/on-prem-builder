@@ -1,5 +1,9 @@
 +++
 title = "About Chef Habitat On-Prem Builder"
+description = "Chef Habitat Builder is Chef's Application Delivery Enterprise hub"
+linkTitle = "Habitat On-Prem Builder"
+summary = "Host and manage packages within your organization's infrastructure"
+
 
 [cascade]
   [cascade.params]
@@ -9,8 +13,8 @@ title = "About Chef Habitat On-Prem Builder"
 [menu]
   [menu.habitat]
     title = "About On-Prem Builder"
-    identifier = "habitat/on-prem-builder/overview"
-    parent = "habitat/on-prem-builder"
+    identifier = "habitat/builder/on-prem/overview"
+    parent = "habitat/builder/on-prem"
     weight = 10
 +++
 

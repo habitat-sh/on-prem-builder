@@ -4,8 +4,8 @@ title = "Configure origin membership and role-based access control"
 [menu]
   [menu.habitat]
     title = "Origin membership and RBAC"
-    identifier = "habitat/on-prem-builder/origins/rbac"
-    parent = "habitat/on-prem-builder/origins"
+    identifier = "habitat/builder/on-prem/origins/rbac"
+    parent = "habitat/builder/on-prem/origins"
     weight = 50
 +++
 

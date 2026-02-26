@@ -4,8 +4,8 @@ title = "Scale frontend Habitat Builder nodes"
 [menu]
   [menu.habitat]
     title = "Scale Builder frontend"
-    identifier = "habitat/on-prem-builder/configure/frontend scaling"
-    parent = "habitat/on-prem-builder/configure"
+    identifier = "habitat/builder/on-prem/configure/frontend scaling"
+    parent = "habitat/builder/on-prem/configure"
     weight = 50
 +++
 

@@ -4,8 +4,8 @@ title = "Manage Habitat Builder data stored by PostgreSQL"
 [menu]
   [menu.habitat]
     title = "PostgreSQL"
-    identifier = "habitat/on-prem-builder/manage/PostgreSQL"
-    parent = "habitat/on-prem-builder/manage"
+    identifier = "habitat/builder/on-prem/manage/PostgreSQL"
+    parent = "habitat/builder/on-prem/manage"
     weight = 30
 +++
 

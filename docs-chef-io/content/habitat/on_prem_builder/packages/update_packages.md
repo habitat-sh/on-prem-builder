@@ -4,8 +4,8 @@ title = "Update packages on Habitat Builder"
 [menu]
   [menu.habitat]
     title = "Update packages"
-    identifier = "habitat/on-prem-builder/packages/update"
-    parent = "habitat/on-prem-builder/packages"
+    identifier = "habitat/builder/on-prem/packages/update"
+    parent = "habitat/builder/on-prem/packages"
     weight = 30
 +++
 

@@ -4,8 +4,8 @@ title = "Use Artifactory as a Habitat package artifact store"
 [menu]
   [menu.habitat]
     title = "Use Artifactory as a package artifact store"
-    identifier = "habitat/on-prem-builder/configure/artifactory"
-    parent = "habitat/on-prem-builder/configure"
+    identifier = "habitat/builder/on-prem/configure/artifactory"
+    parent = "habitat/builder/on-prem/configure"
     weight = 30
 +++
 

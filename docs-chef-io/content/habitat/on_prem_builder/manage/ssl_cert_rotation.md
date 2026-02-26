@@ -3,8 +3,8 @@ title = "Rotate Habitat Builder's SSL certificates"
 
 [menu.habitat]
   title = "Rotate SSL certs"
-  identifier = "habitat/on-prem-builder/manage/SSL certs"
-  parent = "habitat/on-prem-builder/manage"
+  identifier = "habitat/builder/on-prem/manage/SSL certs"
+  parent = "habitat/builder/on-prem/manage"
   weight = 40
 +++
 
