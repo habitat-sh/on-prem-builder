@@ -89,7 +89,7 @@ With an internet-connected computer, follow these steps:
     curl -LO https://github.com/habitat-sh/on-prem-builder/archive/master.zip
     ```
 
-1. Download the Chef Habitat [CLI tool](https://packages.chef.io/files/stable/habitat/latest/hab-x86_64-linux.tar.gz):
+1. Download the Chef Habitat [CLI tool]:
 
     ```bash
     curl -Lo hab.tar.gz "https://chefdownload-community.chef.io/stable/habitat/download?p=<PLATFORM>&pv=<PLATFORM_VERSION>&m=<ARCHITECTURE>&license_id=<LICENSE_ID>"
@@ -97,9 +97,9 @@ With an internet-connected computer, follow these steps:
 
 Or if you're a commercial user:
 
-```bash
-    curl -Lo hab.tar.gz "https://chefdownload-commercial.chef.io/stable/habitat/download?p=<PLATFORM>&pv=<PLATFORM_VERSION>&m=<ARCHITECTURE>&license_id=<LICENSE_ID>"
-    ```
+    ```bash
+        curl -Lo hab.tar.gz "https://chefdownload-commercial.chef.io/stable/habitat/download?p=<PLATFORM>&pv=<PLATFORM_VERSION>&m=<ARCHITECTURE>&license_id=<LICENSE_ID>"
+        ```
 
 1. Create the Habitat Builder package bundle from the Builder seed lists and download the packages:
 
