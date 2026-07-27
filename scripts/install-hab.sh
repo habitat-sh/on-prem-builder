@@ -9,8 +9,9 @@ install_hab() {
 
 install_deps() {
   hab pkg path core/cacerts >/dev/null 2>&1 || hab pkg install core/cacerts
-  hab pkg path core/hab-sup >/dev/null 2>&1 || hab pkg install core/hab-sup
+  hab pkg path chef/hab-sup >/dev/null 2>&1 || hab pkg install chef/hab-sup
 }
 
+hab pkg path chef/hab >/dev/null 2>&1 || install_hab
 type hab > /dev/null 2>&1 || install_hab
 install_deps

@@ -33,9 +33,9 @@ func (pl *PackageList) Set(s string) error {
 		pl.Kind = PackageListBuilder
 		pl.List = map[string][]string{
 			"x86_64-linux": []string{
-				"core/hab",
-				"core/hab-sup",
-				"core/hab-launcher",
+				"chef/hab",
+				"chef/hab-sup",
+				"chef/hab-launcher",
 				"habitat/builder-minio",
 				"habitat/builder-memcached",
 				"habitat/builder-datastore",
@@ -48,22 +48,22 @@ func (pl *PackageList) Set(s string) error {
 		pl.Kind = PackageListHabitat
 		pl.List = map[string][]string{
 			"x86_64-linux": []string{
-				"core/hab-studio",
-				"core/hab",
-				"core/hab-sup",
-				"core/hab-launcher",
-				"core/hab-pkg-export-container",
-				"core/hab-pkg-export-tar",
+				"chef/hab-studio",
+				"chef/hab",
+				"chef/hab-sup",
+				"chef/hab-launcher",
+				"chef/hab-pkg-export-container",
+				"chef/hab-pkg-export-tar",
 			},
 			"x86_64-windows": []string{
-				"core/hab-studio",
-				"core/hab-plan-build-ps1",
-				"core/windows-service",
-				"core/hab",
-				"core/hab-sup",
-				"core/hab-launcher",
-				"core/hab-pkg-export-container",
-				"core/hab-pkg-export-tar",
+				"chef/hab-studio",
+				"chef/hab-plan-build-ps1",
+				"chef/windows-service",
+				"chef/hab",
+				"chef/hab-sup",
+				"chef/hab-launcher",
+				"chef/hab-pkg-export-container",
+				"chef/hab-pkg-export-tar",
 			},
 		}
 		return nil
