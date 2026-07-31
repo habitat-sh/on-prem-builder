@@ -98,7 +98,7 @@ With an internet-connected computer, follow these steps:
 1. Install the Chef Habitat CLI:
 
     ```bash
-    curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh | sudo -E bash
+    curl https://raw.githubusercontent.com/habitat-sh/habitat/main/components/hab/install.sh | sudo -E bash
     ```
 
 1. Create a Habitat Builder package bundle:

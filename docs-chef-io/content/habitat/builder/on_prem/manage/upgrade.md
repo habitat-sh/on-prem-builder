@@ -20,7 +20,7 @@ The uninstall script doesn't remove user data, so you can uninstall and reinstal
 
 {{< warning >}}
 
-Special care must be taken when upgrading Chef Habitat On-Prem Builder to a version dated **20260728** or later from an earlier version. This release includes major version upgrades of Minio and PostgreSQL. If your on-prem deployment includes `builder-minio` or `builder-datastore`, installing the newer package versions will trigger an automatic data migration, which can take several minutes to complete. Customers who run their own external PostgreSQL or S3-compliant storage do not need to worry about this migration.
+Special care must be taken when upgrading Chef Habitat On-Prem Builder to a version dated **20260728** or later from an earlier version. This release includes major version upgrades of MinIO and PostgreSQL. If your on-prem deployment includes `builder-minio` or `builder-datastore`, installing the newer package versions will trigger an automatic data migration, which can take several minutes to complete. Customers who run their own external PostgreSQL or S3-compliant storage do not need to worry about this migration.
 
 Before upgrading, be sure to:
 
@@ -48,7 +48,7 @@ To upgrade Chef Habitat On-Prem Builder, follow these steps:
 
 ## Rolling back an upgrade
 
-If an upgrade to a version dated 20260728 or later fails, and you backed up your `/hab/svc` directory beforehand, you can roll back to the latest on-prem version prior to 20260728:
+If an upgrade to a version dated **20260728** or later fails, and you backed up your `/hab/svc` directory beforehand, you can roll back to the latest on-prem version prior to **20260728**:
 
 1. Uninstall all Habitat Builder services by running the [uninstall script](https://github.com/habitat-sh/on-prem-builder/blob/main/uninstall.sh):
 
