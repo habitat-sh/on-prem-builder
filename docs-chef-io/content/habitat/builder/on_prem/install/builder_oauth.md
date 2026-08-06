@@ -20,7 +20,7 @@ Before you begin, review [Habitat Builder's system requirements](system_requirem
 Chef Habitat On-Prem Builder supports Azure AD (OpenID Connect), GitHub, GitLab (OpenID Connect), Okta (OpenID Connect), and Atlassian Bitbucket (cloud) OAuth providers for authentication.
 You need to set up an OAuth application for your Chef Habitat On-Prem Builder instance.
 
-Before you begin, refer to the for the OAuth provider that you plan to use:
+Before you begin, refer to the documentation for the OAuth provider that you plan to use:
 
 - [Azure Active Directory](https://docs.microsoft.com/azure/active-directory/develop/active-directory-protocols-oauth-code)
 - [GitHub](https://developer.github.com/apps/building-oauth-apps/authorization-options-for-oauth-apps/)
