@@ -41,8 +41,8 @@ fi
 if [[ "$response" =~ ^([yY][eE][sS]|[yY])+$ ]]; then
   pushd scripts >/dev/null || exit
   export HAB_LICENSE=accept
-  sudo ./install-hab.sh
   check_envfile
+  sudo ./install-hab.sh
   sudo ./hab-sup.service.sh
   sudo ./provision.sh "$@"
   popd >/dev/null || exit
