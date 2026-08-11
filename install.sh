@@ -4,7 +4,7 @@ umask 0022
 
 sudo() {
   # the -E pulls in environment variables like HAB_LICENSE
-  [[ $EUID = 0 ]] || set -- command sudo -E "$@"
+  [[ $EUID = 0 ]] || set -- command sudo HAB_AUTH_TOKEN=${HAB_AUTH_TOKEN} HAB_LICENSE=${HAB_LICENSE} "$@"
   "$@"
 }
 

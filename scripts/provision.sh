@@ -6,8 +6,21 @@ umask 0022
 # Defaults
 BLDR_ORIGIN=${BLDR_ORIGIN:="habitat"}
 
+check_envfile() {
+  if [ -f ../bldr.env ]; then
+    # shellcheck disable=SC1091
+    source ../bldr.env
+  elif [ -f /vagrant/bldr.env ]; then
+    # shellcheck disable=SC1091
+    source /vagrant/bldr.env
+  else
+    echo "ERROR: bldr.env file is missing!"
+    exit 1
+  fi
+}
+
 sudo() {
-  [[ $EUID = 0 ]] || set -- command sudo -E "$@"
+  [[ $EUID = 0 ]] || set -- command sudo HAB_AUTH_TOKEN=${HAB_AUTH_TOKEN} HAB_LICENSE=${HAB_LICENSE} "$@"
   "$@"
 }
 
@@ -431,6 +444,7 @@ install_options() {
   fi
 }
 
+check_envfile
 if [ "$#" -eq 0 ]; then
   start_init
   start_builder
