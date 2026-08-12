@@ -8,28 +8,54 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
 
 sudo() {
   if [[ $EUID = 0 ]]; then
-    command sudo "$@"
+    # Already root: no privilege escalation needed, and calling sudo here is
+    # both unnecessary and would fail on systems without sudo installed.
+    "$@"
     return
   fi
 
   # Newer sudo defaults (e.g. Ubuntu 26.04) no longer support "-E", and many
   # sudoers configs disable the SETENV tag, which is what `sudo VAR=val cmd`
-  # relies on. Forwarding the variables as arguments to `env` instead avoids
-  # needing any special sudo privilege, since sudo just sees "env" as the
-  # command being run and the assignments as plain arguments to it. This also
-  # forwards everything scripts/hab-sup.service.sh and scripts/provision.sh
-  # need (proxy settings, HAB_BLDR_URL/PEER_ARG), not just the auth token and
-  # license.
-  local -a forward_env=()
+  # relies on. We also must not pass secrets like HAB_AUTH_TOKEN as `sudo`/
+  # command arguments, since argv is visible to other local users via `ps`.
+  # Instead, write the variables to a temp file that only the owner (and
+  # root) can read, have the root-side shell source it, delete it, and then
+  # exec the real command. This forwards everything scripts/hab-sup.service.sh
+  # and scripts/provision.sh need (proxy settings, HAB_BLDR_URL/PEER_ARG),
+  # not just the auth token and license.
+  local -a forward_vars=()
   local var
   for var in HAB_AUTH_TOKEN HAB_LICENSE HAB_BLDR_URL HAB_BLDR_PEER_ARG \
     HTTP_PROXY HTTPS_PROXY NO_PROXY http_proxy https_proxy no_proxy \
     SSL_CERT_FILE; do
     if [[ -n "${!var:-}" ]]; then
-      forward_env+=("${var}=${!var}")
+      forward_vars+=("$var")
     fi
   done
-  command sudo env "${forward_env[@]}" "$@"
+
+  if [[ ${#forward_vars[@]} -eq 0 ]]; then
+    command sudo "$@"
+    return
+  fi
+
+  local envfile status
+  envfile="$(mktemp)"
+  chmod 600 "$envfile"
+  for var in "${forward_vars[@]}"; do
+    printf '%s=%q\n' "$var" "${!var}"
+  done >"$envfile"
+
+  command sudo bash -c '
+    set -a
+    # shellcheck disable=SC1090
+    source "$1"
+    rm -f "$1"
+    shift
+    exec "$@"
+  ' _ "$envfile" "$@"
+  status=$?
+  rm -f "$envfile"
+  return $status
 }
 
 check_envfile() {
