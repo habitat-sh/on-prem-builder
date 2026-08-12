@@ -2,6 +2,10 @@
 
 umask 0022
 
+# Resolve paths relative to this script's location (not $PWD) so
+# check_envfile works regardless of the caller's current directory.
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
+
 sudo() {
   if [[ $EUID = 0 ]]; then
     command sudo "$@"
@@ -29,9 +33,9 @@ sudo() {
 }
 
 check_envfile() {
-  if [ -f ../bldr.env ]; then
+  if [ -f "${SCRIPT_DIR}/bldr.env" ]; then
     # shellcheck disable=SC1091
-    source ../bldr.env
+    source "${SCRIPT_DIR}/bldr.env"
   elif [ -f /vagrant/bldr.env ]; then
     # shellcheck disable=SC1091
     source /vagrant/bldr.env
