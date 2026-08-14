@@ -87,3 +87,15 @@ If an upgrade to a version dated **20260728** or later fails, and you backed up 
     ```shell
     ./install.sh
     ```
+
+1. Binlink Habitat 1.6:
+
+    ```shell
+    sudo hab pkg install core/hab --channel stable -bf
+    ```
+
+1. Restart the `hab-sup` systemd service:
+
+    ```shell
+    sudo systemctl restart hab-sup
+    ```
