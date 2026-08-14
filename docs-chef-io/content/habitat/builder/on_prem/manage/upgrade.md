@@ -46,6 +46,28 @@ To upgrade Chef Habitat On-Prem Builder, follow these steps:
     ./install.sh
     ```
 
+{{< note >}}
+
+Services may still be unavailable for a few minutes after `install.sh` completes, particularly when a data migration is triggered for `builder-minio` or `builder-datastore`. Follow the supervisor log to monitor progress:
+
+```shell
+journalctl -fu hab-sup
+```
+
+While the migration runs, it is common to see a large number of entries similar to:
+
+```
+Aug 14 15:11:58 ip-172-31-38-141 hab[121787]: [3.4K blob data]
+```
+
+The migration is typically finished once you see a final entry like:
+
+```
+Aug 14 15:12:14 ip-172-31-38-141 hab[121787]: builder-minio.default hook[post-run]:(HK): Minio bucket is up to date.
+```
+
+{{< /note >}}
+
 ## Rolling back an upgrade
 
 If an upgrade to a version dated **20260728** or later fails, and you backed up your `/hab/svc` directory beforehand, you can roll back to the latest on-prem version prior to **20260728**:
