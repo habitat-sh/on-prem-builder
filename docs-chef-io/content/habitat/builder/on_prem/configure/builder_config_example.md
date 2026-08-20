@@ -23,7 +23,7 @@ Also, see the [`bldr.env.sample` file](https://github.com/habitat-sh/on-prem-bui
 #export PG_PASSWORD=hab
 
 # The endpoint and port for your Postgresql(local, RDS, Azure Database for PostgreSql etc)
-# Change only if needed 
+# Change only if needed
 export POSTGRES_HOST=localhost
 export POSTGRES_PORT=5432
 

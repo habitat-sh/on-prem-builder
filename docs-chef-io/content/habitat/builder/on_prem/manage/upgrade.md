@@ -18,17 +18,25 @@ The uninstall script doesn't remove user data, so you can uninstall and reinstal
 
 {{< /note >}}
 
-{{< warning >}}
+## Before you begin
 
-Special care must be taken when upgrading Chef Habitat On-Prem Builder to a version dated **20260728** or later from an earlier version. This release includes major version upgrades of MinIO and PostgreSQL. If your on-prem deployment includes `builder-minio` or `builder-datastore`, installing the newer package versions will trigger an automatic data migration, which can take several minutes to complete. Customers who run their own external PostgreSQL or S3-compliant storage do not need to worry about this migration.
+Before upgrading, follow these steps:
 
-Before upgrading, be sure to:
+1. If you're upgrading to a Habitat Builder version dated **20260728** or later from an earlier version and you're using MinIO and PostgreSQL to store data, back up your `/hab/svc` directory prior to upgrading.
 
-- Use a freshly cloned copy of the [`habitat-sh/on-prem-builder`](https://github.com/habitat-sh/on-prem-builder) repository.
-- Confirm your `bldr.env` file includes a valid `HAB_AUTH_TOKEN` and that `BLDR_CHANNEL` is set to `on-prem-base`. See [`bldr.env.sample`](https://github.com/habitat-sh/on-prem-builder/blob/main/bldr.env.sample) for an example.
-- Back up your `/hab/svc` directory prior to upgrading `builder-minio` or `builder-datastore`, so you can restore it and roll back in case the upgrade fails.
+    This release includes major version upgrades of MinIO and PostgreSQL and upgrading to this release triggers an automatic data migration, which can take several minutes to complete.
 
-{{< /warning >}}
+    If the upgrade fails, you can restore your backed-up data and roll back to an earlier Habitat Builder version.
+
+    If you store data on your own external PostgreSQL or S3-compliant storage, then you don't need to worry about upgrading the MinIO or PostgreSQL packages installed with Habitat Builder.
+
+1. Clone a fresh copy of the [`habitat-sh/on-prem-builder`](https://github.com/habitat-sh/on-prem-builder) repository.
+
+1. Confirm your `bldr.env` file includes a valid `HAB_AUTH_TOKEN` and `BLDR_CHANNEL` is set to `on-prem-base`.
+
+    See the [`bldr.env.sample`](https://github.com/habitat-sh/on-prem-builder/blob/main/bldr.env.sample) file for an example.
+
+## Upgrade Chef Habitat On-Prem Builder
 
 To upgrade Chef Habitat On-Prem Builder, follow these steps:
 
@@ -46,29 +54,26 @@ To upgrade Chef Habitat On-Prem Builder, follow these steps:
     ./install.sh
     ```
 
-{{< note >}}
+1. Optional: Services may still be unavailable for a few minutes after `install.sh` completes, particularly when a data migration is triggered for `builder-minio` or `builder-datastore`.
+   Follow the supervisor log to monitor progress:
 
-Services may still be unavailable for a few minutes after `install.sh` completes, particularly when a data migration is triggered for `builder-minio` or `builder-datastore`. Follow the supervisor log to monitor progress:
+    ```shell
+    journalctl -fu hab-sup
+    ```
 
-```shell
-journalctl -fu hab-sup
-```
+    While the migration runs, it is common to see a large number of entries similar to:
 
-While the migration runs, it is common to see a large number of entries similar to:
+    ```shell
+    Aug 14 15:11:58 ip-172-31-38-141 hab[121787]: [3.4K blob data]
+    ```
 
-```
-Aug 14 15:11:58 ip-172-31-38-141 hab[121787]: [3.4K blob data]
-```
+    The migration is typically finished once you see a final entry like:
 
-The migration is typically finished once you see a final entry like:
+    ```shell
+    Aug 14 15:12:14 ip-172-31-38-141 hab[121787]: builder-minio.default hook[post-run]:(HK): Minio bucket is up to date.
+    ```
 
-```
-Aug 14 15:12:14 ip-172-31-38-141 hab[121787]: builder-minio.default hook[post-run]:(HK): Minio bucket is up to date.
-```
-
-{{< /note >}}
-
-## Rolling back an upgrade
+## Roll back an upgrade
 
 If an upgrade to a version dated **20260728** or later fails, and you backed up your `/hab/svc` directory beforehand, you can roll back to the latest on-prem version prior to **20260728**:
 
@@ -80,7 +85,7 @@ If an upgrade to a version dated **20260728** or later fails, and you backed up 
 
 1. Restore your backed up `/hab/svc` directory.
 
-1. In your `bldr.env` file, point `BLDR_CHANNEL` to `on-prem-stable`.
+1. In your `bldr.env` file, set `BLDR_CHANNEL` to `on-prem-stable`.
 
 1. Reinstall the services by running the [`install.sh` script](https://github.com/habitat-sh/on-prem-builder/blob/main/install.sh):
 
@@ -88,7 +93,7 @@ If an upgrade to a version dated **20260728** or later fails, and you backed up 
     ./install.sh
     ```
 
-1. Binlink Habitat 1.6:
+1. Binlink Chef Habitat version 1.6:
 
     ```shell
     sudo hab pkg install core/hab --channel stable -bf

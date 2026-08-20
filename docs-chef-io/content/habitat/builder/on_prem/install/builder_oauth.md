@@ -92,7 +92,7 @@ With an internet-connected computer, follow these steps:
 1. Export your Chef Habitat Builder auth token:
 
     ```shell
-    export HAB_AUTH_TOKEN=<your-token>
+    export HAB_AUTH_TOKEN=<AUTH_TOKEN>
     ```
 
 1. Install the Chef Habitat CLI:
