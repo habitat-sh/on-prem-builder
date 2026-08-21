@@ -20,27 +20,23 @@ The uninstall script doesn't remove user data, so you can uninstall and reinstal
 
 ## Before you begin
 
-Before upgrading, follow these steps:
+If you're upgrading to a Habitat Builder version dated **20260728** or later from an earlier version and you're using MinIO and PostgreSQL to store data, back up your `/hab/svc` directory prior to upgrading.
 
-1. If you're upgrading to a Habitat Builder version dated **20260728** or later from an earlier version and you're using MinIO and PostgreSQL to store data, back up your `/hab/svc` directory prior to upgrading.
+This release includes major version upgrades of MinIO and PostgreSQL and upgrading to this release triggers an automatic data migration, which can take several minutes to complete.
 
-    This release includes major version upgrades of MinIO and PostgreSQL and upgrading to this release triggers an automatic data migration, which can take several minutes to complete.
+If the upgrade fails, you can restore your backed-up data and roll back to an earlier Habitat Builder version.
 
-    If the upgrade fails, you can restore your backed-up data and roll back to an earlier Habitat Builder version.
-
-    If you store data on your own external PostgreSQL or S3-compliant storage, then you don't need to worry about upgrading the MinIO or PostgreSQL packages installed with Habitat Builder.
-
-1. Clone a fresh copy of the [`habitat-sh/on-prem-builder`](https://github.com/habitat-sh/on-prem-builder) repository.
-
-1. Confirm your `bldr.env` file includes a valid `HAB_AUTH_TOKEN` and `BLDR_CHANNEL` is set to `on-prem-base`.
-
-    See the [`bldr.env.sample`](https://github.com/habitat-sh/on-prem-builder/blob/main/bldr.env.sample) file for an example.
+If you store data on your own external PostgreSQL or S3-compliant storage, then you don't need to worry about upgrading the MinIO or PostgreSQL packages installed with Habitat Builder.
 
 ## Upgrade Chef Habitat On-Prem Builder
 
 To upgrade Chef Habitat On-Prem Builder, follow these steps:
 
-1. Clone the [`habitat-sh/on-prem-builder`](https://github.com/habitat-sh/on-prem-builder) repository on the computer running Habitat On-Prem Builder.
+1. Clone a fresh copy of the [`habitat-sh/on-prem-builder`](https://github.com/habitat-sh/on-prem-builder) repository on the computer running Habitat On-Prem Builder.
+
+1. Confirm your `bldr.env` file has a valid `HAB_AUTH_TOKEN` and set `BLDR_CHANNEL` to `on-prem-base`.
+
+    See the [`bldr.env.sample`](https://github.com/habitat-sh/on-prem-builder/blob/main/bldr.env.sample) file for an example.
 
 1. Uninstall all Habitat Builder services by running the [uninstall script](https://github.com/habitat-sh/on-prem-builder/blob/main/uninstall.sh):
 
@@ -54,8 +50,9 @@ To upgrade Chef Habitat On-Prem Builder, follow these steps:
     ./install.sh
     ```
 
-1. Optional: Services may still be unavailable for a few minutes after `install.sh` completes, particularly when a data migration is triggered for `builder-minio` or `builder-datastore`.
-   Follow the supervisor log to monitor progress:
+1. Optional: Follow the supervisor logs to monitor the migration progress. Services may be unavailable for a few minutes after `install.sh` completes, particularly when a data migration is triggered when updating `builder-minio` or `builder-datastore`.
+
+    To follow the logs, run the following command:
 
     ```shell
     journalctl -fu hab-sup
