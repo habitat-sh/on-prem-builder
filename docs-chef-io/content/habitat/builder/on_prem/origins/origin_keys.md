@@ -113,7 +113,7 @@ When you create an origin in Chef Habitat On-prem Builder, Builder automatically
 
 The Chef Habitat CLI creates origin key pairs through two different commands, for two different uses:
 
-- Use [`hab setup`](/habitat/2.1/install/hab_setup/) to generate your first origin key pair as part of setting up the `hab` CLI.
+- Use [`hab setup`](/habitat/latest/install/hab_setup/) to generate your first origin key pair as part of setting up the `hab` CLI.
 - Use the `hab origin key generate` command to create a key pair for an origin created with the `hab origin create` command
 
 To create an origin key with the `hab` CLI, run the [`hab origin key generate` command](/habitat/habitat_cli/#hab-origin-key-generate):
