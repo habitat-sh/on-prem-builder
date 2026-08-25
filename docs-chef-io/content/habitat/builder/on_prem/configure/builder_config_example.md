@@ -15,26 +15,26 @@ Also, see the [`bldr.env.sample` file](https://github.com/habitat-sh/on-prem-bui
 ```shell
 #!/bin/bash
 
-# Only enable and set these if you are using externally hosted PostgreSQL(RDS, Azure Database for PostgreSql etc).
+# Only enable and set these if you are using externally hosted PostgreSQL (RDS, Azure Database for PostgreSQL etc).
 # set PG_EXT_ENABLED = true, uncomment PG_USER and update PG_PASSWORD and POSTGRES_HOST appropriately.
 # Migrations from local PostgreSQL to RDS are currently not supported.
 #export PG_EXT_ENABLED=false
 #export PG_USER=hab
 #export PG_PASSWORD=hab
 
-# The endpoint and port for your Postgresql(local, RDS, Azure Database for PostgreSql etc)
+# The endpoint and port for your PostgreSQL (local, RDS, Azure Database for PostgreSQL etc)
 # Change only if needed
 export POSTGRES_HOST=localhost
 export POSTGRES_PORT=5432
 
-# The endpoint, key and secret for your Minio instance (see README)
+# The endpoint, key and secret for your MinIO instance (see README)
 # Change these before the first install if needed
 export MINIO_ENDPOINT=http://localhost:9000
 export MINIO_BUCKET=habitat-builder-artifact-store.local
 export MINIO_ACCESS_KEY=depot
 export MINIO_SECRET_KEY=password
 
-# If you'd like to use AWS S3 instead of Minio,
+# If you'd like to use AWS S3 instead of MinIO,
 # set S3_ENABLED=true and change the other S3 associated variables appropriately.
 export S3_ENABLED=false
 export S3_REGION=us-west-2
@@ -42,7 +42,7 @@ export S3_BUCKET=habitat-builder-artifact-store.local
 export S3_ACCESS_KEY=depotaccesskey
 export S3_SECRET_KEY=depotsecretkey
 
-# If you'd like to use Artifactory instead of Minio, uncomment
+# If you'd like to use Artifactory instead of MinIO, uncomment
 # and set the following variables appropriately.
 # IMPORTANT: See the README for more info
 # export ARTIFACTORY_ENABLED=true
