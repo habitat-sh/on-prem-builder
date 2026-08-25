@@ -56,7 +56,7 @@ The documentation for On-Prem Builder is located in the [on-prem-docs](docs-chef
 
 #### Reference
 
-1. [Example builder.env](docs-chef-io/content/habitat/builder/on_prem/configure/builder_config_example.md)
+1. [Example bldr.env](docs-chef-io/content/habitat/builder/on_prem/configure/builder_config_example.md)
 2. [Logging](docs-chef-io/content/habitat/builder/on_prem/configure/logs.md)
 3. [Troubleshooting](docs-chef-io/content/habitat/builder/on_prem/troubleshooting.md)
 

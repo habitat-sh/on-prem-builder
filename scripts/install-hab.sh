@@ -4,7 +4,7 @@ set -euo pipefail
 
 install_hab() {
   type curl >/dev/null 2>&1 || { echo >&2 "curl is required for installation of habitat, but was not found. Exiting."; exit 1; }
-  curl -fsSL https://raw.githubusercontent.com/habitat-sh/habitat/main/components/hab/install.sh | bash -s -- -v 1.6.1245
+  curl -fsSL https://raw.githubusercontent.com/habitat-sh/habitat/main/components/hab/install.sh | bash
 }
 
 install_deps() {
